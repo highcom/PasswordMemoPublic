@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_search_view"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always"
+        android:visible="true"
+        android:title="Search Bar" />
+    <item android:id="@+id/edit_mode" android:title="@string/edit_mode"></item>
+    <group android:id="@+id/sort_group" >
+        <item android:id="@+id/sort_operation" android:title="@string/sort_operation"
+            app:showAsAction="never">
+            <menu>
+                <item android:id="@+id/sort_default" android:title="@string/sort_default"></item>
+                <item android:id="@+id/sort_title" android:title="@string/sort_title"></item>
+                <item android:id="@+id/sort_update" android:title="@string/sort_update"></item>
+            </menu>
+        </item>
+    </group>
+    <item android:id="@+id/select_group" android:title="@string/select_group"></item>
+    <item android:id="@+id/setting_menu" android:title="@string/setting_menu"></item>
+</menu>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rowLinearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="45dp"
+    android:orientation="horizontal"
+    android:weightSum="1">
+
+    <ImageButton
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="10dp"
+        android:focusableInTouchMode="false"
+        android:adjustViewBounds="true"
+        android:background="@null"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_round_key"
+        android:id="@+id/round_key_icon" />
+
+    <LinearLayout
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:textColor="@android:color/black"
+            android:text="TextView"
+            android:textSize="15dp" />
+
+        <TextView
+            android:layout_weight="1"
+            android:id="@+id/memoView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:singleLine="true"
+            android:text=""
+            android:visibility="gone"
+            android:textSize="12dp"
+            android:textColor="@color/darkgray" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="10dp"
+        android:gravity="center_vertical|right"
+        android:text="0000/00/00"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="12dp" />
+
+    <ImageButton
+        android:layout_width="35dp"
+        android:layout_height="match_parent"
+        android:focusableInTouchMode="false"
+        android:visibility="gone"
+        android:layout_margin="10dp"
+        android:adjustViewBounds="true"
+        android:background="@null"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_baseline_drag_handle_24"
+        android:id="@+id/rearrangebutton" />
+
+</LinearLayout>
