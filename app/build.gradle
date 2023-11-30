@@ -8,8 +8,8 @@ android {
         applicationId "com.highcom.passwordmemo"
         minSdkVersion 19
         targetSdkVersion 33
-        versionCode 37
-        versionName "3.0.3"
+        versionCode 38
+        versionName "3.1.0"
 
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
