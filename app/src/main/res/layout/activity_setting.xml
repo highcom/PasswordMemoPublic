@@ -153,6 +153,41 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textTextVisible" />
 
+        <Switch
+            android:id="@+id/passwordVisibleSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/password_visible_enable"
+            android:textSize="15dp"
+            android:checked="false"
+            android:textColor="@android:color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textTextVisible" />
+
+        <TextView
+            android:id="@+id/textPasswordVisible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/password_visible_enable_message"
+            android:textSize="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/passwordVisibleSwitch" />
+
+        <View
+            android:id="@+id/textPasswordVisible_line"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"
+            android:layout_marginVertical="2dp"
+            android:layout_marginRight="110dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textPasswordVisible" />
+
         <TextView
             android:id="@+id/textSizeView"
             android:layout_width="wrap_content"
@@ -197,7 +232,7 @@
             android:layout_gravity="center_vertical"
             android:gravity="right"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textTextVisible" />
+            app:layout_constraintTop_toBottomOf="@+id/textPasswordVisible" />
 
         <TextView
             android:id="@+id/copyClipboardView"

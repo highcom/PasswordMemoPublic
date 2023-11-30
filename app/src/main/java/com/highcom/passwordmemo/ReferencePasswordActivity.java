@@ -7,6 +7,7 @@ import android.content.ClipboardManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -16,7 +17,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -104,8 +104,10 @@ public class ReferencePasswordActivity extends AppCompatActivity {
             }
         });
 
-        // パスワードをクリックor長押し時の処理
         EditText passwordText = (EditText) findViewById(R.id.editRefPassword);
+        // パスワードの初期表示設定
+        if (loginDataManager.isPasswordVisibleSwitchEnable()) passwordText.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+        // パスワードをクリックor長押し時の処理
         passwordText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -85,6 +85,8 @@
     <string name="display_background_enable_message">Hide the screen and log out after a while</string>
     <string name="memo_visible_enable">Display memo</string>
     <string name="memo_visible_enable_message">Display the memo on password list screen</string>
+    <string name="password_visible_enable">Display password</string>
+    <string name="password_visible_enable_message">Initial display of password field on reference screen</string>
     <string name="text_size">Change text size</string>
     <string name="text_size_message">Change the text size of this app</string>
     <string name="copy_clipboard">How to copy password</string>

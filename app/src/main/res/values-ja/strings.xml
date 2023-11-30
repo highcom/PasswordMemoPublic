@@ -84,7 +84,9 @@
     <string name="display_background_enable">バックグラウンド時の非表示設定</string>
     <string name="display_background_enable_message">画面を非表示にして一定時間経過でログアウト</string>
     <string name="memo_visible_enable">メモの表示</string>
-    <string name="memo_visible_enable_message">パスワード一覧画面にメモ蘭の内容を表示</string>
+    <string name="memo_visible_enable_message">パスワード一覧画面にメモ欄の内容を表示</string>
+    <string name="password_visible_enable">パスワードの表示</string>
+    <string name="password_visible_enable_message">参照画面でのパスワード欄の初期表示設定</string>
     <string name="text_size">テキストサイズ変更</string>
     <string name="text_size_message">このアプリの表示テキストサイズを変更</string>
     <string name="copy_clipboard">パスワードのコピー方法</string>

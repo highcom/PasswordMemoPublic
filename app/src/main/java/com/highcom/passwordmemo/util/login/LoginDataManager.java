@@ -24,6 +24,7 @@ public class LoginDataManager {
     private boolean biometricLoginSwitchEnable;
     private boolean displayBackgroundSwitchEnable;
     private boolean memoVisibleSwitchEnable;
+    private boolean passwordVisibleSwitchEnable;
     private int backgroundColor;
     private float textSize;
     private int copyClipboard;
@@ -49,6 +50,7 @@ public class LoginDataManager {
         biometricLoginSwitchEnable = sharedPref.getBoolean("biometricLoginSwitchEnable", true);
         displayBackgroundSwitchEnable = sharedPref.getBoolean("displayBackgroundSwitchEnable", false);
         memoVisibleSwitchEnable = sharedPref.getBoolean("memoVisibleSwitchEnable", false);
+        passwordVisibleSwitchEnable = sharedPref.getBoolean("passwordVisibleSwitchEnable", false);
         backgroundColor = sharedPref.getInt("backgroundColor", 0);
         textSize = sharedPref.getFloat("textSize", TextSizeUtil.TEXT_SIZE_MEDIUM);
         copyClipboard = sharedPref.getInt("copyClipboard", 0);
@@ -102,6 +104,15 @@ public class LoginDataManager {
 
     public void setMemoVisibleSwitchEnable(boolean b) {
         sharedPref.edit().putBoolean("memoVisibleSwitchEnable", b).apply();
+        updateSetting();
+    }
+
+    public boolean isPasswordVisibleSwitchEnable() {
+        return passwordVisibleSwitchEnable;
+    }
+
+    public void setPasswordVisibleSwitchEnable(boolean b) {
+        sharedPref.edit().putBoolean("passwordVisibleSwitchEnable", b).apply();
         updateSetting();
     }
 

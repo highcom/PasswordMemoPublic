@@ -117,6 +117,16 @@ public class SettingActivity extends AppCompatActivity implements BackgroundColo
             }
         });
 
+        // パスワード表示スイッチ処理
+        Switch passwordVisibleSwitch = (Switch) findViewById(R.id.passwordVisibleSwitch);
+        passwordVisibleSwitch.setChecked(loginDataManager.isPasswordVisibleSwitchEnable());
+        passwordVisibleSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                loginDataManager.setPasswordVisibleSwitchEnable(b);
+            }
+        });
+
         // テキストサイズスピナー処理
         Spinner textSizeSpinner = (Spinner) findViewById(R.id.textSizeSpinner);
         TextSizeUtil textSizeUtil = new TextSizeUtil(getApplicationContext(), this);
@@ -424,6 +434,7 @@ public class SettingActivity extends AppCompatActivity implements BackgroundColo
         ((Switch)findViewById(R.id.biometricLoginSwitch)).setTextSize(TypedValue.COMPLEX_UNIT_DIP, size);
         ((Switch)findViewById(R.id.displayBackgroundSwitch)).setTextSize(TypedValue.COMPLEX_UNIT_DIP, size);
         ((Switch)findViewById(R.id.memoVisibleSwitch)).setTextSize(TypedValue.COMPLEX_UNIT_DIP, size);
+        ((Switch)findViewById(R.id.passwordVisibleSwitch)).setTextSize(TypedValue.COMPLEX_UNIT_DIP, size);
         ((TextView)findViewById(R.id.textSizeView)).setTextSize(TypedValue.COMPLEX_UNIT_DIP, size);
         // テキストサイズ設定のSpinnerは設定不要
         ((TextView)findViewById(R.id.copyClipboardView)).setTextSize(TypedValue.COMPLEX_UNIT_DIP, size);
