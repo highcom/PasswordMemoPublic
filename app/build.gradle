@@ -20,6 +20,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    namespace 'com.highcom.passwordmemo'
     applicationVariants.all { variant ->
         if (variant.buildType.name.equals("release")) {
             // releaseビルドのみ、ファイル名にVesionNameとビルド時間を付与
