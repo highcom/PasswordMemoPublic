@@ -58,7 +58,7 @@ class CryptUtil {
         val secretKeySpec = SecretKeySpec(secretKey.toByteArray(), ALGORITHM)
         val cipher = Cipher.getInstance(MODE)
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, IvParameterSpec(IV.toByteArray()))
-        return cipher.doFinal(values).toString()
+        return String(cipher.doFinal(values))
     }
 
     companion object {
