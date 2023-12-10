@@ -11,10 +11,10 @@ class ListDataManager private constructor(private val context: Context) {
     private var groupId: Long = 1
     val rdb: SQLiteDatabase
     val wdb: SQLiteDatabase
-    private var data: MutableMap<String?, String?>? = null
-    private val dataList: MutableList<Map<String?, String?>>
-    private var groupData: MutableMap<String?, String?>? = null
-    private val groupList: MutableList<Map<String?, String?>>
+    private lateinit var data: MutableMap<String?, String?>
+    val dataList = ArrayList<Map<String?, String?>>()
+    private lateinit var groupData: MutableMap<String?, String?>
+    val groupList: MutableList<Map<String?, String?>>
     private var sortKey: String?
 
     init {
@@ -25,7 +25,6 @@ class ListDataManager private constructor(private val context: Context) {
         wdb = helper.getWritableDatabase(context.getString(R.string.db_secret_key))
         rdb = helper.getReadableDatabase(context.getString(R.string.db_secret_key))
         val cur = cursor
-        dataList = ArrayList()
         var mov = cur.moveToFirst()
         while (mov) {
             data = HashMap()
@@ -205,7 +204,7 @@ class ListDataManager private constructor(private val context: Context) {
         sortKey = key
         Collections.sort(
             dataList,
-            java.util.Comparator<Map<String?, String>> { stringStringMap, t1 ->
+            Comparator { stringStringMap, t1 ->
                 var result: Int
                 result = if (sortKey == SORT_TITLE) {
                     stringStringMap[sortKey]!!.compareTo(t1[sortKey]!!)
@@ -226,7 +225,8 @@ class ListDataManager private constructor(private val context: Context) {
                     )
                 }
                 result
-            })
+            }
+        )
     }
 
     fun resetGroupIdData(groupId: Long?) {
@@ -262,10 +262,6 @@ class ListDataManager private constructor(private val context: Context) {
                 null
             )
         }
-
-    fun getGroupList(): List<Map<String?, String?>> {
-        return groupList
-    }
 
     fun rearrangeGroupData(fromPos: Int, toPos: Int) {
         var mov: Boolean

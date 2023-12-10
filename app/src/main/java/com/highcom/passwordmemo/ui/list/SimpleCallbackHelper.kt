@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.highcom.passwordmemo.R
 import java.util.LinkedList
 import java.util.Queue
+import kotlin.properties.Delegates
 
 abstract class SimpleCallbackHelper(
     context: Context?,
@@ -29,12 +30,12 @@ abstract class SimpleCallbackHelper(
     ItemTouchHelper.UP or ItemTouchHelper.DOWN,
     ItemTouchHelper.LEFT
 ) {
-    private var buttons: MutableList<UnderlayButton>
-    private val gestureDetector: GestureDetector
+    private lateinit var buttons: MutableList<UnderlayButton>
+    private lateinit var gestureDetector: GestureDetector
     private var swipedPos = -1
     private var swipeThreshold = 0.5f
     private val buttonsBuffer: MutableMap<Int, MutableList<UnderlayButton>>
-    private val recoverQueue: Queue<Int>
+    private lateinit var recoverQueue: Queue<Int>
     private var isMoved: Boolean
 
     interface SimpleCallbackListener {
@@ -294,7 +295,7 @@ abstract class SimpleCallbackHelper(
     companion object {
         private const val BUTTON_WIDTH = 60
         private const val FONT_SIZE = 12
-        private var BUTTON_WIDTH_DP: Int
-        private var FONT_SIZE_DP: Int
+        private var BUTTON_WIDTH_DP by Delegates.notNull<Int>()
+        private var FONT_SIZE_DP by Delegates.notNull<Int>()
     }
 }

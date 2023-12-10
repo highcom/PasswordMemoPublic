@@ -52,7 +52,7 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         loginDataManager = LoginDataManager.Companion.getInstance(this)
 
         // バックグラウンドでは画面の中身が見えないようにする
-        if (loginDataManager!!.isDisplayBackgroundSwitchEnable) {
+        if (loginDataManager!!.displayBackgroundSwitchEnable) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
 
@@ -63,9 +63,9 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
 
         // データ削除スイッチ処理
         val deleteSwitch = findViewById<View>(R.id.deleteSwitch) as Switch
-        deleteSwitch.isChecked = loginDataManager!!.isDeleteSwitchEnable
+        deleteSwitch.isChecked = loginDataManager!!.deleteSwitchEnable
         deleteSwitch.setOnCheckedChangeListener { compoundButton, b ->
-            loginDataManager!!.isDeleteSwitchEnable = b
+            loginDataManager!!.setDeleteSwitchEnable(b)
         }
 
         // 生体認証ログインスイッチ処理
@@ -75,33 +75,33 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
             biometricLoginSwitch.isChecked = false
             biometricLoginSwitch.isEnabled = false
         } else {
-            biometricLoginSwitch.isChecked = loginDataManager!!.isBiometricLoginSwitchEnable
+            biometricLoginSwitch.isChecked = loginDataManager!!.biometricLoginSwitchEnable
             biometricLoginSwitch.isEnabled = true
         }
         biometricLoginSwitch.setOnCheckedChangeListener { compoundButton, b ->
-            loginDataManager!!.isBiometricLoginSwitchEnable = b
+            loginDataManager!!.setBiometricLoginSwitchEnable(b)
         }
 
         // バックグラウンド時の非表示設定
         val displayBackgroundSwitch = findViewById<View>(R.id.displayBackgroundSwitch) as Switch
-        displayBackgroundSwitch.isChecked = loginDataManager!!.isDisplayBackgroundSwitchEnable
+        displayBackgroundSwitch.isChecked = loginDataManager!!.displayBackgroundSwitchEnable
         displayBackgroundSwitch.setOnCheckedChangeListener { compoundButton, b ->
-            loginDataManager!!.isDisplayBackgroundSwitchEnable = b
+            loginDataManager!!.setDisplayBackgroundSwitchEnable(b)
             restartPasswordMemoActivity()
         }
 
         // メモ表示スイッチ処理
         val memoVisibleSwitch = findViewById<View>(R.id.memoVisibleSwitch) as Switch
-        memoVisibleSwitch.isChecked = loginDataManager!!.isMemoVisibleSwitchEnable
+        memoVisibleSwitch.isChecked = loginDataManager!!.memoVisibleSwitchEnable
         memoVisibleSwitch.setOnCheckedChangeListener { compoundButton, b ->
-            loginDataManager!!.isMemoVisibleSwitchEnable = b
+            loginDataManager!!.setMemoVisibleSwitchEnable(b)
         }
 
         // パスワード表示スイッチ処理
         val passwordVisibleSwitch = findViewById<View>(R.id.passwordVisibleSwitch) as Switch
-        passwordVisibleSwitch.isChecked = loginDataManager!!.isPasswordVisibleSwitchEnable
+        passwordVisibleSwitch.isChecked = loginDataManager!!.passwordVisibleSwitchEnable
         passwordVisibleSwitch.setOnCheckedChangeListener { compoundButton, b ->
-            loginDataManager!!.isPasswordVisibleSwitchEnable = b
+            loginDataManager!!.setPasswordVisibleSwitchEnable(b)
         }
 
         // テキストサイズスピナー処理
@@ -117,11 +117,11 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         copyClipboardNames!!.add(getString(R.string.copy_with_tap))
         val copyClipboardAdapter =
             SetTextSizeAdapter(this, copyClipboardNames, loginDataManager!!.textSize.toInt())
-        copyClipboardSpinner.setAdapter(copyClipboardAdapter)
-        copyClipboardSpinner.setSelection(loginDataManager!!.copyClipboard)
-        copyClipboardSpinner.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+        copyClipboardSpinner?.setAdapter(copyClipboardAdapter)
+        copyClipboardSpinner?.setSelection(loginDataManager!!.copyClipboard)
+        copyClipboardSpinner?.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(adapterView: AdapterView<*>?, view: View, i: Int, l: Long) {
-                loginDataManager!!.copyClipboard = i
+                loginDataManager!!.setCopyClipboard(i)
             }
 
             override fun onNothingSelected(adapterView: AdapterView<*>?) {}
@@ -313,7 +313,7 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
                 return@OnClickListener
             } else {
                 (alertDialog.findViewById<View>(R.id.inputNavigateText) as TextView).text = " "
-                loginDataManager!!.masterPassword = newPassword
+                loginDataManager!!.setMasterPassword(newPassword)
                 passwordChangeComplete()
                 alertDialog.dismiss()
             }
@@ -334,7 +334,7 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
     @SuppressLint("ResourceType")
     override fun onSelectColorClicked(color: Int) {
         (findViewById<View>(R.id.settingView) as ScrollView).setBackgroundColor(color)
-        loginDataManager!!.backgroundColor = color
+        loginDataManager!!.setBackgroundColor(color)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -346,7 +346,7 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
 
     override fun onTextSizeSelected(size: Float) {
         setTextSize(size)
-        loginDataManager!!.textSize = size
+        loginDataManager!!.setTextSize(size)
     }
 
     private fun setTextSize(size: Float) {
@@ -462,7 +462,7 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
 
     public override fun onDestroy() {
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
-        if (loginDataManager!!.isDisplayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.getIsBackground()) {
+        if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.isBackground) {
             finishAffinity()
         }
         super.onDestroy()

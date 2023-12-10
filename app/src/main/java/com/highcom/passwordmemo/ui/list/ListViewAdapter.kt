@@ -33,41 +33,40 @@ class ListViewAdapter(
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var rowLinearLayout: LinearLayout
+        var rowLinearLayout: LinearLayout? = null
         var id: Long? = null
-        var imageButton: ImageButton
-        var title: TextView
+        var imageButton: ImageButton? = null
+        var title: TextView? = null
         var account: String? = null
         var password: String? = null
         var url: String? = null
         var groupId: Long? = null
         var memo: String? = null
-        var date: TextView
-        var rearrangebtn: ImageButton
-        var memoView: TextView
+        var date: TextView? = null
+        var rearrangebtn: ImageButton? = null
+        var memoView: TextView? = null
 
         init {
             // フッターの場合には何も設定しない
-            if (itemView.id == R.id.row_footer) {
-                return
-            }
-            rowLinearLayout = itemView.findViewById<View>(R.id.rowLinearLayout) as LinearLayout
-            imageButton = itemView.findViewById<View>(R.id.round_key_icon) as ImageButton
-            title = itemView.findViewById<View>(R.id.title) as TextView
-            date = itemView.findViewById<View>(R.id.date) as TextView
-            rearrangebtn = itemView.findViewById<View>(R.id.rearrangebutton) as ImageButton
-            memoView = itemView.findViewById<View>(R.id.memoView) as TextView
-            if (editEnable) {
-                rearrangebtn.visibility = View.VISIBLE
-            } else {
-                rearrangebtn.visibility = View.GONE
+            if (itemView.id != R.id.row_footer) {
+                rowLinearLayout = itemView.findViewById<View>(R.id.rowLinearLayout) as LinearLayout
+                imageButton = itemView.findViewById<View>(R.id.round_key_icon) as ImageButton
+                title = itemView.findViewById<View>(R.id.title) as TextView
+                date = itemView.findViewById<View>(R.id.date) as TextView
+                rearrangebtn = itemView.findViewById<View>(R.id.rearrangebutton) as ImageButton
+                memoView = itemView.findViewById<View>(R.id.memoView) as TextView
+                if (editEnable) {
+                    rearrangebtn?.visibility = View.VISIBLE
+                } else {
+                    rearrangebtn?.visibility = View.GONE
+                }
             }
         }
     }
 
     init {
         inflater = LayoutInflater.from(context)
-        layoutHeightMap = object : HashMap<Int?, Float?>() {
+        layoutHeightMap = object : HashMap<Int, Float>() {
             init {
                 put(
                     TextSizeUtil.Companion.TEXT_SIZE_SMALL,
@@ -125,18 +124,24 @@ class ListViewAdapter(
                 )
             )
         } else {
-            null
+            ViewHolder(
+                inflater.inflate(
+                    R.layout.row,
+                    parent,
+                    false
+                )
+            )
         }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         // フッターの場合にはデータをバインドしない
         if (position >= listData!!.size) return
         val layoutHeight = layoutHeightMap[textSize.toInt()]
         if (layoutHeight != null) {
-            val params = holder!!.rowLinearLayout.layoutParams
-            params.height = layoutHeight.toInt()
-            holder.rowLinearLayout.layoutParams = params
+            val params = holder!!.rowLinearLayout?.layoutParams
+            params?.height = layoutHeight.toInt()
+            holder.rowLinearLayout?.layoutParams = params
         }
         val id = (listData!![position] as HashMap<*, *>?)!!["id"].toString()
         val title = (listData!![position] as HashMap<*, *>?)!!["title"].toString()
@@ -147,27 +152,27 @@ class ListViewAdapter(
         val memo = (listData!![position] as HashMap<*, *>?)!!["memo"].toString()
         val date = (listData!![position] as HashMap<*, *>?)!!["inputdate"].toString()
         holder!!.id = java.lang.Long.valueOf(id)
-        holder.title.text = title
-        holder.title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
+        holder.title?.text = title
+        holder.title?.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
         holder.account = account
         holder.password = password
         holder.url = url
         holder.groupId = java.lang.Long.valueOf(groupId)
         holder.memo = memo
-        holder.date.text = date
-        holder.date.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize - 3)
+        holder.date?.text = date
+        holder.date?.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize - 3)
         // メモ表示が有効でメモが入力されている場合は表示する
-        if (loginDataManager!!.isMemoVisibleSwitchEnable && memo != "") {
-            holder.memoView.visibility = View.VISIBLE
-            holder.memoView.text = memo
+        if (loginDataManager!!.memoVisibleSwitchEnable && memo != "") {
+            holder.memoView?.visibility = View.VISIBLE
+            holder.memoView?.text = memo
         } else {
-            holder.memoView.visibility = View.GONE
-            holder.memoView.text = ""
+            holder.memoView?.visibility = View.GONE
+            holder.memoView?.text = ""
         }
-        holder.memoView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize - 3)
+        holder.memoView?.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize - 3)
         holder.itemView.tag = holder
         // アイテムクリック時ののイベントを追加
-        holder.imageButton.setOnClickListener { view ->
+        holder.imageButton?.setOnClickListener { view ->
             val parentView = view.parent as View
             parentView.callOnClick()
         }

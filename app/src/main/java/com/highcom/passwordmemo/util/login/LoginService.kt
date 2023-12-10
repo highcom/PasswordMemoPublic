@@ -16,8 +16,8 @@ import androidx.fragment.app.FragmentActivity
 import com.highcom.passwordmemo.PasswordListActivity
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.database.ListDataManager
+import java.util.concurrent.Executor
 
-java.util.concurrent.Executor
 class LoginService(var loginDataManager: LoginDataManager?) {
     private var incorrectPwCount = 0
     var firstTime = false
@@ -35,7 +35,7 @@ class LoginService(var loginDataManager: LoginDataManager?) {
         var message: String? = null
         val masterPassword = loginDataManager!!.masterPassword
         rotateAnimation = AnimationUtils.loadAnimation(activity, R.anim.rotate_animation)
-        rotateAnimation.setAnimationListener(object : Animation.AnimationListener {
+        rotateAnimation?.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation) {}
             override fun onAnimationEnd(animation: Animation) {
                 login(activity, firstTime)
@@ -51,11 +51,11 @@ class LoginService(var loginDataManager: LoginDataManager?) {
                 message = activity.getString(R.string.err_input_same)
             } else if (editPassword == firstPassword) {
                 // マスターパスワードが作成されていない場合は新規作成
-                loginDataManager!!.masterPassword = editPassword
+                loginDataManager!!.setMasterPassword(editPassword)
                 // ログイン中の表示に切り替える
                 firstTime = true
-                navigateText.setText(activity.getString(R.string.login_success))
-                masterKeyIcon.startAnimation(rotateAnimation)
+                navigateText?.setText(activity.getString(R.string.login_success))
+                masterKeyIcon?.startAnimation(rotateAnimation)
             } else {
                 // 一度目の入力と異なることを伝える
                 val ts = Toast.makeText(
@@ -70,9 +70,9 @@ class LoginService(var loginDataManager: LoginDataManager?) {
         } else if (editPassword == masterPassword) {
             // ログイン中の表示に切り替える
             firstTime = false
-            navigateText.setText(activity.getString(R.string.login_success))
-            masterKeyIcon.startAnimation(rotateAnimation)
-        } else if (!loginDataManager!!.isDeleteSwitchEnable) {
+            navigateText?.setText(activity.getString(R.string.login_success))
+            masterKeyIcon?.startAnimation(rotateAnimation)
+        } else if (!loginDataManager!!.deleteSwitchEnable) {
             // データ削除機能が無効の場合にはエラー表示を行うだけ
             message = activity.getString(R.string.err_incorrect)
         } else {
@@ -81,9 +81,9 @@ class LoginService(var loginDataManager: LoginDataManager?) {
             if (incorrectPwCount >= 5) {
                 incorrectPwCount = 0
                 loginDataManager!!.clearAllData()
-                val manager: ListDataManager = ListDataManager.Companion.getInstance(activity)
-                manager.deleteAllData()
-                manager.closeData()
+                val manager: ListDataManager? = ListDataManager.Companion.getInstance(activity)
+                manager?.deleteAllData()
+                manager?.closeData()
                 // すべてのデータを削除したことを表示
                 val ts = Toast.makeText(
                     activity,
@@ -112,7 +112,7 @@ class LoginService(var loginDataManager: LoginDataManager?) {
         navigateText = activity.findViewById(R.id.navigateText)
         masterKeyIcon = activity.findViewById(R.id.masterKeyIcon)
         rotateAnimation = AnimationUtils.loadAnimation(activity, R.anim.rotate_animation)
-        rotateAnimation.setAnimationListener(object : Animation.AnimationListener {
+        rotateAnimation?.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation) {}
             override fun onAnimationEnd(animation: Animation) {
                 login(activity, false)
@@ -142,8 +142,8 @@ class LoginService(var loginDataManager: LoginDataManager?) {
                     super.onAuthenticationSucceeded(result)
                     // ログイン中の表示に切り替える
                     firstTime = false
-                    navigateText.setText(activity.getString(R.string.login_success))
-                    masterKeyIcon.startAnimation(rotateAnimation)
+                    navigateText?.setText(activity.getString(R.string.login_success))
+                    masterKeyIcon?.startAnimation(rotateAnimation)
                 }
 
                 override fun onAuthenticationFailed() {

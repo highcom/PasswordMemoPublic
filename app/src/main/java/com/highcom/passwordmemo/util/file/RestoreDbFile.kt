@@ -144,10 +144,10 @@ class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListe
                     .setTitle(R.string.db_restore_processing)
                     .setView(activity.layoutInflater.inflate(R.layout.alert_progressbar, null))
                     .create()
-                progressAlertDialog.show()
-                progressAlertDialog.setCancelable(false)
-                progressAlertDialog.setCanceledOnTouchOutside(false)
-                progressBar = progressAlertDialog.findViewById(R.id.ProgressBarHorizontal)
+                progressAlertDialog?.show()
+                progressAlertDialog?.setCancelable(false)
+                progressAlertDialog?.setCanceledOnTouchOutside(false)
+                progressBar = progressAlertDialog?.findViewById(R.id.ProgressBarHorizontal)
 
                 // ワーカースレッドで取込みを開始する
                 val mainLooper = Looper.getMainLooper()

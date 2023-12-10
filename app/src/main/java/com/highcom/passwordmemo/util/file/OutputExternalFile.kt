@@ -39,11 +39,11 @@ class OutputExternalFile(private val context: Context) {
             outputStream = context.contentResolver.openOutputStream(uri!!)
             val db: SQLiteDatabase = ListDataManager.Companion.getInstance(
                 context
-            ).getRdb()
+            )!!.rdb
             val curCSV: Cursor = db.rawQuery("select * from passworddata", null)
             val groupList: List<Map<String?, String?>> = ListDataManager.Companion.getInstance(
                 context
-            )!!.getGroupList()
+            )!!.groupList
             //Write the name of the table and the name of the columns (comma separated values) in the .csv file.
             val header =
                 "TITLE,ACCOUNT,PASSWORD,URL,GROUP,MEMO,INPUTDATE" + System.getProperty("line.separator")
@@ -58,7 +58,7 @@ class OutputExternalFile(private val context: Context) {
                 for (data in groupList) {
                     val id = data["group_id"]
                     if (groupId == id) {
-                        group = data["name"]
+                        group = data["name"]!!
                         break
                     }
                 }

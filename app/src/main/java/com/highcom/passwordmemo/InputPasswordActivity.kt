@@ -55,12 +55,12 @@ class InputPasswordActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input_password)
         adContainerView = findViewById(R.id.adView_frame_input)
-        adContainerView.post(Runnable { loadBanner() })
+        adContainerView?.post(Runnable { loadBanner() })
         loginDataManager = LoginDataManager.Companion.getInstance(this)
         listDataManager = ListDataManager.Companion.getInstance(this)
 
         // バックグラウンドでは画面の中身が見えないようにする
-        if (loginDataManager!!.isDisplayBackgroundSwitchEnable) {
+        if (loginDataManager!!.displayBackgroundSwitchEnable) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
 
@@ -72,12 +72,12 @@ class InputPasswordActivity : AppCompatActivity() {
         }
         val selectGroupAdapter =
             SetTextSizeAdapter(this, selectGroupNames, loginDataManager!!.textSize.toInt())
-        selectGroupSpinner.setAdapter(selectGroupAdapter)
-        selectGroupSpinner.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+        selectGroupSpinner?.setAdapter(selectGroupAdapter)
+        selectGroupSpinner?.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(adapterView: AdapterView<*>?, view: View, i: Int, l: Long) {
                 val groupList = listDataManager!!.groupList
                 val group = groupList!![i]
-                selectGroupId = Objects.requireNonNull(group!!["group_id"]).toLong()
+                selectGroupId = Objects.requireNonNull(group!!["group_id"])?.toLong()
             }
 
             override fun onNothingSelected(adapterView: AdapterView<*>?) {}
@@ -97,9 +97,9 @@ class InputPasswordActivity : AppCompatActivity() {
         for (i in groupList!!.indices) {
             val id = Objects.requireNonNull(
                 groupList[i]!!["group_id"]
-            ).toLong()
+            )?.toLong()
             if (groupId == id) {
-                selectGroupSpinner.setSelection(i)
+                selectGroupSpinner?.setSelection(i)
                 break
             }
         }
@@ -263,7 +263,7 @@ class InputPasswordActivity : AppCompatActivity() {
             RandomStringUtils.randomGraph(passwordCount)
         }
         if (isLowerCaseOnly) {
-            generatePasswordText!!.setText(generatePassword.lowercase(Locale.getDefault()))
+            generatePasswordText!!.setText(generatePassword?.lowercase(Locale.getDefault()))
         } else {
             generatePasswordText!!.setText(generatePassword)
         }
@@ -280,7 +280,7 @@ class InputPasswordActivity : AppCompatActivity() {
     public override fun onDestroy() {
         if (mAdView != null) mAdView!!.destroy()
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
-        if (loginDataManager!!.isDisplayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.getIsBackground()) {
+        if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.isBackground) {
             finishAffinity()
         }
         super.onDestroy()
@@ -334,7 +334,7 @@ class InputPasswordActivity : AppCompatActivity() {
         for (i in groupList!!.indices) {
             val id = Objects.requireNonNull(
                 groupList[i]!!["group_id"]
-            ).toLong()
+            )?.toLong()
             if (groupId == id) {
                 selectGroupSpinner!!.setSelection(i)
                 break

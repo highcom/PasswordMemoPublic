@@ -131,7 +131,7 @@ class InputExternalFile(private val activity: Activity, listener: InputExternalF
             group["group_id"] = "1"
             group["group_order"] = "1"
             group["name"] = activity.getString(R.string.list_title)
-            groupList.add(group)
+            groupList?.add(group)
             id = HEADER_RECORD
             while (reader.readLine().also { line = it } != null) {
                 val result = line.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
@@ -161,21 +161,21 @@ class InputExternalFile(private val activity: Activity, listener: InputExternalF
                     data["group_id"] = "1"
                     data["memo"] = result[4]
                     data["inputdate"] = result[5]
-                    dataList.add(data)
+                    dataList?.add(data)
                 } else if (isHeaderCorrect && columnCount == 7) {
                     var groupId = "0"
-                    for (data in groupList) {
+                    for (data in groupList!!) {
                         if (data["name"] == result[4]) {
-                            groupId = data["group_id"]
+                            groupId = data["group_id"]!!
                         }
                     }
                     if (groupId == "0") {
                         val data: MutableMap<String?, String?> = HashMap()
-                        data["group_id"] = (groupList.size + 1).toString()
-                        data["group_order"] = (groupList.size + 1).toString()
+                        data["group_id"] = (groupList?.size?.plus(1)).toString()
+                        data["group_order"] = (groupList?.size?.plus(1)).toString()
                         data["name"] = result[4]
-                        groupId = (groupList.size + 1).toString()
-                        groupList.add(data)
+                        groupId = (groupList?.size?.plus(1)).toString()
+                        groupList?.add(data)
                     }
                     val data: MutableMap<String?, String?> = HashMap()
                     data["id"] = id.toString()
@@ -186,7 +186,7 @@ class InputExternalFile(private val activity: Activity, listener: InputExternalF
                     data["group_id"] = groupId
                     data["memo"] = result[5].replace("  ", "\n")
                     data["inputdate"] = result[6]
-                    dataList.add(data)
+                    dataList?.add(data)
                 }
                 id++
             }
@@ -222,10 +222,10 @@ class InputExternalFile(private val activity: Activity, listener: InputExternalF
                     .setTitle(R.string.csv_input_processing)
                     .setView(activity.layoutInflater.inflate(R.layout.alert_progressbar, null))
                     .create()
-                progressAlertDialog.show()
-                progressAlertDialog.setCancelable(false)
-                progressAlertDialog.setCanceledOnTouchOutside(false)
-                progressBar = progressAlertDialog.findViewById(R.id.ProgressBarHorizontal)
+                progressAlertDialog?.show()
+                progressAlertDialog?.setCancelable(false)
+                progressAlertDialog?.setCanceledOnTouchOutside(false)
+                progressBar = progressAlertDialog?.findViewById(R.id.ProgressBarHorizontal)
 
                 // ワーカースレッドで取込みを開始する
                 val mainLooper = Looper.getMainLooper()

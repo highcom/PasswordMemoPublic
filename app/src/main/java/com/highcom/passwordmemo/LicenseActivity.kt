@@ -20,7 +20,7 @@ class LicenseActivity : AppCompatActivity() {
         loginDataManager = LoginDataManager.Companion.getInstance(this)
 
         // バックグラウンドでは画面の中身が見えないようにする
-        if (loginDataManager!!.isDisplayBackgroundSwitchEnable) {
+        if (loginDataManager!!.displayBackgroundSwitchEnable) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
     }
@@ -29,7 +29,7 @@ class LicenseActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         (findViewById<View>(R.id.licenseView) as LinearLayout).setBackgroundColor(
-            LoginDataManager.Companion.getInstance(this)!!.getBackgroundColor()
+            LoginDataManager.Companion.getInstance(this)!!.backgroundColor
         )
     }
 
@@ -42,7 +42,7 @@ class LicenseActivity : AppCompatActivity() {
 
     public override fun onDestroy() {
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
-        if (loginDataManager!!.isDisplayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.getIsBackground()) {
+        if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.isBackground) {
             finishAffinity()
         }
         super.onDestroy()

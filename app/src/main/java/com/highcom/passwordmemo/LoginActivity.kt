@@ -33,7 +33,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         loginService = LoginService(loginDataManager)
 
         // バックグラウンドでは画面の中身が見えないようにする
-        if (loginDataManager!!.isDisplayBackgroundSwitchEnable) {
+        if (loginDataManager!!.displayBackgroundSwitchEnable) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
         val versionText = findViewById<TextView>(R.id.versionText)
@@ -105,7 +105,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun checkBiometricSetting() {
-        if (!loginDataManager!!.isBiometricLoginSwitchEnable) {
+        if (!loginDataManager!!.biometricLoginSwitchEnable) {
             findViewById<View>(R.id.biometricLoginButton).visibility = View.INVISIBLE
             return
         } else if (!loginDataManager!!.isMasterPasswordCreated) {

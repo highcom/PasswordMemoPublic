@@ -33,7 +33,7 @@ import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper.SimpleCallbackListener
 import com.highcom.passwordmemo.util.login.LoginDataManager
 
-class GroupListActivity : AppCompatActivity(), GroupAdapterListener, SimpleCallbackListener {
+class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
     private var loginDataManager: LoginDataManager? = null
     private var listDataManager: ListDataManager? = null
     private var adContainerView: FrameLayout? = null
@@ -56,7 +56,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener, SimpleCallb
             ).build()
         )
         adContainerView = findViewById(R.id.adView_groupFrame)
-        adContainerView.post(Runnable { loadBanner() })
+        adContainerView?.post(Runnable { loadBanner() })
         title = getString(R.string.group_title) + getString(R.string.group_title_select)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         loginDataManager = LoginDataManager.Companion.getInstance(this)
@@ -71,7 +71,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener, SimpleCallb
             }
         }
         // バックグラウンドでは画面の中身が見えないようにする
-        if (loginDataManager!!.isDisplayBackgroundSwitchEnable) {
+        if (loginDataManager?.displayBackgroundSwitchEnable == true) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
         adapter = GroupListAdapter(
@@ -79,7 +79,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener, SimpleCallb
             listDataManager!!.groupList,
             this
         )
-        adapter.setTextSize(loginDataManager!!.textSize)
+        adapter?.textSize = loginDataManager!!.textSize
         recyclerView = findViewById<View>(R.id.groupListView) as RecyclerView
         recyclerView!!.layoutManager = LinearLayoutManager(this)
         recyclerView!!.adapter = adapter
@@ -88,9 +88,9 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener, SimpleCallb
             DividerItemDecoration(this, DividerItemDecoration.Companion.VERTICAL_LIST)
         recyclerView!!.addItemDecoration(itemDecoration)
         groupFab = findViewById(R.id.groupFab)
-        groupFab.setOnClickListener(View.OnClickListener {
+        groupFab?.setOnClickListener(View.OnClickListener {
             val data: MutableMap<String?, String?> = HashMap()
-            data["group_id"] = java.lang.Long.valueOf(listDataManager.getNewGroupId()).toString()
+            data["group_id"] = listDataManager?.newGroupId.toString()
             data["group_order"] = Integer.valueOf(listDataManager!!.groupList.size + 1).toString()
             data["name"] = ""
             listDataManager!!.setGroupData(false, data)
@@ -103,11 +103,11 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener, SimpleCallb
                 }
             }
         })
-        if (!adapter.getEditEnable()) groupFab.setVisibility(View.GONE)
+        if (adapter?.editEnable == false) groupFab?.setVisibility(View.GONE)
         val scale = resources.displayMetrics.density
         // ドラックアンドドロップの操作を実装する
         simpleCallbackHelper =
-            object : SimpleCallbackHelper(applicationContext, recyclerView, scale, this) {
+            object : SimpleCallbackHelper(applicationContext, recyclerView, scale, GroupListCallbackListener()) {
                 @SuppressLint("ResourceType")
                 override fun instantiateUnderlayButton(
                     viewHolder: RecyclerView.ViewHolder,
@@ -120,28 +120,32 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener, SimpleCallb
                         getString(R.string.delete),
                         BitmapFactory.decodeResource(resources, R.drawable.ic_delete),
                         Color.parseColor(getString(R.color.underlay_red)),
-                        viewHolder
-                    ) { holder, pos ->
-                        AlertDialog.Builder(this@GroupListActivity)
-                            .setTitle(
-                                getString(R.string.delete_title_head) + (holder as GroupViewHolder).groupName.text.toString() + getString(
-                                    R.string.delete_title
-                                )
-                            )
-                            .setMessage(getString(R.string.delete_message))
-                            .setPositiveButton(getString(R.string.delete_execute)) { dialog1: DialogInterface?, which: Int ->
-                                listDataManager!!.deleteGroupData((holder as GroupViewHolder).groupId.toString())
-                                listDataManager!!.resetGroupIdData((holder as GroupViewHolder).groupId)
-                                if (loginDataManager!!.selectGroup == (holder as GroupViewHolder).groupId) {
-                                    loginDataManager!!.selectGroup = 1L
-                                    listDataManager!!.setSelectGroupId(1L)
-                                }
-                                simpleCallbackHelper!!.resetSwipePos()
-                                adapter!!.notifyDataSetChanged()
+                        viewHolder,
+                        object : UnderlayButtonClickListener {
+                            override fun onClick(holder: RecyclerView.ViewHolder, pos: Int) {
+                                AlertDialog.Builder(this@GroupListActivity)
+                                    .setTitle(
+                                        getString(R.string.delete_title_head) + (holder as GroupViewHolder).groupName?.text.toString() + getString(
+                                            R.string.delete_title
+                                        )
+                                    )
+                                    .setMessage(getString(R.string.delete_message))
+                                    .setPositiveButton(getString(R.string.delete_execute)) { dialog1: DialogInterface?, which: Int ->
+                                        listDataManager!!.deleteGroupData((holder as GroupViewHolder).groupId.toString())
+                                        listDataManager!!.resetGroupIdData((holder as GroupViewHolder).groupId)
+                                        if (loginDataManager?.selectGroup == (holder as GroupViewHolder).groupId) {
+                                            loginDataManager?.setSelectGroup(1L)
+                                            listDataManager?.setSelectGroupId(1L)
+                                        }
+                                        simpleCallbackHelper?.resetSwipePos()
+                                        adapter!!.notifyDataSetChanged()
+                                    }
+                                    .setNegativeButton(getString(R.string.delete_cancel), null)
+                                    .show()
+
                             }
-                            .setNegativeButton(getString(R.string.delete_cancel), null)
-                            .show()
-                    })
+                        }
+                    ))
                 }
             }
     }
@@ -190,8 +194,8 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener, SimpleCallb
         super.onResume()
         var needRefresh = false
         // テキストサイズ設定に変更があった場合には再描画する
-        if (adapter.getTextSize() != loginDataManager!!.textSize) {
-            adapter.setTextSize(loginDataManager!!.textSize)
+        if (adapter?.textSize != loginDataManager?.textSize) {
+            adapter?.textSize = loginDataManager!!.textSize
             needRefresh = true
         }
         if (needRefresh) adapter!!.notifyDataSetChanged()
@@ -210,12 +214,12 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener, SimpleCallb
             }
 
             R.id.select_group_mode -> {
-                if (adapter.getEditEnable()) {
-                    adapter.setEditEnable(false)
+                if (adapter?.editEnable == true) {
+                    adapter?.editEnable = false
                     title = getString(R.string.group_title) + getString(R.string.group_title_select)
                     groupFab!!.visibility = View.GONE
                 } else {
-                    adapter.setEditEnable(true)
+                    adapter?.editEnable = true
                     title = getString(R.string.group_title) + getString(R.string.group_title_edit)
                     groupFab!!.visibility = View.VISIBLE
                 }
@@ -228,15 +232,15 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener, SimpleCallb
     public override fun onDestroy() {
         if (mAdView != null) mAdView!!.destroy()
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
-        if (loginDataManager!!.isDisplayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.getIsBackground()) {
-            listDataManager!!.closeData()
+        if (loginDataManager?.displayBackgroundSwitchEnable == true && PasswordMemoLifecycle.Companion.isBackground) {
+            listDataManager?.closeData()
             finishAffinity()
         }
         super.onDestroy()
     }
 
-    override fun onGroupNameClicked(view: View, groupId: Long) {
-        if (adapter.getEditEnable()) {
+    override fun onGroupNameClicked(view: View, groupId: Long?) {
+        if (adapter?.editEnable == true) {
             view.post {
                 groupFab!!.visibility = View.GONE
                 view.isFocusable = true
@@ -247,8 +251,8 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener, SimpleCallb
                 inputMethodManager?.showSoftInput(view, 0)
             }
         } else {
-            loginDataManager!!.selectGroup = groupId
-            listDataManager!!.setSelectGroupId(groupId)
+            loginDataManager?.setSelectGroup(groupId!!)
+            listDataManager?.setSelectGroupId(groupId!!)
             finish()
         }
     }
@@ -268,42 +272,44 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener, SimpleCallb
         if (data["name"] == "") {
             listDataManager!!.deleteGroupData(data["group_id"])
             listDataManager!!.resetGroupIdData(java.lang.Long.valueOf(data["group_id"]))
-            if (loginDataManager!!.selectGroup == data["group_id"]!!.toLong()) {
-                loginDataManager!!.selectGroup = 1L
-                listDataManager!!.setSelectGroupId(1L)
+            if (loginDataManager?.selectGroup == data["group_id"]!!.toLong()) {
+                loginDataManager?.setSelectGroup(1L)
+                listDataManager?.setSelectGroupId(1L)
             }
             return
         }
         listDataManager!!.setGroupData(true, data)
     }
 
-    override fun onSimpleCallbackMove(
-        viewHolder: RecyclerView.ViewHolder,
-        target: RecyclerView.ViewHolder
-    ): Boolean {
-        if (!adapter.getEditEnable()) return false
-        // グループ名が入力されていない場合は移動させない
-        if ((viewHolder as GroupViewHolder).groupName.text.toString() == "" || (target as GroupViewHolder).groupName.text.toString() == "") return false
-        // グループ名が入力途中でDB反映されていないデータも並び替えさせない
-        val groupList = listDataManager!!.groupList
-        for (group in groupList!!) {
-            if (group!!["group_id"] == viewHolder.groupId.toString() || group["group_id"] == target.groupId.toString()) {
-                if (group["name"] == "") return false
+    inner class GroupListCallbackListener : SimpleCallbackListener {
+        override fun onSimpleCallbackMove(
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            if (adapter?.editEnable == false) return false
+            // グループ名が入力されていない場合は移動させない
+            if ((viewHolder as GroupViewHolder).groupName?.text.toString() == "" || (target as GroupViewHolder).groupName?.text.toString() == "") return false
+            // グループ名が入力途中でDB反映されていないデータも並び替えさせない
+            val groupList = listDataManager!!.groupList
+            for (group in groupList!!) {
+                if (group!!["group_id"] == viewHolder.groupId.toString() || group["group_id"] == target.groupId.toString()) {
+                    if (group["name"] == "") return false
+                }
             }
+            val fromPos = viewHolder.getAdapterPosition()
+            val toPos = target.getAdapterPosition()
+            // 1番目のデータは「すべて」なので並べ替え不可にする
+            if (fromPos == 0 || toPos == 0) return false
+            adapter!!.notifyItemMoved(fromPos, toPos)
+            listDataManager!!.rearrangeGroupData(fromPos, toPos)
+            return true
         }
-        val fromPos = viewHolder.getAdapterPosition()
-        val toPos = target.getAdapterPosition()
-        // 1番目のデータは「すべて」なので並べ替え不可にする
-        if (fromPos == 0 || toPos == 0) return false
-        adapter!!.notifyItemMoved(fromPos, toPos)
-        listDataManager!!.rearrangeGroupData(fromPos, toPos)
-        return true
-    }
 
-    override fun clearSimpleCallbackView(
-        recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder
-    ) {
-        recyclerView.adapter = adapter
+        override fun clearSimpleCallbackView(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ) {
+            recyclerView.adapter = adapter
+        }
     }
 }

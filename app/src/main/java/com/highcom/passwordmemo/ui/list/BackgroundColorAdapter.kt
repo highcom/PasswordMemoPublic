@@ -31,7 +31,7 @@ class BackgroundColorAdapter(
         val title = view.findViewById<TextView>(R.id.backgroundColorName)
         title.text = item.colorName
         val linearLayout = view.findViewById<LinearLayout>(R.id.backgroundColorRow)
-        linearLayout.setBackgroundColor(item.colorCode)
+        item.colorCode?.let { linearLayout.setBackgroundColor(it) }
         return view
     }
 }

@@ -41,7 +41,7 @@ import java.util.Arrays
 import java.util.Date
 import java.util.Locale
 
-class PasswordListActivity : AppCompatActivity(), AdapterListener, SimpleCallbackListener {
+class PasswordListActivity : AppCompatActivity(), AdapterListener {
     private var selectGroupName: String? = null
     private var loginDataManager: LoginDataManager? = null
     private var listDataManager: ListDataManager? = null
@@ -67,7 +67,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener, SimpleCallbac
             ).build()
         )
         adContainerView = findViewById(R.id.adView_frame)
-        adContainerView.post(Runnable { loadBanner() })
+        adContainerView?.post(Runnable { loadBanner() })
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         // レビュー評価依頼のダイアログに表示する内容を設定
@@ -115,10 +115,10 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener, SimpleCallbac
         listDataManager = ListDataManager.Companion.getInstance(this)
 
         // バックグラウンドでは画面の中身が見えないようにする
-        if (loginDataManager!!.isDisplayBackgroundSwitchEnable) {
+        if (loginDataManager!!.displayBackgroundSwitchEnable) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
-        currentMemoVisible = loginDataManager!!.isMemoVisibleSwitchEnable
+        currentMemoVisible = loginDataManager!!.memoVisibleSwitchEnable
         listDataManager!!.setSelectGroupId(loginDataManager!!.selectGroup)
         listDataManager!!.sortListData(loginDataManager!!.sortKey)
         adapter = ListViewAdapter(
@@ -127,7 +127,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener, SimpleCallbac
             loginDataManager,
             this
         )
-        adapter.setTextSize(loginDataManager!!.textSize)
+        adapter?.textSize = loginDataManager!!.textSize
         recyclerView = findViewById<View>(R.id.passwordListView) as RecyclerView
         recyclerView!!.layoutManager = LinearLayoutManager(this)
         recyclerView!!.adapter = adapter
@@ -138,7 +138,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener, SimpleCallbac
         val scale = resources.displayMetrics.density
         // ドラックアンドドロップの操作を実装する
         simpleCallbackHelper =
-            object : SimpleCallbackHelper(applicationContext, recyclerView, scale, this) {
+            object : SimpleCallbackHelper(applicationContext, recyclerView, scale, PasswordListCallbackListener()) {
                 @SuppressLint("ResourceType")
                 override fun instantiateUnderlayButton(
                     viewHolder: RecyclerView.ViewHolder,
@@ -149,81 +149,90 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener, SimpleCallbac
                         getString(R.string.delete),
                         BitmapFactory.decodeResource(resources, R.drawable.ic_delete),
                         Color.parseColor(getString(R.color.underlay_red)),
-                        viewHolder as ListViewAdapter.ViewHolder
-                    ) { holder, pos ->
-                        AlertDialog.Builder(this@PasswordListActivity)
-                            .setTitle(
-                                getString(R.string.delete_title_head) + (holder as ListViewAdapter.ViewHolder).title.text.toString() + getString(
-                                    R.string.delete_title
-                                )
-                            )
-                            .setMessage(getString(R.string.delete_message))
-                            .setPositiveButton(getString(R.string.delete_execute)) { dialog1: DialogInterface?, which: Int ->
-                                listDataManager!!.deleteData((holder as ListViewAdapter.ViewHolder).id.toString())
-                                simpleCallbackHelper!!.resetSwipePos()
-                                reflesh()
+                        viewHolder as ListViewAdapter.ViewHolder,
+                        object : UnderlayButtonClickListener {
+                            override fun onClick(holder: RecyclerView.ViewHolder, pos: Int) {
+                                AlertDialog.Builder(this@PasswordListActivity)
+                                    .setTitle(
+                                        getString(R.string.delete_title_head) + (holder as ListViewAdapter.ViewHolder).title?.text.toString() + getString(
+                                            R.string.delete_title
+                                        )
+                                    )
+                                    .setMessage(getString(R.string.delete_message))
+                                    .setPositiveButton(getString(R.string.delete_execute)) { dialog1: DialogInterface?, which: Int ->
+                                        listDataManager!!.deleteData((holder as ListViewAdapter.ViewHolder).id.toString())
+                                        simpleCallbackHelper!!.resetSwipePos()
+                                        reflesh()
+                                    }
+                                    .setNegativeButton(getString(R.string.delete_cancel), null)
+                                    .show()
                             }
-                            .setNegativeButton(getString(R.string.delete_cancel), null)
-                            .show()
-                    })
+                        }
+                    ))
                     underlayButtons.add(UnderlayButton(
                         getString(R.string.edit),
                         BitmapFactory.decodeResource(resources, R.drawable.ic_edit),
                         Color.parseColor(getString(R.color.underlay_gray)),
-                        viewHolder
-                    ) { holder, pos -> // 入力画面を生成
-                        val intent =
-                            Intent(this@PasswordListActivity, InputPasswordActivity::class.java)
-                        // 選択アイテムを編集モードで設定
-                        intent.putExtra("ID", (holder as ListViewAdapter.ViewHolder).id)
-                        intent.putExtra("EDIT", true)
-                        intent.putExtra(
-                            "TITLE",
-                            (holder as ListViewAdapter.ViewHolder).title.text.toString()
-                        )
-                        intent.putExtra(
-                            "ACCOUNT",
-                            (holder as ListViewAdapter.ViewHolder).account
-                        )
-                        intent.putExtra(
-                            "PASSWORD",
-                            (holder as ListViewAdapter.ViewHolder).password
-                        )
-                        intent.putExtra("URL", (holder as ListViewAdapter.ViewHolder).url)
-                        intent.putExtra("GROUP", (holder as ListViewAdapter.ViewHolder).groupId)
-                        intent.putExtra("MEMO", (holder as ListViewAdapter.ViewHolder).memo)
-                        startActivityForResult(intent, EDIT_DATA)
-                    })
+                        viewHolder,
+                        object : UnderlayButtonClickListener {
+                            override fun onClick(holder: RecyclerView.ViewHolder, pos: Int) {
+                                val intent =
+                                    Intent(this@PasswordListActivity, InputPasswordActivity::class.java)
+                                // 選択アイテムを編集モードで設定
+                                intent.putExtra("ID", (holder as ListViewAdapter.ViewHolder).id)
+                                intent.putExtra("EDIT", true)
+                                intent.putExtra(
+                                    "TITLE",
+                                    (holder as ListViewAdapter.ViewHolder).title?.text.toString()
+                                )
+                                intent.putExtra(
+                                    "ACCOUNT",
+                                    (holder as ListViewAdapter.ViewHolder).account
+                                )
+                                intent.putExtra(
+                                    "PASSWORD",
+                                    (holder as ListViewAdapter.ViewHolder).password
+                                )
+                                intent.putExtra("URL", (holder as ListViewAdapter.ViewHolder).url)
+                                intent.putExtra("GROUP", (holder as ListViewAdapter.ViewHolder).groupId)
+                                intent.putExtra("MEMO", (holder as ListViewAdapter.ViewHolder).memo)
+                                startActivityForResult(intent, EDIT_DATA)
+                            }
+                        }
+                    ))
                     underlayButtons.add(UnderlayButton(
                         getString(R.string.copy),
                         BitmapFactory.decodeResource(resources, R.drawable.ic_copy),
                         Color.parseColor(getString(R.color.underlay_gray)),
-                        viewHolder
-                    ) { holder, pos -> // 入力画面を生成
-                        val intent =
-                            Intent(this@PasswordListActivity, InputPasswordActivity::class.java)
-                        // 選択アイテムを複製モードで設定
-                        intent.putExtra("ID", listDataManager.getNewId())
-                        intent.putExtra("EDIT", false)
-                        intent.putExtra(
-                            "TITLE",
-                            (holder as ListViewAdapter.ViewHolder).title.text.toString() + " " + getString(
-                                R.string.copy_title
-                            )
-                        )
-                        intent.putExtra(
-                            "ACCOUNT",
-                            (holder as ListViewAdapter.ViewHolder).account
-                        )
-                        intent.putExtra(
-                            "PASSWORD",
-                            (holder as ListViewAdapter.ViewHolder).password
-                        )
-                        intent.putExtra("URL", (holder as ListViewAdapter.ViewHolder).url)
-                        intent.putExtra("GROUP", (holder as ListViewAdapter.ViewHolder).groupId)
-                        intent.putExtra("MEMO", (holder as ListViewAdapter.ViewHolder).memo)
-                        startActivityForResult(intent, EDIT_DATA)
-                    })
+                        viewHolder,
+                        object : UnderlayButtonClickListener {
+                            override fun onClick(holder: RecyclerView.ViewHolder, pos: Int) {
+                                val intent =
+                                    Intent(this@PasswordListActivity, InputPasswordActivity::class.java)
+                                // 選択アイテムを複製モードで設定
+                                intent.putExtra("ID", listDataManager?.newId)
+                                intent.putExtra("EDIT", false)
+                                intent.putExtra(
+                                     "TITLE",
+                                     (holder as ListViewAdapter.ViewHolder).title?.text.toString() + " " + getString(
+                                        R.string.copy_title
+                                    )
+                                )
+                                intent.putExtra(
+                                     "ACCOUNT",
+                                    (holder as ListViewAdapter.ViewHolder).account
+                                )
+                                intent.putExtra(
+                                     "PASSWORD",
+                                    (holder as ListViewAdapter.ViewHolder).password
+                                )
+                                intent.putExtra("URL", (holder as ListViewAdapter.ViewHolder).url)
+                                intent.putExtra("GROUP", (holder as ListViewAdapter.ViewHolder).groupId)
+                                intent.putExtra("MEMO", (holder as ListViewAdapter.ViewHolder).memo)
+                                startActivityForResult(intent, EDIT_DATA)
+                            }
+                        }
+                    ))
                 }
             }
 
@@ -231,7 +240,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener, SimpleCallbac
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
             val intent = Intent(this@PasswordListActivity, InputPasswordActivity::class.java)
-            intent.putExtra("ID", listDataManager.getNewId())
+            intent.putExtra("ID", listDataManager?.newId)
             intent.putExtra("EDIT", false)
             startActivityForResult(intent, EDIT_DATA)
         }
@@ -313,50 +322,50 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener, SimpleCallbac
         when (item.itemId) {
             android.R.id.home -> {
                 // 編集状態は解除する
-                adapter.setEditEnable(false)
+                adapter?.editEnable = false
                 finish()
             }
 
             R.id.edit_mode -> {
                 // 編集状態の変更
                 listDataManager!!.sortListData(ListDataManager.Companion.SORT_ID)
-                if (adapter.getEditEnable()) {
+                if (adapter?.editEnable == true) {
                     setCurrentSelectMenuTitle(menu!!.findItem(R.id.sort_default), R.id.sort_default)
-                    adapter.setEditEnable(false)
+                    adapter?.editEnable = false
                 } else {
                     setCurrentSelectMenuTitle(item, R.id.edit_mode)
-                    adapter.setEditEnable(true)
+                    adapter?.editEnable = true
                 }
                 title = getString(R.string.sort_name_default) + "：" + selectGroupName
                 recyclerView!!.adapter = adapter
-                loginDataManager!!.sortKey = ListDataManager.Companion.SORT_ID
+                loginDataManager!!.setSortKey(ListDataManager.Companion.SORT_ID)
             }
 
             R.id.sort_default -> {
                 setCurrentSelectMenuTitle(item, R.id.sort_default)
                 title = getString(R.string.sort_name_default) + "：" + selectGroupName
                 listDataManager!!.sortListData(ListDataManager.Companion.SORT_ID)
-                if (adapter.getEditEnable()) adapter.setEditEnable(false)
+                if (adapter?.editEnable == true) adapter?.editEnable = false
                 recyclerView!!.adapter = adapter
-                loginDataManager!!.sortKey = ListDataManager.Companion.SORT_ID
+                loginDataManager!!.setSortKey(ListDataManager.Companion.SORT_ID)
             }
 
             R.id.sort_title -> {
                 setCurrentSelectMenuTitle(item, R.id.sort_title)
                 title = getString(R.string.sort_name_title) + "：" + selectGroupName
                 listDataManager!!.sortListData(ListDataManager.Companion.SORT_TITLE)
-                if (adapter.getEditEnable()) adapter.setEditEnable(false)
+                if (adapter?.editEnable == true) adapter?.editEnable = false
                 recyclerView!!.adapter = adapter
-                loginDataManager!!.sortKey = ListDataManager.Companion.SORT_TITLE
+                loginDataManager!!.setSortKey(ListDataManager.Companion.SORT_TITLE)
             }
 
             R.id.sort_update -> {
                 setCurrentSelectMenuTitle(item, R.id.sort_update)
                 title = getString(R.string.sort_name_update) + "：" + selectGroupName
                 listDataManager!!.sortListData(ListDataManager.Companion.SORT_INPUTDATE)
-                if (adapter.getEditEnable()) adapter.setEditEnable(false)
+                if (adapter?.editEnable == true) adapter?.editEnable = false
                 recyclerView!!.adapter = adapter
-                loginDataManager!!.sortKey = ListDataManager.Companion.SORT_INPUTDATE
+                loginDataManager!!.setSortKey(ListDataManager.Companion.SORT_INPUTDATE)
             }
 
             R.id.select_group -> {
@@ -407,7 +416,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener, SimpleCallbac
         }
         // 選択していたグループが存在しなくなった場合には「すべて」にリセットする
         if (!isSelectGroupExist) {
-            loginDataManager!!.selectGroup = 1L
+            loginDataManager!!.setSelectGroup(1L)
             listDataManager!!.setSelectGroupId(1L)
         }
         title = when (loginDataManager!!.sortKey) {
@@ -422,13 +431,13 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener, SimpleCallbac
         super.onResume()
         var needRefresh = false
         // メモ表示設定に変更があった場合には再描画する
-        if (currentMemoVisible != loginDataManager!!.isMemoVisibleSwitchEnable) {
-            currentMemoVisible = loginDataManager!!.isMemoVisibleSwitchEnable
+        if (currentMemoVisible != loginDataManager!!.memoVisibleSwitchEnable) {
+            currentMemoVisible = loginDataManager!!.memoVisibleSwitchEnable
             needRefresh = true
         }
         // テキストサイズ設定に変更があった場合には再描画する
-        if (adapter.getTextSize() != loginDataManager!!.textSize) {
-            adapter.setTextSize(loginDataManager!!.textSize)
+        if (adapter?.textSize != loginDataManager!!.textSize) {
+            adapter?.textSize = loginDataManager!!.textSize
             needRefresh = true
         }
         if (needRefresh) reflesh()
@@ -467,7 +476,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener, SimpleCallbac
         listDataManager!!.closeData()
         if (mAdView != null) mAdView!!.destroy()
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
-        if (loginDataManager!!.isDisplayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.getIsBackground()) {
+        if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.isBackground) {
             finishAffinity()
         }
         super.onDestroy()
@@ -475,7 +484,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener, SimpleCallbac
 
     override fun onAdapterClicked(view: View) {
         // 編集状態の場合は入力画面に遷移しない
-        if (adapter.getEditEnable() == true) {
+        if (adapter?.editEnable == true) {
             return
         }
         // 入力画面を生成
@@ -483,7 +492,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener, SimpleCallbac
         // 選択アイテムを設定
         val holder = view.tag as ListViewAdapter.ViewHolder
         intent.putExtra("ID", holder.id)
-        intent.putExtra("TITLE", holder.title.text.toString())
+        intent.putExtra("TITLE", holder.title?.text.toString())
         intent.putExtra("ACCOUNT", holder.account)
         intent.putExtra("PASSWORD", holder.password)
         intent.putExtra("URL", holder.url)
@@ -513,25 +522,28 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener, SimpleCallbac
         }
     }
 
-    override fun onSimpleCallbackMove(
-        viewHolder: RecyclerView.ViewHolder,
-        target: RecyclerView.ViewHolder
-    ): Boolean {
-        if (adapter.getEditEnable() && TextUtils.isEmpty(seachViewWord)) {
-            val fromPos = viewHolder.adapterPosition
-            val toPos = target.adapterPosition
-            adapter!!.notifyItemMoved(fromPos, toPos)
-            listDataManager!!.rearrangeData(fromPos, toPos)
-            return true
-        }
-        return false
-    }
 
-    override fun clearSimpleCallbackView(
-        recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder
-    ) {
-        recyclerView.adapter = adapter
+    inner class PasswordListCallbackListener : SimpleCallbackListener {
+        override fun onSimpleCallbackMove(
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            if (adapter?.editEnable == true && TextUtils.isEmpty(seachViewWord)) {
+                val fromPos = viewHolder.adapterPosition
+                val toPos = target.adapterPosition
+                adapter!!.notifyItemMoved(fromPos, toPos)
+                listDataManager!!.rearrangeData(fromPos, toPos)
+                return true
+            }
+            return false
+        }
+
+        override fun clearSimpleCallbackView(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ) {
+            recyclerView.adapter = adapter
+        }
     }
 
     companion object {

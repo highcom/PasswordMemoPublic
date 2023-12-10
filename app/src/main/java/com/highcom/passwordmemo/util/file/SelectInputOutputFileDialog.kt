@@ -11,7 +11,7 @@ class SelectInputOutputFileDialog(
     private val inputOutputFileDialogListener: InputOutputFileDialogListener
 ) {
     private var checkedItem = -1
-    private var items: Array<String?>
+    private lateinit var items: Array<String?>
 
     enum class Operation {
         DB_RESTORE_BACKUP, CSV_INPUT_OUTPUT

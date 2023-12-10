@@ -12,17 +12,28 @@ import com.highcom.passwordmemo.util.TextSizeUtil
 class LoginDataManager private constructor(activity: Activity) {
     private val sharedPref: SharedPreferences
     private val passUtil: MasterPasswordUtil
-    private var masterPassword: String? = null
-    private var sortKey: String? = null
-    private var deleteSwitchEnable = false
-    private var biometricLoginSwitchEnable = false
-    private var displayBackgroundSwitchEnable = false
-    private var memoVisibleSwitchEnable = false
-    private var passwordVisibleSwitchEnable = false
-    private var backgroundColor = 0
-    private var textSize = 0f
-    private var copyClipboard = 0
-    private var selectGroup: Long = 0
+    var masterPassword: String? = null
+        private set
+    var sortKey: String? = null
+        private set
+    var deleteSwitchEnable = false
+        private set
+    var biometricLoginSwitchEnable = false
+        private set
+    var displayBackgroundSwitchEnable = false
+        private set
+    var memoVisibleSwitchEnable = false
+        private set
+    var passwordVisibleSwitchEnable = false
+        private set
+    var backgroundColor = 0
+        private set
+    var textSize = 0f
+        private set
+    var copyClipboard = 0
+        private set
+    var selectGroup: Long = 0
+        private set
 
     init {
         sharedPref = activity.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
@@ -51,17 +62,9 @@ class LoginDataManager private constructor(activity: Activity) {
         }
     }
 
-    fun getSortKey(): String? {
-        return sortKey
-    }
-
     fun setSortKey(key: String?) {
         sharedPref.edit().putString("sortKey", key).apply()
         sortKey = key
-    }
-
-    fun isDeleteSwitchEnable(): Boolean {
-        return deleteSwitchEnable
     }
 
     fun setDeleteSwitchEnable(b: Boolean) {
@@ -69,17 +72,9 @@ class LoginDataManager private constructor(activity: Activity) {
         updateSetting()
     }
 
-    fun isBiometricLoginSwitchEnable(): Boolean {
-        return biometricLoginSwitchEnable
-    }
-
     fun setBiometricLoginSwitchEnable(b: Boolean) {
         sharedPref.edit().putBoolean("biometricLoginSwitchEnable", b).apply()
         updateSetting()
-    }
-
-    fun isDisplayBackgroundSwitchEnable(): Boolean {
-        return displayBackgroundSwitchEnable
     }
 
     fun setDisplayBackgroundSwitchEnable(b: Boolean) {
@@ -87,17 +82,9 @@ class LoginDataManager private constructor(activity: Activity) {
         updateSetting()
     }
 
-    fun isMemoVisibleSwitchEnable(): Boolean {
-        return memoVisibleSwitchEnable
-    }
-
     fun setMemoVisibleSwitchEnable(b: Boolean) {
         sharedPref.edit().putBoolean("memoVisibleSwitchEnable", b).apply()
         updateSetting()
-    }
-
-    fun isPasswordVisibleSwitchEnable(): Boolean {
-        return passwordVisibleSwitchEnable
     }
 
     fun setPasswordVisibleSwitchEnable(b: Boolean) {
@@ -105,18 +92,9 @@ class LoginDataManager private constructor(activity: Activity) {
         updateSetting()
     }
 
-    @ColorInt
-    fun getBackgroundColor(): Int {
-        return backgroundColor
-    }
-
     fun setBackgroundColor(@ColorInt color: Int) {
         sharedPref.edit().putInt("backgroundColor", color).apply()
         backgroundColor = color
-    }
-
-    fun getTextSize(): Float {
-        return textSize
     }
 
     fun setTextSize(size: Float) {
@@ -124,17 +102,9 @@ class LoginDataManager private constructor(activity: Activity) {
         textSize = size
     }
 
-    fun getCopyClipboard(): Int {
-        return copyClipboard
-    }
-
     fun setCopyClipboard(operation: Int) {
         sharedPref.edit().putInt("copyClipboard", operation).apply()
         copyClipboard = operation
-    }
-
-    fun getSelectGroup(): Long {
-        return selectGroup
     }
 
     fun setSelectGroup(select: Long) {
@@ -144,10 +114,6 @@ class LoginDataManager private constructor(activity: Activity) {
 
     val isMasterPasswordCreated: Boolean
         get() = if (masterPassword != null) true else false
-
-    fun getMasterPassword(): String? {
-        return masterPassword
-    }
 
     fun setMasterPassword(password: String?) {
         try {

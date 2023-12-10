@@ -31,65 +31,64 @@ class GroupListAdapter(
     }
 
     inner class GroupViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var rowLinearLayout: LinearLayout
+        var rowLinearLayout: LinearLayout? = null
         var groupId: Long? = null
         var groupOrder = 0
-        var groupImage: ImageButton
-        var groupName: EditText
+        var groupImage: ImageButton? = null
+        var groupName: EditText? = null
         private var orgGroupName = ""
-        var groupRearrangeButton: ImageButton
+        var groupRearrangeButton: ImageButton? = null
 
         init {
             // フッターの場合には何も設定しない
-            if (itemView.id == R.id.row_footer) {
-                return
-            }
-            rowLinearLayout = itemView.findViewById<View>(R.id.rowGroupLayout) as LinearLayout
-            groupImage = itemView.findViewById<View>(R.id.folder_icon) as ImageButton
-            groupName = itemView.findViewById<View>(R.id.groupName) as EditText
-            groupImage.setOnClickListener { view: View ->
-                if (!editEnable) {
-                    orgGroupName = groupName.text.toString()
-                    adapterListener.onGroupNameClicked(view, groupId)
-                }
-            }
-            groupName.setOnClickListener { view: View ->
-                orgGroupName = groupName.text.toString()
-                adapterListener.onGroupNameClicked(view, groupId)
-            }
-            groupName.onFocusChangeListener = OnFocusChangeListener { view: View, b: Boolean ->
-                if (b) {
-                    orgGroupName = groupName.text.toString()
-                    adapterListener.onGroupNameClicked(view, groupId)
-                } else {
-                    // グループ名を空欄で登録することは出来ないので元の名前にする
-                    if (groupName.text.toString() == "") {
-                        groupName.setText(orgGroupName)
+            if (itemView.id != R.id.row_footer) {
+                rowLinearLayout = itemView.findViewById<View>(R.id.rowGroupLayout) as LinearLayout
+                groupImage = itemView.findViewById<View>(R.id.folder_icon) as ImageButton
+                groupName = itemView.findViewById<View>(R.id.groupName) as EditText
+                groupImage?.setOnClickListener { view: View ->
+                    if (!editEnable) {
+                        orgGroupName = groupName?.text.toString()
+                        adapterListener.onGroupNameClicked(view, groupId)
                     }
-                    val data: MutableMap<String?, String?> = HashMap()
-                    data["group_id"] = java.lang.Long.valueOf(groupId!!).toString()
-                    data["group_order"] = Integer.valueOf(groupOrder).toString()
-                    data["name"] = groupName.text.toString()
-                    // フォーカスが外れた時に内容が変更されていたら更新する
-                    adapterListener.onGroupNameOutOfFocused(view, data)
                 }
-            }
-            // キーボードのエンターが押下された場合
-            groupName.setOnEditorActionListener { textView, i, keyEvent ->
-                if (i == EditorInfo.IME_ACTION_DONE) {
-                    textView.isFocusable = false
-                    textView.isFocusableInTouchMode = false
-                    textView.requestFocus()
+                groupName?.setOnClickListener { view: View ->
+                    orgGroupName = groupName?.text.toString()
+                    adapterListener.onGroupNameClicked(view, groupId)
                 }
-                false
+                groupName?.onFocusChangeListener = OnFocusChangeListener { view: View, b: Boolean ->
+                    if (b) {
+                        orgGroupName = groupName?.text.toString()
+                        adapterListener.onGroupNameClicked(view, groupId)
+                    } else {
+                        // グループ名を空欄で登録することは出来ないので元の名前にする
+                        if (groupName?.text.toString() == "") {
+                            groupName?.setText(orgGroupName)
+                        }
+                        val data: MutableMap<String?, String?> = HashMap()
+                        data["group_id"] = java.lang.Long.valueOf(groupId!!).toString()
+                        data["group_order"] = Integer.valueOf(groupOrder).toString()
+                        data["name"] = groupName?.text.toString()
+                        // フォーカスが外れた時に内容が変更されていたら更新する
+                        adapterListener.onGroupNameOutOfFocused(view, data)
+                    }
+                }
+                // キーボードのエンターが押下された場合
+                groupName?.setOnEditorActionListener { textView, i, keyEvent ->
+                    if (i == EditorInfo.IME_ACTION_DONE) {
+                        textView.isFocusable = false
+                        textView.isFocusableInTouchMode = false
+                        textView.requestFocus()
+                    }
+                    false
+                }
+                groupRearrangeButton = itemView.findViewById(R.id.groupRearrangeButton)
             }
-            groupRearrangeButton = itemView.findViewById(R.id.groupRearrangeButton)
         }
     }
 
     init {
         inflater = LayoutInflater.from(context)
-        layoutHeightMap = object : HashMap<Int?, Float?>() {
+        layoutHeightMap = object : HashMap<Int, Float>() {
             init {
                 put(
                     TextSizeUtil.Companion.TEXT_SIZE_SMALL,
@@ -135,26 +134,26 @@ class GroupListAdapter(
         } else if (viewType == TYPE_FOOTER) {
             GroupViewHolder(inflater.inflate(R.layout.row_footer, parent, false))
         } else {
-            null
+            GroupViewHolder(inflater.inflate(R.layout.row_group, parent, false))
         }
     }
 
-    override fun onBindViewHolder(holder: GroupViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: GroupViewHolder, position: Int) {
         // フッターの場合にはデータをバインドしない
         if (position >= listData!!.size) return
         val layoutHeight = layoutHeightMap[textSize.toInt()]
         if (layoutHeight != null) {
-            val params = holder!!.rowLinearLayout.layoutParams
-            params.height = layoutHeight.toInt()
-            holder.rowLinearLayout.layoutParams = params
+            val params = holder!!.rowLinearLayout?.layoutParams
+            params?.height = layoutHeight.toInt()
+            holder.rowLinearLayout?.layoutParams = params
         }
         val groupId = (listData[position] as HashMap<*, *>?)!!["group_id"].toString()
         val groupOrder = (listData[position] as HashMap<*, *>?)!!["group_order"].toString()
         val groupName = (listData[position] as HashMap<*, *>?)!!["name"].toString()
         holder!!.groupId = java.lang.Long.valueOf(groupId)
         holder.groupOrder = Integer.valueOf(groupOrder)
-        holder.groupName.setText(groupName)
-        holder.groupName.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
+        holder.groupName?.setText(groupName)
+        holder.groupName?.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
         holder.itemView.tag = holder
         // グループ名が空欄があった場合は新規追加時なのでフォーカスする
         if (groupName == "") {
@@ -165,9 +164,9 @@ class GroupListAdapter(
         }
         // 編集モードでも1番目の「すべて」は並べ替えさせない
         if (editEnable && holder.groupId != null && holder.groupId != 1L) {
-            holder.groupRearrangeButton.visibility = View.VISIBLE
+            holder.groupRearrangeButton?.visibility = View.VISIBLE
         } else {
-            holder.groupRearrangeButton.visibility = View.GONE
+            holder.groupRearrangeButton?.visibility = View.GONE
         }
     }
 

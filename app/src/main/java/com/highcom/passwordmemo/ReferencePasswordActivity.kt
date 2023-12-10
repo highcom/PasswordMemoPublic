@@ -37,13 +37,13 @@ class ReferencePasswordActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reference_password)
         adContainerView = findViewById(R.id.adView_frame_reference)
-        adContainerView.post(Runnable { loadBanner() })
+        adContainerView?.post(Runnable { loadBanner() })
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         loginDataManager = LoginDataManager.Companion.getInstance(this)
         listDataManager = ListDataManager.Companion.getInstance(this)
 
         // バックグラウンドでは画面の中身が見えないようにする
-        if (loginDataManager!!.isDisplayBackgroundSwitchEnable) {
+        if (loginDataManager!!.displayBackgroundSwitchEnable) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
 
@@ -85,7 +85,7 @@ class ReferencePasswordActivity : AppCompatActivity() {
         }
         val passwordText = findViewById<View>(R.id.editRefPassword) as EditText
         // パスワードの初期表示設定
-        if (loginDataManager!!.isPasswordVisibleSwitchEnable) passwordText.inputType =
+        if (loginDataManager!!.passwordVisibleSwitchEnable) passwordText.inputType =
             InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
         // パスワードをクリックor長押し時の処理
         passwordText.setOnClickListener { v ->
@@ -162,7 +162,7 @@ class ReferencePasswordActivity : AppCompatActivity() {
                 // 入力画面を生成
                 intent = Intent(this@ReferencePasswordActivity, InputPasswordActivity::class.java)
                 // 選択アイテムを複製モードで設定
-                intent.putExtra("ID", listDataManager.getNewId())
+                intent.putExtra("ID", listDataManager?.newId)
                 intent.putExtra("EDIT", false)
                 intent.putExtra("TITLE", title.toString() + " " + getString(R.string.copy_title))
                 intent.putExtra(
@@ -269,7 +269,7 @@ class ReferencePasswordActivity : AppCompatActivity() {
     public override fun onDestroy() {
         if (mAdView != null) mAdView!!.destroy()
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
-        if (loginDataManager!!.isDisplayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.getIsBackground()) {
+        if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.isBackground) {
             finishAffinity()
         }
         super.onDestroy()
