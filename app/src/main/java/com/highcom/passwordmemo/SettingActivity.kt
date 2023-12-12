@@ -120,7 +120,7 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         copyClipboardSpinner?.setAdapter(copyClipboardAdapter)
         copyClipboardSpinner?.setSelection(loginDataManager!!.copyClipboard)
         copyClipboardSpinner?.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(adapterView: AdapterView<*>?, view: View, i: Int, l: Long) {
+            override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, i: Int, l: Long) {
                 loginDataManager!!.setCopyClipboard(i)
             }
 

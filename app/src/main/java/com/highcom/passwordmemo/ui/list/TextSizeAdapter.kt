@@ -39,7 +39,7 @@ class TextSizeAdapter(
         return position.toLong()
     }
 
-    override fun getView(position: Int, convertView: View, parent: ViewGroup): View {
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         var convertView = convertView
         val holder: TextSizeViewHolder
         if (convertView == null) {
@@ -52,6 +52,6 @@ class TextSizeAdapter(
         }
         holder.textView!!.text = names[position]
         holder.textView!!.setTextSize(TypedValue.COMPLEX_UNIT_DIP, sizes[position].toFloat())
-        return convertView
+        return convertView!!
     }
 }
