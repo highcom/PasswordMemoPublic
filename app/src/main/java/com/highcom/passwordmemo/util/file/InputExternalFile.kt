@@ -133,7 +133,7 @@ class InputExternalFile(private val activity: Activity, listener: InputExternalF
             group["name"] = activity.getString(R.string.list_title)
             groupList?.add(group)
             id = HEADER_RECORD
-            while (reader.readLine().also { line = it } != null) {
+            while (reader.readLine().also { line = it ?: "" } != null) {
                 val result = line.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                 // カラム数が合っていなかった場合終了
                 if (result.size != 6 && result.size != 7) return false
