@@ -46,6 +46,8 @@ android {
 }
 
 dependencies {
+    def room_version = "2.5.0"
+
     implementation "androidx.multidex:multidex:2.0.1"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
@@ -62,7 +64,7 @@ dependencies {
             because 'previous versions have a bug impacting this application'
         }
     }
-    implementation 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
+    implementation 'net.zetetic:android-database-sqlcipher:4.4.2'
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     // materialのバージョンをあげるとビルドエラーになるので保留
     implementation 'com.google.android.material:material:1.4.0'
@@ -71,11 +73,16 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics:17.4.0'
     implementation 'com.github.albfernandez:juniversalchardet:2.3.2'
     implementation 'com.google.firebase:firebase-messaging:23.0.8'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'jp.co.recruit_mp:android-RMP-Appirater:1.1.1'
     // The minCompileSdk (33) specified となるので保留
     implementation 'androidx.biometric:biometric:1.2.0-alpha03'
     implementation 'org.apache.commons:commons-lang3:3.7'
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.2"
+    //noinspection GradleDependency
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
