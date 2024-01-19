@@ -21,12 +21,16 @@ import android.widget.NumberPicker
 import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.database.ListDataManager
 import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
+import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import org.apache.commons.lang3.RandomStringUtils
 import java.text.SimpleDateFormat
@@ -50,6 +54,10 @@ class InputPasswordActivity : AppCompatActivity() {
     var selectGroupSpinner: Spinner? = null
     var selectGroupNames: ArrayList<String?>? = null
     private var selectGroupId: Long? = null
+
+    private val passwordListViewModel: PasswordListViewModel by viewModels {
+        PasswordListViewModel.Factory((application as PasswordMemoApplication).repository)
+    }
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -156,21 +164,21 @@ class InputPasswordActivity : AppCompatActivity() {
             android.R.id.home -> finish()
             R.id.action_done -> {
                 // 入力データを登録する
-                val editTitle = findViewById<View>(R.id.editTitle) as EditText
-                val editAccount = findViewById<View>(R.id.editAccount) as EditText
-                val editPassword = findViewById<View>(R.id.editPassword) as EditText
-                val editUrl = findViewById<View>(R.id.editUrl) as EditText
-                val editMemo = findViewById<View>(R.id.editMemo) as EditText
-                val data: MutableMap<String?, String?> = HashMap()
-                data["id"] = java.lang.Long.valueOf(id).toString()
-                data["title"] = editTitle.text.toString()
-                data["account"] = editAccount.text.toString()
-                data["password"] = editPassword.text.toString()
-                data["url"] = editUrl.text.toString()
-                data["group_id"] = selectGroupId.toString()
-                data["memo"] = editMemo.text.toString()
-                data["inputdate"] = nowDate
-                ListDataManager.Companion.getInstance(this)!!.setData(editState, data)
+                val passwordEntity = PasswordEntity(
+                    id = id,
+                    title = findViewById<EditText>(R.id.editTitle).text.toString(),
+                    account = findViewById<EditText>(R.id.editAccount).text.toString(),
+                    password = findViewById<EditText>(R.id.editPassword).text.toString(),
+                    url = findViewById<EditText>(R.id.editUrl).text.toString(),
+                    groupId = selectGroupId ?: 1,
+                    memo = findViewById<EditText>(R.id.editMemo).text.toString(),
+                    inputDate = nowDate
+                )
+                if (editState) {
+                    passwordListViewModel.update(passwordEntity)
+                } else {
+                    passwordListViewModel.insert(passwordEntity)
+                }
                 // 詳細画面を終了
                 finish()
             }

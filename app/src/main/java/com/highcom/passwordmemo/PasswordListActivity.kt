@@ -14,6 +14,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Filterable
 import android.widget.FrameLayout
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -34,6 +35,7 @@ import com.highcom.passwordmemo.ui.list.ListViewAdapter
 import com.highcom.passwordmemo.ui.list.ListViewAdapter.AdapterListener
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper.SimpleCallbackListener
+import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import jp.co.recruit_mp.android.rmp_appirater.RmpAppirater
 import jp.co.recruit_mp.android.rmp_appirater.RmpAppirater.ShowRateDialogCondition
@@ -54,6 +56,10 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
     private var currentMenuSelect = 0
     private var currentMemoVisible: Boolean? = null
     var seachViewWord: String? = null
+
+    private val passwordListViewModel: PasswordListViewModel by viewModels {
+        PasswordListViewModel.Factory((application as PasswordMemoApplication).repository)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_password_list)
@@ -160,7 +166,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
                                     )
                                     .setMessage(getString(R.string.delete_message))
                                     .setPositiveButton(getString(R.string.delete_execute)) { dialog1: DialogInterface?, which: Int ->
-                                        listDataManager!!.deleteData((holder as ListViewAdapter.ViewHolder).id.toString())
+                                        holder.id?.let { passwordListViewModel.delete(it) }
                                         simpleCallbackHelper!!.resetSwipePos()
                                         reflesh()
                                     }

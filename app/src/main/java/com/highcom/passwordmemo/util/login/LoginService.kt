@@ -16,9 +16,10 @@ import androidx.fragment.app.FragmentActivity
 import com.highcom.passwordmemo.PasswordListActivity
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.database.ListDataManager
+import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import java.util.concurrent.Executor
 
-class LoginService(var loginDataManager: LoginDataManager?) {
+class LoginService(private var loginDataManager: LoginDataManager?, private val passwordListViewModel: PasswordListViewModel) {
     private var incorrectPwCount = 0
     var firstTime = false
     var firstPassword: String? = null
@@ -80,10 +81,12 @@ class LoginService(var loginDataManager: LoginDataManager?) {
             incorrectPwCount += 1
             if (incorrectPwCount >= 5) {
                 incorrectPwCount = 0
-                loginDataManager!!.clearAllData()
-                val manager: ListDataManager? = ListDataManager.Companion.getInstance(activity)
-                manager?.deleteAllData()
-                manager?.closeData()
+//                loginDataManager!!.clearAllData()
+//                val manager: ListDataManager? = ListDataManager.Companion.getInstance(activity)
+//                manager?.deleteAllData()
+//                manager?.closeData()
+                // TODO:グループの全削除と初期グループの登録を実施する必要がある
+                passwordListViewModel.deleteAll()
                 // すべてのデータを削除したことを表示
                 val ts = Toast.makeText(
                     activity,

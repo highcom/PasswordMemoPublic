@@ -17,10 +17,12 @@ import android.widget.Spinner
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import com.google.android.material.textfield.TextInputEditText
 import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
+import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import com.highcom.passwordmemo.util.BackgroundColorUtil
 import com.highcom.passwordmemo.util.BackgroundColorUtil.BackgroundColorListener
 import com.highcom.passwordmemo.util.TextSizeUtil
@@ -43,6 +45,10 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
     private val handler = Handler()
     var copyClipboardSpinner: Spinner? = null
     var copyClipboardNames: ArrayList<String?>? = null
+
+    private val passwordListViewModel: PasswordListViewModel by viewModels {
+        PasswordListViewModel.Factory((application as PasswordMemoApplication).repository)
+    }
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -268,7 +274,7 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
                 }
 
                 INPUT_CSV -> {
-                    val inputExternalFile = InputExternalFile(this, this)
+                    val inputExternalFile = InputExternalFile(this, passwordListViewModel, this)
                     inputExternalFile.inputSelectFolder(uri)
                 }
 

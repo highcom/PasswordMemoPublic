@@ -12,5 +12,5 @@ class PasswordMemoApplication : Application() {
     }
 
     val database by lazy { PasswordMemoRoomDatabase.getDatabase(this) }
-    val epository by lazy { PasswordMemoRepository(database.passwordDao(), database.groupDao()) }
+    val repository by lazy { PasswordMemoRepository(database.passwordDao(), database.groupDao()) }
 }

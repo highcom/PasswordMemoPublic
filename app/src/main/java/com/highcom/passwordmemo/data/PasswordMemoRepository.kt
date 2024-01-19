@@ -51,6 +51,14 @@ class PasswordMemoRepository(private val passwordDao: PasswordDao, private val g
     }
 
     /**
+     * パスワードデータ全削除
+     *
+     */
+    suspend fun deleteAllPassword() {
+        passwordDao.deleteAllPassword()
+    }
+
+    /**
      * グループデータ追加
      *
      * @param groupEntity グループデータ

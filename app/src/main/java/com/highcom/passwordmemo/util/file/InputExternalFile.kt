@@ -7,13 +7,16 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.os.HandlerCompat
 import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.database.ListDataManager
+import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStream
@@ -22,15 +25,15 @@ import java.io.PrintWriter
 import java.util.Objects
 import java.util.concurrent.Executors
 
-class InputExternalFile(private val activity: Activity, listener: InputExternalFileListener) {
-    private val context: Context
-    private var dataList: MutableList<Map<String?, String?>>? = null
+class InputExternalFile(private val activity: Activity,
+                        private val passwordListViewModel: PasswordListViewModel,
+                        private val listener: InputExternalFileListener) {
+    private var passwordList: MutableList<PasswordEntity>? = null
     private var groupList: MutableList<Map<String?, String?>>? = null
-    private var id = 0
+    private var id = 0L
     private var uri: Uri? = null
     private var progressAlertDialog: AlertDialog? = null
     private var progressBar: ProgressBar? = null
-    private val listener: InputExternalFileListener
 
     interface InputExternalFileListener {
         fun importComplete()
@@ -40,12 +43,14 @@ class InputExternalFile(private val activity: Activity, listener: InputExternalF
         @WorkerThread
         override fun run() {
             // 既存のデータは全て削除する
-            ListDataManager.Companion.getInstance(context)!!.deleteAllData()
-            val countUnit = dataList!!.size / 20
+//            ListDataManager.Companion.getInstance(activity)!!.deleteAllData()
+            // TODO:グループの全削除と初期グループの登録を実施する必要がある
+            passwordListViewModel.deleteAll()
+            val countUnit = passwordList?.size?.div(20) ?: 0
             var progressCount = 1
             // 結果が全て取り出せたらデータを登録していく
-            for (data in dataList!!) {
-                ListDataManager.Companion.getInstance(context)!!.setData(false, data)
+            for (entity in passwordList!!) {
+                passwordListViewModel.insert(entity)
                 if (countUnit > 0) {
                     // 5パーセントずつ表示を更新する
                     if (progressCount % countUnit == 0) {
@@ -57,7 +62,7 @@ class InputExternalFile(private val activity: Activity, listener: InputExternalF
             // 最後にグループデータを登録する
             for (data in groupList!!) {
                 if (data["group_id"] == "1") continue
-                ListDataManager.Companion.getInstance(context)!!.setGroupData(false, data)
+                ListDataManager.Companion.getInstance(activity)!!.setGroupData(false, data)
             }
             progressBar!!.progress = 100
             val postExecutor: PostExecutor = PostExecutor()
@@ -70,32 +75,27 @@ class InputExternalFile(private val activity: Activity, listener: InputExternalF
         override fun run() {
             progressAlertDialog!!.dismiss()
             listener.importComplete()
-            AlertDialog.Builder(context)
-                .setTitle(context.getString(R.string.input_csv))
+            AlertDialog.Builder(activity)
+                .setTitle(activity.getString(R.string.input_csv))
                 .setMessage(
-                    context.getString(R.string.csv_input_complete_message) + System.getProperty(
+                    activity.getString(R.string.csv_input_complete_message) + System.getProperty(
                         "line.separator"
-                    ) + getFileNameByUri(context, uri)
+                    ) + getFileNameByUri(activity, uri)
                 )
                 .setPositiveButton(R.string.ok, null)
                 .show()
         }
     }
 
-    init {
-        context = activity
-        this.listener = listener
-    }
-
     fun inputSelectFolder(uri: Uri?) {
         this.uri = uri
-        AlertDialog.Builder(context)
-            .setTitle(context.getString(R.string.input_csv))
+        AlertDialog.Builder(activity)
+            .setTitle(activity.getString(R.string.input_csv))
             .setMessage(
-                context.getString(R.string.input_message_front) + getFileNameByUri(
-                    context,
+                activity.getString(R.string.input_message_front) + getFileNameByUri(
+                    activity,
                     uri
-                ) + System.getProperty("line.separator") + context.getString(R.string.input_message_rear)
+                ) + System.getProperty("line.separator") + activity.getString(R.string.input_message_rear)
             )
             .setPositiveButton(R.string.input_button) { dialog, which ->
                 if (importDatabase(uri)) {
@@ -114,18 +114,18 @@ class InputExternalFile(private val activity: Activity, listener: InputExternalF
         var inputStream: InputStream? = null
         try {
             // 文字コードを判定し、判定できなければデフォルトをutf8とする
-            val fd = FileCharDetector(context, uri)
+            val fd = FileCharDetector(activity, uri)
             var encType = fd.detect()
             if (encType == null) encType = "UTF-8"
 
             // 判定された文字コードを指定してファイル読み込みを行う
-            inputStream = context.contentResolver.openInputStream(uri!!)
+            inputStream = activity.contentResolver.openInputStream(uri!!)
             val reader =
                 BufferedReader(InputStreamReader(Objects.requireNonNull(inputStream), encType))
             var line: String
             var isHeaderCorrect = false
             var columnCount = 0
-            dataList = ArrayList()
+            passwordList = ArrayList()
             groupList = ArrayList()
             val group: MutableMap<String?, String?> = HashMap()
             group["group_id"] = "1"
@@ -152,41 +152,43 @@ class InputExternalFile(private val activity: Activity, listener: InputExternalF
                     continue
                 }
                 if (isHeaderCorrect && columnCount == 6) {
-                    val data: MutableMap<String?, String?> = HashMap()
-                    data["id"] = id.toString()
-                    data["title"] = result[0]
-                    data["account"] = result[1]
-                    data["password"] = result[2]
-                    data["url"] = result[3]
-                    data["group_id"] = "1"
-                    data["memo"] = result[4]
-                    data["inputdate"] = result[5]
-                    dataList?.add(data)
+                    val passwordEntity = PasswordEntity(
+                        id = id,
+                        title = result[0],
+                        account = result[1],
+                        password = result[2],
+                        url = result[3],
+                        groupId = 1,
+                        memo = result[4],
+                        inputDate = result[5]
+                    )
+                    passwordList?.add(passwordEntity)
                 } else if (isHeaderCorrect && columnCount == 7) {
-                    var groupId = "0"
+                    var groupId = 0L
                     for (data in groupList!!) {
                         if (data["name"] == result[4]) {
-                            groupId = data["group_id"]!!
+                            groupId = (data["group_id"]!!).toLong()
                         }
                     }
-                    if (groupId == "0") {
+                    if (groupId == 0L) {
                         val data: MutableMap<String?, String?> = HashMap()
                         data["group_id"] = (groupList?.size?.plus(1)).toString()
                         data["group_order"] = (groupList?.size?.plus(1)).toString()
                         data["name"] = result[4]
-                        groupId = (groupList?.size?.plus(1)).toString()
+                        groupId = groupList?.size?.plus(1)!!.toLong()
                         groupList?.add(data)
                     }
-                    val data: MutableMap<String?, String?> = HashMap()
-                    data["id"] = id.toString()
-                    data["title"] = result[0]
-                    data["account"] = result[1]
-                    data["password"] = result[2]
-                    data["url"] = result[3]
-                    data["group_id"] = groupId
-                    data["memo"] = result[5].replace("  ", "\n")
-                    data["inputdate"] = result[6]
-                    dataList?.add(data)
+                    val passwordEntity = PasswordEntity(
+                        id = id,
+                        title = result[0],
+                        account = result[1],
+                        password = result[2],
+                        url = result[3],
+                        groupId = groupId,
+                        memo = result[5].replace("  ", "\n"),
+                        inputDate = result[6]
+                    )
+                    passwordList?.add(passwordEntity)
                 }
                 id++
             }
@@ -195,8 +197,8 @@ class InputExternalFile(private val activity: Activity, listener: InputExternalF
             if (!isHeaderCorrect) return false
         } catch (exc: Exception) {
             val ts = Toast.makeText(
-                context,
-                context.getString(R.string.csv_input_failed_message),
+                activity,
+                activity.getString(R.string.csv_input_failed_message),
                 Toast.LENGTH_SHORT
             )
             ts.show()
@@ -214,11 +216,11 @@ class InputExternalFile(private val activity: Activity, listener: InputExternalF
     }
 
     private fun execImportDatabase() {
-        AlertDialog.Builder(context)
-            .setTitle(context.getString(R.string.input_csv))
-            .setMessage(context.getString(R.string.csv_input_confirm_message))
+        AlertDialog.Builder(activity)
+            .setTitle(activity.getString(R.string.input_csv))
+            .setMessage(activity.getString(R.string.csv_input_confirm_message))
             .setPositiveButton(R.string.execute) { dialog, which -> // 取込み中のプログレスバーを表示する
-                progressAlertDialog = AlertDialog.Builder(context)
+                progressAlertDialog = AlertDialog.Builder(activity)
                     .setTitle(R.string.csv_input_processing)
                     .setView(activity.layoutInflater.inflate(R.layout.alert_progressbar, null))
                     .create()
@@ -241,32 +243,32 @@ class InputExternalFile(private val activity: Activity, listener: InputExternalF
     private fun failedImportDatabase() {
         if (id == HEADER_RECORD) {
             // ヘッダが正しくないエラーを表示する
-            AlertDialog.Builder(context)
-                .setTitle(context.getString(R.string.input_csv))
-                .setMessage(context.getString(R.string.csv_input_failed_header_message))
+            AlertDialog.Builder(activity)
+                .setTitle(activity.getString(R.string.input_csv))
+                .setMessage(activity.getString(R.string.csv_input_failed_header_message))
                 .setPositiveButton(R.string.ok, null)
                 .show()
         } else if (id > MAX_RECORD) {
             // 入力上限を超えたエラーを表示する
-            AlertDialog.Builder(context)
-                .setTitle(context.getString(R.string.input_csv))
-                .setMessage(context.getString(R.string.csv_input_failed_counts_message))
+            AlertDialog.Builder(activity)
+                .setTitle(activity.getString(R.string.input_csv))
+                .setMessage(activity.getString(R.string.csv_input_failed_counts_message))
                 .setPositiveButton(R.string.ok, null)
                 .show()
         } else {
             // 指定行がエラーであるエラーを表示する
-            AlertDialog.Builder(context)
-                .setTitle(context.getString(R.string.input_csv))
-                .setMessage(context.getString(R.string.csv_input_failed_body_message) + id)
+            AlertDialog.Builder(activity)
+                .setTitle(activity.getString(R.string.input_csv))
+                .setMessage(activity.getString(R.string.csv_input_failed_body_message) + id)
                 .setPositiveButton(R.string.ok, null)
                 .show()
         }
     }
 
-    private fun getFileNameByUri(context: Context, uri: Uri?): String {
+    private fun getFileNameByUri(activity: Context, uri: Uri?): String {
         var fileName = ""
         val projection = arrayOf(MediaStore.MediaColumns.DISPLAY_NAME)
-        val cursor = context.contentResolver
+        val cursor = activity.contentResolver
             .query(uri!!, projection, null, null, null)
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -280,7 +282,7 @@ class InputExternalFile(private val activity: Activity, listener: InputExternalF
     }
 
     companion object {
-        private const val HEADER_RECORD = 1
+        private const val HEADER_RECORD = 1L
         private const val MAX_RECORD = 10000
     }
 }

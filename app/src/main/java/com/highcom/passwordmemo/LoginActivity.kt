@@ -11,11 +11,13 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import com.highcom.passwordmemo.util.login.LoginService
 
@@ -24,13 +26,17 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     var loginService: LoginService? = null
     var naviText: TextView? = null
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
+
+    private val passwordListViewModel: PasswordListViewModel by viewModels {
+        PasswordListViewModel.Factory((application as PasswordMemoApplication).repository)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.AppTheme)
         setContentView(R.layout.activity_login)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         loginDataManager = LoginDataManager.Companion.getInstance(this)
-        loginService = LoginService(loginDataManager)
+        loginService = LoginService(loginDataManager, passwordListViewModel)
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager!!.displayBackgroundSwitchEnable) {

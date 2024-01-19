@@ -52,4 +52,11 @@ interface PasswordDao {
      */
     @Query("DELETE FROM passworddata WHERE id = :id")
     suspend fun deletePassword(id: Long)
+
+    /**
+     * パスワードデータ全削除
+     *
+     */
+    @Query("DELETE FROM passworddata")
+    suspend fun deleteAllPassword()
 }

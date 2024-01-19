@@ -51,11 +51,12 @@ dependencies {
     implementation "androidx.multidex:multidex:2.0.1"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    //noinspection GradleCompatible
-    implementation 'com.android.support:support-v4:28.0.0'
-    //noinspection GradleCompatible
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:2.0.4'
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation "androidx.activity:activity-ktx:1.5.1"
+    implementation 'androidx.fragment:fragment-ktx:1.5.5'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.gms:play-services-ads:21.5.0'
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.0.0'
@@ -65,7 +66,6 @@ dependencies {
         }
     }
     implementation 'net.zetetic:android-database-sqlcipher:4.4.2'
-    implementation 'android.arch.lifecycle:extensions:1.1.1'
     // materialのバージョンをあげるとビルドエラーになるので保留
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'com.google.firebase:firebase-analytics:21.3.0'
