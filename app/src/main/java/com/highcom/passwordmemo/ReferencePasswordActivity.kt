@@ -162,7 +162,8 @@ class ReferencePasswordActivity : AppCompatActivity() {
                 // 入力画面を生成
                 intent = Intent(this@ReferencePasswordActivity, InputPasswordActivity::class.java)
                 // 選択アイテムを複製モードで設定
-                intent.putExtra("ID", listDataManager?.newId)
+                // TODO:動作確認したらコメントアウトを削除
+//                intent.putExtra("ID", listDataManager?.newId)
                 intent.putExtra("EDIT", false)
                 intent.putExtra("TITLE", title.toString() + " " + getString(R.string.copy_title))
                 intent.putExtra(

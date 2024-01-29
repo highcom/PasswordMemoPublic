@@ -93,7 +93,7 @@ class InputPasswordActivity : AppCompatActivity() {
 
         // 渡されたデータを取得する
         val intent = intent
-        id = intent.getLongExtra("ID", -1)
+        id = intent.getLongExtra("ID", 0)
         groupId = intent.getLongExtra("GROUP", 1)
         editState = intent.getBooleanExtra("EDIT", false)
         (findViewById<View>(R.id.editTitle) as EditText).setText(intent.getStringExtra("TITLE"))

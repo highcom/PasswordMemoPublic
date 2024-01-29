@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.util.TextSizeUtil
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import java.util.Locale
@@ -23,6 +24,13 @@ class ListViewAdapter(
     private val adapterListener: AdapterListener
 ) : RecyclerView.Adapter<ListViewAdapter.ViewHolder?>(), Filterable {
     private val inflater: LayoutInflater
+    /** DBに登録されているパスワード一覧データ */
+    private var origPasswordList: List<PasswordEntity>? = null
+    /** ソートやフィルタされた表示用のパスワード一覧データ */
+    private var passwordList: List<PasswordEntity>? = null
+    /** ソート種別 */
+    private var sortType: String? = null
+    // TODO:置き換え必要な変数
     private var orig: List<Map<String?, *>?>? = null
     private val layoutHeightMap: Map<Int, Float>
     var textSize = 15f
@@ -86,6 +94,11 @@ class ListViewAdapter(
                 )
             }
         }
+    }
+
+    fun setList(list: List<PasswordEntity>) {
+        origPasswordList = list
+        passwordList = origPasswordList
     }
 
     private fun convertFromDpToPx(context: Context, dp: Float): Float {
@@ -210,7 +223,65 @@ class ListViewAdapter(
         }
     }
 
+    /**
+     * パスワードデータ一覧の並べ替え処理
+     *
+     * @param fromPos 移動元の位置
+     * @param toPos 移動先の位置
+     * @return 並べ替え後のパスワード一覧データ
+     */
+    fun rearrangePasswordList(fromPos: Int, toPos: Int): List<PasswordEntity> {
+        val origPasswordIds = ArrayList<Long>()
+        val rearrangePasswordList = ArrayList<PasswordEntity>()
+        // 元のIDの並びを保持と並べ替えができるリストに入れ替える
+        origPasswordList?.let {
+            for (comic in origPasswordList!!) {
+                origPasswordIds.add(comic.id)
+                rearrangePasswordList.add(comic)
+            }
+        }
+        // 引数で渡された位置で並べ替え
+        val fromPassword = rearrangePasswordList[fromPos]
+        rearrangePasswordList.removeAt(fromPos)
+        rearrangePasswordList.add(toPos, fromPassword)
+        // 再度IDを振り直す
+        val itr = origPasswordIds.listIterator()
+        for (comic in rearrangePasswordList) {
+            comic.id = itr.next()
+        }
+
+        return rearrangePasswordList
+    }
+
+    /**
+     * パスワードデータ一覧のソート処理
+     *
+     * @param key ソート種別
+     */
+    fun sortPasswordList(key: String?) {
+        sortType = key
+        // 比較処理の実装
+        val comparator = Comparator<PasswordEntity> { t1, t2 ->
+            var result = when(sortType) {
+                SORT_ID -> t1.id.compareTo(t2.id)
+                SORT_TITLE -> t1.title.compareTo(t2.title)
+                SORT_INPUTDATE -> t1.inputDate.compareTo(t2.inputDate)
+                else -> t1.id.compareTo(t2.id)
+            }
+
+            // ソート順が決まらない場合には、idで比較する
+            if (result == 0) {
+                result = t1.id.compareTo(t2.id)
+            }
+            return@Comparator result
+        }
+        passwordList = passwordList?.sortedWith(comparator)
+    }
+
     companion object {
+        const val SORT_ID = "id"
+        const val SORT_TITLE = "title"
+        const val SORT_INPUTDATE = "inputdate"
         // private Context context;
         private const val TYPE_ITEM = 1
         private const val TYPE_FOOTER = 2

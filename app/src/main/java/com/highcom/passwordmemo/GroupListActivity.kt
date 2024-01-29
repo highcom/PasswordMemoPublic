@@ -233,7 +233,8 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         if (mAdView != null) mAdView!!.destroy()
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
         if (loginDataManager?.displayBackgroundSwitchEnable == true && PasswordMemoLifecycle.Companion.isBackground) {
-            listDataManager?.closeData()
+            // TODO:動作確認をしたらコメントアウトを削除
+//            listDataManager?.closeData()
             finishAffinity()
         }
         super.onDestroy()

@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SearchView.SearchAutoComplete
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -39,6 +40,7 @@ import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import jp.co.recruit_mp.android.rmp_appirater.RmpAppirater
 import jp.co.recruit_mp.android.rmp_appirater.RmpAppirater.ShowRateDialogCondition
+import kotlinx.coroutines.launch
 import java.util.Arrays
 import java.util.Date
 import java.util.Locale
@@ -126,7 +128,8 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         }
         currentMemoVisible = loginDataManager!!.memoVisibleSwitchEnable
         listDataManager!!.setSelectGroupId(loginDataManager!!.selectGroup)
-        listDataManager!!.sortListData(loginDataManager!!.sortKey)
+        // TODO:動作確認したらコメントアウトを削除
+//        listDataManager!!.sortListData(loginDataManager!!.sortKey)
         adapter = ListViewAdapter(
             this,
             listDataManager!!.dataList,
@@ -137,6 +140,14 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         recyclerView = findViewById<View>(R.id.passwordListView) as RecyclerView
         recyclerView!!.layoutManager = LinearLayoutManager(this)
         recyclerView!!.adapter = adapter
+
+        lifecycleScope.launch {
+            passwordListViewModel.passwordList.collect { list ->
+                adapter?.setList(list)
+                adapter?.sortPasswordList(loginDataManager?.sortKey)
+            }
+        }
+
         // セル間に区切り線を実装する
         val itemDecoration: ItemDecoration =
             DividerItemDecoration(this, DividerItemDecoration.Companion.VERTICAL_LIST)
@@ -216,7 +227,8 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
                                 val intent =
                                     Intent(this@PasswordListActivity, InputPasswordActivity::class.java)
                                 // 選択アイテムを複製モードで設定
-                                intent.putExtra("ID", listDataManager?.newId)
+                                // TODO:動作確認したらコメントアウトを削除
+//                                intent.putExtra("ID", listDataManager?.newId)
                                 intent.putExtra("EDIT", false)
                                 intent.putExtra(
                                      "TITLE",
@@ -246,7 +258,8 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
             val intent = Intent(this@PasswordListActivity, InputPasswordActivity::class.java)
-            intent.putExtra("ID", listDataManager?.newId)
+            // TODO:動作確認したらコメントアウトを削除
+//            intent.putExtra("ID", listDataManager?.newId)
             intent.putExtra("EDIT", false)
             startActivityForResult(intent, EDIT_DATA)
         }
@@ -334,7 +347,9 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
 
             R.id.edit_mode -> {
                 // 編集状態の変更
-                listDataManager!!.sortListData(ListDataManager.Companion.SORT_ID)
+                // TODO:動作確認したらコメントアウトを削除
+//                listDataManager!!.sortListData(ListDataManager.Companion.SORT_ID)
+                adapter?.sortPasswordList(ListViewAdapter.SORT_ID)
                 if (adapter?.editEnable == true) {
                     setCurrentSelectMenuTitle(menu!!.findItem(R.id.sort_default), R.id.sort_default)
                     adapter?.editEnable = false
@@ -350,7 +365,8 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
             R.id.sort_default -> {
                 setCurrentSelectMenuTitle(item, R.id.sort_default)
                 title = getString(R.string.sort_name_default) + "：" + selectGroupName
-                listDataManager!!.sortListData(ListDataManager.Companion.SORT_ID)
+//                listDataManager!!.sortListData(ListDataManager.Companion.SORT_ID)
+                adapter?.sortPasswordList(ListViewAdapter.SORT_ID)
                 if (adapter?.editEnable == true) adapter?.editEnable = false
                 recyclerView!!.adapter = adapter
                 loginDataManager!!.setSortKey(ListDataManager.Companion.SORT_ID)
@@ -359,7 +375,8 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
             R.id.sort_title -> {
                 setCurrentSelectMenuTitle(item, R.id.sort_title)
                 title = getString(R.string.sort_name_title) + "：" + selectGroupName
-                listDataManager!!.sortListData(ListDataManager.Companion.SORT_TITLE)
+//                listDataManager!!.sortListData(ListDataManager.Companion.SORT_TITLE)
+                adapter?.sortPasswordList(ListViewAdapter.SORT_TITLE)
                 if (adapter?.editEnable == true) adapter?.editEnable = false
                 recyclerView!!.adapter = adapter
                 loginDataManager!!.setSortKey(ListDataManager.Companion.SORT_TITLE)
@@ -368,7 +385,8 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
             R.id.sort_update -> {
                 setCurrentSelectMenuTitle(item, R.id.sort_update)
                 title = getString(R.string.sort_name_update) + "：" + selectGroupName
-                listDataManager!!.sortListData(ListDataManager.Companion.SORT_INPUTDATE)
+//                listDataManager!!.sortListData(ListDataManager.Companion.SORT_INPUTDATE)
+                adapter?.sortPasswordList(ListViewAdapter.SORT_INPUTDATE)
                 if (adapter?.editEnable == true) adapter?.editEnable = false
                 recyclerView!!.adapter = adapter
                 loginDataManager!!.setSortKey(ListDataManager.Companion.SORT_INPUTDATE)
@@ -479,7 +497,8 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
     }
 
     public override fun onDestroy() {
-        listDataManager!!.closeData()
+        // TODO:動作確認をしたらコメントアウトを削除
+//        listDataManager!!.closeData()
         if (mAdView != null) mAdView!!.destroy()
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
         if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.isBackground) {
@@ -530,15 +549,25 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
 
 
     inner class PasswordListCallbackListener : SimpleCallbackListener {
+        private var fromPos = -1
+        private var toPos = -1
         override fun onSimpleCallbackMove(
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
         ): Boolean {
             if (adapter?.editEnable == true && TextUtils.isEmpty(seachViewWord)) {
-                val fromPos = viewHolder.adapterPosition
-                val toPos = target.adapterPosition
-                adapter!!.notifyItemMoved(fromPos, toPos)
-                listDataManager!!.rearrangeData(fromPos, toPos)
+                // TODO:動作に問題が無いことが確認できたら消す
+//                val fromPos = viewHolder.adapterPosition
+//                val toPos = target.adapterPosition
+//                adapter!!.notifyItemMoved(fromPos, toPos)
+//                listDataManager!!.rearrangeData(fromPos, toPos)
+                // 移動元位置は最初のイベント時の値を保持する
+                if (fromPos == -1) fromPos = viewHolder.adapterPosition
+                // 通知用の移動元位置は毎回更新する
+                val notifyFromPos = viewHolder.adapterPosition
+                // 移動先位置は最後イベント時の値を保持する
+                toPos = target.adapterPosition
+                adapter?.notifyItemMoved(notifyFromPos, toPos)
                 return true
             }
             return false
@@ -548,7 +577,14 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder
         ) {
-            recyclerView.adapter = adapter
+            // TODO:動作に問題が無いことが確認できたら消す
+//            recyclerView.adapter = adapter
+            // 入れ替え完了後に最後に一度DBの更新をする
+            val rearrangePasswordList = adapter?.rearrangePasswordList(fromPos, toPos)
+            rearrangePasswordList?.let { passwordListViewModel.update(rearrangePasswordList) }
+            // 移動位置情報を初期化
+            fromPos = -1
+            toPos = -1
         }
     }
 

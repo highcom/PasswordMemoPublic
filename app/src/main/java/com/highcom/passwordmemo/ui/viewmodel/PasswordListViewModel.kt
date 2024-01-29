@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.data.PasswordMemoRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class PasswordListViewModel(private val repository: PasswordMemoRepository) : ViewModel() {
@@ -15,6 +17,10 @@ class PasswordListViewModel(private val repository: PasswordMemoRepository) : Vi
             return PasswordListViewModel(repository) as T
         }
     }
+
+    private val _passwordList = MutableStateFlow<List<PasswordEntity>>(emptyList())
+    val passwordList = _passwordList.asStateFlow()
+
     fun insert(passwordEntity: PasswordEntity) = viewModelScope.launch { repository.insertPassword(passwordEntity) }
     fun update(passwordEntity: PasswordEntity) = viewModelScope.launch { repository.updatePassword(passwordEntity) }
     fun update(passwordList: List<PasswordEntity>) = viewModelScope.launch { repository.updatePasswords(passwordList) }
