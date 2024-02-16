@@ -12,6 +12,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.ui.list.GroupListAdapter.GroupViewHolder
 import com.highcom.passwordmemo.util.TextSizeUtil
 
@@ -22,12 +23,14 @@ class GroupListAdapter(
 ) : RecyclerView.Adapter<GroupViewHolder?>() {
     private val inflater: LayoutInflater
     private val layoutHeightMap: Map<Int, Float>
+    /** 表示用グループ一覧データ */
+    var groupList: List<GroupEntity>? = null
     var textSize = 15f
     var editEnable = false
 
     interface GroupAdapterListener {
         fun onGroupNameClicked(view: View, groupId: Long?)
-        fun onGroupNameOutOfFocused(view: View, data: Map<String?, String?>)
+        fun onGroupNameOutOfFocused(view: View, groupEntity: GroupEntity)
     }
 
     inner class GroupViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -64,12 +67,18 @@ class GroupListAdapter(
                         if (groupName?.text.toString() == "") {
                             groupName?.setText(orgGroupName)
                         }
-                        val data: MutableMap<String?, String?> = HashMap()
-                        data["group_id"] = java.lang.Long.valueOf(groupId!!).toString()
-                        data["group_order"] = Integer.valueOf(groupOrder).toString()
-                        data["name"] = groupName?.text.toString()
+                        // TODO:動作に問題が無いことが確認できたら消す
+//                        val data: MutableMap<String?, String?> = HashMap()
+//                        data["group_id"] = java.lang.Long.valueOf(groupId!!).toString()
+//                        data["group_order"] = Integer.valueOf(groupOrder).toString()
+//                        data["name"] = groupName?.text.toString()
+                        val groupEntity = GroupEntity(
+                            groupId = groupId!!,
+                            groupOrder = groupOrder,
+                            name = groupName?.text.toString()
+                        )
                         // フォーカスが外れた時に内容が変更されていたら更新する
-                        adapterListener.onGroupNameOutOfFocused(view, data)
+                        adapterListener.onGroupNameOutOfFocused(view, groupEntity)
                     }
                 }
                 // キーボードのエンターが押下された場合
@@ -168,6 +177,34 @@ class GroupListAdapter(
         } else {
             holder.groupRearrangeButton?.visibility = View.GONE
         }
+    }
+
+    /**
+     * グループデータ一覧の並べ替え処理
+     *
+     * @param fromPos 移動元の位置
+     * @param toPos 移動先の位置
+     * @return 並べ替え後のグループ一覧データ
+     */
+    fun rearrangeGroupList(fromPos: Int, toPos: Int): List<GroupEntity> {
+        var rearrangeList: ArrayList<GroupEntity> = ArrayList<GroupEntity>()
+        groupList?.let {
+            for (entity in it) {
+                rearrangeList.add(entity)
+            }
+        }
+        // 引数で渡された位置で並べ替え
+        val fromentity = rearrangeList[fromPos]
+        rearrangeList.removeAt(fromPos)
+        rearrangeList.add(toPos, fromentity)
+        // 再度順番を振り直す
+        var order = 1
+        for (entity in rearrangeList) {
+            entity.groupOrder = order
+            order++
+        }
+        groupList = rearrangeList
+        return rearrangeList
     }
 
     companion object {

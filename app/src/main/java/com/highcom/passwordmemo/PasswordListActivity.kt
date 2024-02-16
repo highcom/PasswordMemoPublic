@@ -36,6 +36,7 @@ import com.highcom.passwordmemo.ui.list.ListViewAdapter
 import com.highcom.passwordmemo.ui.list.ListViewAdapter.AdapterListener
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper.SimpleCallbackListener
+import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import jp.co.recruit_mp.android.rmp_appirater.RmpAppirater
@@ -61,6 +62,9 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
 
     private val passwordListViewModel: PasswordListViewModel by viewModels {
         PasswordListViewModel.Factory((application as PasswordMemoApplication).repository)
+    }
+    private val groupListViewModel: GroupListViewModel by viewModels {
+        GroupListViewModel.Factory((application as PasswordMemoApplication).repository)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,8 +131,8 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
         currentMemoVisible = loginDataManager!!.memoVisibleSwitchEnable
-        listDataManager!!.setSelectGroupId(loginDataManager!!.selectGroup)
         // TODO:動作確認したらコメントアウトを削除
+//        listDataManager!!.setSelectGroupId(loginDataManager!!.selectGroup)
 //        listDataManager!!.sortListData(loginDataManager!!.sortKey)
         adapter = ListViewAdapter(
             this,
@@ -141,6 +145,8 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         recyclerView!!.layoutManager = LinearLayoutManager(this)
         recyclerView!!.adapter = adapter
 
+        // 選択されているグループのパスワード一覧を設定する
+        passwordListViewModel.setSelectGroup(loginDataManager?.selectGroup ?: 1L)
         lifecycleScope.launch {
             passwordListViewModel.passwordList.collect { list ->
                 adapter?.setList(list)
@@ -430,18 +436,31 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         )
         selectGroupName = getString(R.string.list_title)
         var isSelectGroupExist = false
-        for (group in listDataManager!!.groupList) {
-            if (java.lang.Long.valueOf(group!!["group_id"]) == loginDataManager!!.selectGroup) {
-                selectGroupName = group["name"]
-                listDataManager!!.setSelectGroupId(loginDataManager!!.selectGroup)
-                isSelectGroupExist = true
-                break
+        // TODO:動作確認したらコメントアウトを削除
+//        for (group in listDataManager!!.groupList) {
+//            if (java.lang.Long.valueOf(group!!["group_id"]) == loginDataManager!!.selectGroup) {
+//                selectGroupName = group["name"]
+//                listDataManager!!.setSelectGroupId(loginDataManager!!.selectGroup)
+//                isSelectGroupExist = true
+//                break
+//            }
+//        }
+        lifecycleScope.launch {
+            groupListViewModel.groupList.collect { list ->
+                for (entity in list) {
+                    if (entity.groupId == loginDataManager?.selectGroup) {
+                        selectGroupName = entity.name
+                        isSelectGroupExist = true
+                    }
+                }
+                // 選択していたグループが存在しなくなった場合には「すべて」にリセットする
+                if (!isSelectGroupExist) {
+                    loginDataManager!!.setSelectGroup(1L)
+                    passwordListViewModel.setSelectGroup(1L)
+                    // TODO:動作確認したらコメントアウトを削除
+//                    listDataManager!!.setSelectGroupId(1L)
+                }
             }
-        }
-        // 選択していたグループが存在しなくなった場合には「すべて」にリセットする
-        if (!isSelectGroupExist) {
-            loginDataManager!!.setSelectGroup(1L)
-            listDataManager!!.setSelectGroupId(1L)
         }
         title = when (loginDataManager!!.sortKey) {
             ListDataManager.Companion.SORT_ID -> getString(R.string.sort_name_default) + "：" + selectGroupName

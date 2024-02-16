@@ -48,4 +48,11 @@ interface GroupDao {
      */
     @Query("DELETE FROM groupdata WHERE group_id = :groupId")
     suspend fun deleteGroup(groupId: Long)
+
+    /**
+     * グループデータ全削除
+     *
+     */
+    @Query("DELETE FROM groupdata")
+    suspend fun deleteAllGroup()
 }

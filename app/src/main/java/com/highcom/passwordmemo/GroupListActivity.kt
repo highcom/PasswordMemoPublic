@@ -12,9 +12,11 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -24,6 +26,7 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.database.ListDataManager
 import com.highcom.passwordmemo.ui.DividerItemDecoration
 import com.highcom.passwordmemo.ui.list.GroupListAdapter
@@ -31,7 +34,9 @@ import com.highcom.passwordmemo.ui.list.GroupListAdapter.GroupAdapterListener
 import com.highcom.passwordmemo.ui.list.GroupListAdapter.GroupViewHolder
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper.SimpleCallbackListener
+import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.util.login.LoginDataManager
+import kotlinx.coroutines.launch
 
 class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
     private var loginDataManager: LoginDataManager? = null
@@ -42,6 +47,11 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
     private var groupFab: FloatingActionButton? = null
     var adapter: GroupListAdapter? = null
     private var simpleCallbackHelper: SimpleCallbackHelper? = null
+
+    private val groupListViewModel: GroupListViewModel by viewModels {
+        GroupListViewModel.Factory((application as PasswordMemoApplication).repository)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_list)
@@ -63,13 +73,14 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         listDataManager = ListDataManager.Companion.getInstance(this)
 
         // グループ名が空白のデータが存在していた場合には削除する
-        val groupList = listDataManager!!.groupList
-        for (group in groupList!!) {
-            if (group!!["name"] == "") {
-                listDataManager!!.deleteGroupData(group["group_id"])
-                listDataManager!!.resetGroupIdData(java.lang.Long.valueOf(group["group_id"]))
-            }
-        }
+        // TODO:動作確認をしたらコメントアウトを削除
+//        val groupList = listDataManager!!.groupList
+//        for (group in groupList!!) {
+//            if (group!!["name"] == "") {
+//                listDataManager!!.deleteGroupData(group["group_id"])
+//                listDataManager!!.resetGroupIdData(java.lang.Long.valueOf(group["group_id"]))
+//            }
+//        }
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager?.displayBackgroundSwitchEnable == true) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
@@ -83,17 +94,37 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         recyclerView = findViewById<View>(R.id.groupListView) as RecyclerView
         recyclerView!!.layoutManager = LinearLayoutManager(this)
         recyclerView!!.adapter = adapter
+
+        lifecycleScope.launch {
+            groupListViewModel.groupList.collect { list ->
+                // グループデータがない場合はデフォルトデータとして「すべて」を必ず追加」
+                if (list.isEmpty()) {
+                    groupListViewModel.insert(GroupEntity(1, 1, getString(R.string.list_title)))
+                }
+                // グループ名が空白のデータが存在していた場合には削除する
+                for (group in list) {
+                    if (group.name.isEmpty()) {
+                        groupListViewModel.delete(group.groupId)
+                        groupListViewModel.resetGroupId(group.groupId)
+                    }
+                }
+                adapter?.groupList = list
+            }
+        }
+
         // セル間に区切り線を実装する
         val itemDecoration: ItemDecoration =
             DividerItemDecoration(this, DividerItemDecoration.Companion.VERTICAL_LIST)
         recyclerView!!.addItemDecoration(itemDecoration)
         groupFab = findViewById(R.id.groupFab)
         groupFab?.setOnClickListener(View.OnClickListener {
-            val data: MutableMap<String?, String?> = HashMap()
-            data["group_id"] = listDataManager?.newGroupId.toString()
-            data["group_order"] = Integer.valueOf(listDataManager!!.groupList.size + 1).toString()
-            data["name"] = ""
-            listDataManager!!.setGroupData(false, data)
+//            val data: MutableMap<String?, String?> = HashMap()
+//            data["group_id"] = listDataManager?.newGroupId.toString()
+//            data["group_order"] = Integer.valueOf(listDataManager!!.groupList.size + 1).toString()
+//            data["name"] = ""
+//            listDataManager!!.setGroupData(false, data)
+            // TODO:groupList+1をアダプタから取得出来るように修正が必要
+            groupListViewModel.insert(GroupEntity(0, listDataManager!!.groupList.size + 1, ""))
             adapter!!.notifyDataSetChanged()
             // 新規作成時は対象のセルにフォーカスされるようにスクロールする
             for (position in listDataManager!!.groupList.indices) {
@@ -131,11 +162,14 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
                                     )
                                     .setMessage(getString(R.string.delete_message))
                                     .setPositiveButton(getString(R.string.delete_execute)) { dialog1: DialogInterface?, which: Int ->
-                                        listDataManager!!.deleteGroupData((holder as GroupViewHolder).groupId.toString())
-                                        listDataManager!!.resetGroupIdData((holder as GroupViewHolder).groupId)
+                                        (holder as GroupViewHolder).groupId?.let {
+                                            groupListViewModel.delete(it)
+                                            groupListViewModel.resetGroupId(it)
+                                        }
                                         if (loginDataManager?.selectGroup == (holder as GroupViewHolder).groupId) {
                                             loginDataManager?.setSelectGroup(1L)
-                                            listDataManager?.setSelectGroupId(1L)
+                                            // TODO:動作確認をしたらコメントアウトを削除
+//                                            listDataManager?.setSelectGroupId(1L)
                                         }
                                         simpleCallbackHelper?.resetSwipePos()
                                         adapter!!.notifyDataSetChanged()
@@ -253,12 +287,13 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
             }
         } else {
             loginDataManager?.setSelectGroup(groupId!!)
-            listDataManager?.setSelectGroupId(groupId!!)
+            // TODO:動作確認をしたらコメントアウトを削除
+//            listDataManager?.setSelectGroupId(groupId!!)
             finish()
         }
     }
 
-    override fun onGroupNameOutOfFocused(view: View, data: Map<String?, String?>) {
+    override fun onGroupNameOutOfFocused(view: View, groupEntity: GroupEntity) {
         // 内容編集中にフォーカスが外れた場合は、キーボードを閉じる
         val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(
@@ -270,19 +305,23 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         view.isFocusableInTouchMode = false
         view.requestFocus()
         // 内容が空白の場合には削除する
-        if (data["name"] == "") {
-            listDataManager!!.deleteGroupData(data["group_id"])
-            listDataManager!!.resetGroupIdData(java.lang.Long.valueOf(data["group_id"]))
-            if (loginDataManager?.selectGroup == data["group_id"]!!.toLong()) {
+        if (groupEntity.name.isEmpty()) {
+            groupListViewModel.delete(groupEntity.groupId)
+            groupListViewModel.resetGroupId(groupEntity.groupId)
+            if (loginDataManager?.selectGroup == groupEntity.groupId) {
                 loginDataManager?.setSelectGroup(1L)
-                listDataManager?.setSelectGroupId(1L)
+                // TODO:動作確認をしたらコメントアウトを削除
+//                listDataManager?.setSelectGroupId(1L)
             }
             return
         }
-        listDataManager!!.setGroupData(true, data)
+//        listDataManager!!.setGroupData(true, data)
+        groupListViewModel.update(groupEntity)
     }
 
     inner class GroupListCallbackListener : SimpleCallbackListener {
+        private var fromPos = -1
+        private var toPos = -1
         override fun onSimpleCallbackMove(
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
@@ -291,18 +330,37 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
             // グループ名が入力されていない場合は移動させない
             if ((viewHolder as GroupViewHolder).groupName?.text.toString() == "" || (target as GroupViewHolder).groupName?.text.toString() == "") return false
             // グループ名が入力途中でDB反映されていないデータも並び替えさせない
-            val groupList = listDataManager!!.groupList
-            for (group in groupList!!) {
-                if (group!!["group_id"] == viewHolder.groupId.toString() || group["group_id"] == target.groupId.toString()) {
-                    if (group["name"] == "") return false
+            // TODO:動作に問題が無いことが確認できたら消す
+//            val groupList = listDataManager!!.groupList
+//            for (group in groupList!!) {
+//                if (group!!["group_id"] == viewHolder.groupId.toString() || group["group_id"] == target.groupId.toString()) {
+//                    if (group["name"] == "") return false
+//                }
+//            }
+            adapter?.groupList?.let {
+                for (entity in it) {
+                    if (entity.groupId == viewHolder.groupId || entity.groupId == target.groupId) {
+                        if (entity.name.isEmpty()) return false
+                    }
                 }
             }
-            val fromPos = viewHolder.getAdapterPosition()
-            val toPos = target.getAdapterPosition()
+            // TODO:動作に問題が無いことが確認できたら消す
+//            val fromPos = viewHolder.getAdapterPosition()
+//            val toPos = target.getAdapterPosition()
+//            // 1番目のデータは「すべて」なので並べ替え不可にする
+//            if (fromPos == 0 || toPos == 0) return false
+//            adapter!!.notifyItemMoved(fromPos, toPos)
+//            listDataManager!!.rearrangeGroupData(fromPos, toPos)
+//            return true
+            // 移動元位置は最初のイベント時の値を保持する
+            if (fromPos == -1) fromPos = viewHolder.adapterPosition
+            // 通知用の移動元位置は毎回更新する
+            val notifyFromPos = viewHolder.adapterPosition
+            // 移動先位置は最後イベント時の値を保持する
+            toPos = target.adapterPosition
             // 1番目のデータは「すべて」なので並べ替え不可にする
             if (fromPos == 0 || toPos == 0) return false
-            adapter!!.notifyItemMoved(fromPos, toPos)
-            listDataManager!!.rearrangeGroupData(fromPos, toPos)
+            adapter?.notifyItemMoved(notifyFromPos, toPos)
             return true
         }
 
@@ -310,7 +368,14 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder
         ) {
-            recyclerView.adapter = adapter
+            // TODO:動作に問題が無いことが確認できたら消す
+//            recyclerView.adapter = adapter
+            // 入れ替え完了後に最後に一度DBの更新をする
+            val rearrangeList = adapter?.rearrangeGroupList(fromPos, toPos)
+            rearrangeList?.let { groupListViewModel.update(rearrangeList) }
+            // 移動位置情報を初期化
+            fromPos = -1
+            toPos = -1
         }
     }
 }

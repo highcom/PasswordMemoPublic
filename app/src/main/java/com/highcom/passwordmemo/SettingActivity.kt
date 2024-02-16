@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import com.google.android.material.textfield.TextInputEditText
 import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
+import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import com.highcom.passwordmemo.util.BackgroundColorUtil
 import com.highcom.passwordmemo.util.BackgroundColorUtil.BackgroundColorListener
@@ -49,6 +50,10 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
     private val passwordListViewModel: PasswordListViewModel by viewModels {
         PasswordListViewModel.Factory((application as PasswordMemoApplication).repository)
     }
+    private val groupListViewModel: GroupListViewModel by viewModels {
+        GroupListViewModel.Factory((application as PasswordMemoApplication).repository)
+    }
+
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -274,7 +279,7 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
                 }
 
                 INPUT_CSV -> {
-                    val inputExternalFile = InputExternalFile(this, passwordListViewModel, this)
+                    val inputExternalFile = InputExternalFile(this, passwordListViewModel, groupListViewModel, this)
                     inputExternalFile.inputSelectFolder(uri)
                 }
 

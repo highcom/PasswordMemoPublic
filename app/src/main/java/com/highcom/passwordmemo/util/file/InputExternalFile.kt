@@ -14,8 +14,10 @@ import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.os.HandlerCompat
 import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.database.ListDataManager
+import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import java.io.BufferedReader
 import java.io.File
@@ -27,9 +29,10 @@ import java.util.concurrent.Executors
 
 class InputExternalFile(private val activity: Activity,
                         private val passwordListViewModel: PasswordListViewModel,
+                        private val groupListViewModel: GroupListViewModel,
                         private val listener: InputExternalFileListener) {
     private var passwordList: MutableList<PasswordEntity>? = null
-    private var groupList: MutableList<Map<String?, String?>>? = null
+    private var groupList: MutableList<GroupEntity>? = null
     private var id = 0L
     private var uri: Uri? = null
     private var progressAlertDialog: AlertDialog? = null
@@ -42,10 +45,10 @@ class InputExternalFile(private val activity: Activity,
     private inner class BackgroundTask(private val _handler: Handler) : Runnable {
         @WorkerThread
         override fun run() {
-            // 既存のデータは全て削除する
+            // 既存のデータは全て削除して初期グループのみ登録された状態にする
+            // TODO:動作確認したらコメントアウトを削除
 //            ListDataManager.Companion.getInstance(activity)!!.deleteAllData()
-            // TODO:グループの全削除と初期グループの登録を実施する必要がある
-            passwordListViewModel.deleteAll()
+            passwordListViewModel.resetAll()
             val countUnit = passwordList?.size?.div(20) ?: 0
             var progressCount = 1
             // 結果が全て取り出せたらデータを登録していく
@@ -60,9 +63,11 @@ class InputExternalFile(private val activity: Activity,
                 }
             }
             // 最後にグループデータを登録する
-            for (data in groupList!!) {
-                if (data["group_id"] == "1") continue
-                ListDataManager.Companion.getInstance(activity)!!.setGroupData(false, data)
+            for (entity in groupList!!) {
+                if (entity.groupId == 1L) continue
+                // TODO:動作確認したらコメントアウトを削除
+//                ListDataManager.Companion.getInstance(activity)!!.setGroupData(false, data)
+                groupListViewModel.insert(entity)
             }
             progressBar!!.progress = 100
             val postExecutor: PostExecutor = PostExecutor()
@@ -127,11 +132,11 @@ class InputExternalFile(private val activity: Activity,
             var columnCount = 0
             passwordList = ArrayList()
             groupList = ArrayList()
-            val group: MutableMap<String?, String?> = HashMap()
-            group["group_id"] = "1"
-            group["group_order"] = "1"
-            group["name"] = activity.getString(R.string.list_title)
-            groupList?.add(group)
+            groupList?.add(GroupEntity(
+                groupId = 1L,
+                groupOrder = 1,
+                name = activity.getString(R.string.list_title)
+            ))
             id = HEADER_RECORD
             while (reader.readLine().also { line = it ?: "" } != null) {
                 val result = line.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
@@ -165,18 +170,22 @@ class InputExternalFile(private val activity: Activity,
                     passwordList?.add(passwordEntity)
                 } else if (isHeaderCorrect && columnCount == 7) {
                     var groupId = 0L
-                    for (data in groupList!!) {
-                        if (data["name"] == result[4]) {
-                            groupId = (data["group_id"]!!).toLong()
+                    for (entity in groupList!!) {
+                        if (entity.name == result[4]) {
+                            groupId = entity.groupId
                         }
                     }
+                    // 登録されているグループ名と一致するものが無かったら追加登録
                     if (groupId == 0L) {
-                        val data: MutableMap<String?, String?> = HashMap()
-                        data["group_id"] = (groupList?.size?.plus(1)).toString()
-                        data["group_order"] = (groupList?.size?.plus(1)).toString()
-                        data["name"] = result[4]
-                        groupId = groupList?.size?.plus(1)!!.toLong()
-                        groupList?.add(data)
+                        groupList?.size?.let {
+                            groupId = it.plus(1).toLong()
+                            val groupEntity = GroupEntity(
+                                groupId = it.plus(1).toLong(),
+                                groupOrder = it.plus(1),
+                                name = result[4]
+                            )
+                            groupList?.add(groupEntity)
+                        }
                     }
                     val passwordEntity = PasswordEntity(
                         id = id,

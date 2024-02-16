@@ -53,21 +53,22 @@ class ListDataManager private constructor(private val context: Context) {
             gmov = gcur.moveToNext()
         }
         // グループデータがない場合はデフォルトデータとして「すべて」を必ず追加」
-        if (groupList.size == 0) {
-            groupData = HashMap()
-            groupData["group_id"] = "1"
-            groupData["group_order"] = "1"
-            groupData["name"] = context.getString(R.string.list_title)
-            setGroupData(false, groupData)
-        }
+//        if (groupList.size == 0) {
+//            groupData = HashMap()
+//            groupData["group_id"] = "1"
+//            groupData["group_order"] = "1"
+//            groupData["name"] = context.getString(R.string.list_title)
+//            setGroupData(false, groupData)
+//        }
         gcur.close()
-        sortGroupListData()
+        // TODO:必要ないソートをしていたから単純に削除で良い
+//        sortGroupListData()
     }
 
-    fun setSelectGroupId(id: Long) {
-        groupId = id
-        remakeListData()
-    }
+//    fun setSelectGroupId(id: Long) {
+//        groupId = id
+//        remakeListData()
+//    }
 
 //    fun setData(isEdit: Boolean, data: Map<String?, String?>) {
 //        // データベースに追加or編集する
@@ -179,7 +180,7 @@ class ListDataManager private constructor(private val context: Context) {
 //        manager = null
 //    }
 
-    private fun remakeListData() {
+//    private fun remakeListData() {
 //        dataList.clear()
 //        val cur = cursor
 //        var mov = cur.moveToFirst()
@@ -198,7 +199,7 @@ class ListDataManager private constructor(private val context: Context) {
 //        }
 //        cur.close()
 //        sortListData(sortKey)
-    }
+//    }
 
 //    fun sortListData(key: String?) {
 //        sortKey = key
@@ -229,12 +230,12 @@ class ListDataManager private constructor(private val context: Context) {
 //        )
 //    }
 
-    fun resetGroupIdData(groupId: Long?) {
-        val values = ContentValues()
-        values.put("group_id", 1L)
-        wdb.update("passworddata", values, "group_id=?", arrayOf(groupId.toString()))
-        remakeListData()
-    }
+//    fun resetGroupIdData(groupId: Long?) {
+//        val values = ContentValues()
+//        values.put("group_id", 1L)
+//        wdb.update("passworddata", values, "group_id=?", arrayOf(groupId.toString()))
+//        remakeListData()
+//    }
 
     private val cursor: Cursor
         private get() {
@@ -263,87 +264,87 @@ class ListDataManager private constructor(private val context: Context) {
             )
         }
 
-    fun rearrangeGroupData(fromPos: Int, toPos: Int) {
-        var mov: Boolean
-        var values: ContentValues
-        val cur = groupCursor
-        mov = cur.moveToPosition(fromPos)
-        if (!mov) return
-        val fromOrder = cur.getInt(1)
-        mov = cur.moveToPosition(toPos)
-        if (!mov) return
-        val toOrder = cur.getInt(1)
-        values = ContentValues()
-        values.put("group_order", -1)
-        wdb.update("groupdata", values, "group_order=?", arrayOf(Integer.toString(fromOrder)))
-        values = ContentValues()
-        values.put("group_order", fromOrder)
-        wdb.update("groupdata", values, "group_order=?", arrayOf(Integer.toString(toOrder)))
-        values = ContentValues()
-        values.put("group_order", toOrder)
-        wdb.update("groupdata", values, "group_order=?", arrayOf(Integer.toString(-1)))
-        cur.close()
-        remakeGroupListData()
-    }
+//    fun rearrangeGroupData(fromPos: Int, toPos: Int) {
+//        var mov: Boolean
+//        var values: ContentValues
+//        val cur = groupCursor
+//        mov = cur.moveToPosition(fromPos)
+//        if (!mov) return
+//        val fromOrder = cur.getInt(1)
+//        mov = cur.moveToPosition(toPos)
+//        if (!mov) return
+//        val toOrder = cur.getInt(1)
+//        values = ContentValues()
+//        values.put("group_order", -1)
+//        wdb.update("groupdata", values, "group_order=?", arrayOf(Integer.toString(fromOrder)))
+//        values = ContentValues()
+//        values.put("group_order", fromOrder)
+//        wdb.update("groupdata", values, "group_order=?", arrayOf(Integer.toString(toOrder)))
+//        values = ContentValues()
+//        values.put("group_order", toOrder)
+//        wdb.update("groupdata", values, "group_order=?", arrayOf(Integer.toString(-1)))
+//        cur.close()
+//        remakeGroupListData()
+//    }
 
-    val newGroupId: Long
-        get() {
-            var newId: Long = 0
-            val cur = groupCursor
-            var mov = cur.moveToFirst()
-            var curId: Long
-            while (mov) {
-                curId = java.lang.Long.valueOf(cur.getString(0))
-                if (newId < curId) {
-                    newId = curId
-                }
-                mov = cur.moveToNext()
-            }
-            cur.close()
-            return newId + 1
-        }
+//    val newGroupId: Long
+//        get() {
+//            var newId: Long = 0
+//            val cur = groupCursor
+//            var mov = cur.moveToFirst()
+//            var curId: Long
+//            while (mov) {
+//                curId = java.lang.Long.valueOf(cur.getString(0))
+//                if (newId < curId) {
+//                    newId = curId
+//                }
+//                mov = cur.moveToNext()
+//            }
+//            cur.close()
+//            return newId + 1
+//        }
 
-    fun setGroupData(isEdit: Boolean, data: Map<String?, String?>) {
-        // データベースに追加or編集する
-        val values = ContentValues()
-        values.put("group_id", java.lang.Long.valueOf(data["group_id"]))
-        values.put("group_order", Integer.valueOf(data["group_order"]))
-        values.put("name", data["name"])
-        if (isEdit) {
-            // 編集の場合
-            wdb.update("groupdata", values, "group_id=?", arrayOf(data["group_id"]))
-            remakeGroupListData()
-        } else {
-            // 新規作成の場合
-            wdb.insert("groupdata", data["group_id"], values)
-            groupList.add(data)
-        }
-    }
+//    fun setGroupData(isEdit: Boolean, data: Map<String?, String?>) {
+//        // データベースに追加or編集する
+//        val values = ContentValues()
+//        values.put("group_id", java.lang.Long.valueOf(data["group_id"]))
+//        values.put("group_order", Integer.valueOf(data["group_order"]))
+//        values.put("name", data["name"])
+//        if (isEdit) {
+//            // 編集の場合
+//            wdb.update("groupdata", values, "group_id=?", arrayOf(data["group_id"]))
+//            remakeGroupListData()
+//        } else {
+//            // 新規作成の場合
+//            wdb.insert("groupdata", data["group_id"], values)
+//            groupList.add(data)
+//        }
+//    }
 
-    fun deleteGroupData(id: String?) {
-        // データベースから削除する
-        wdb.delete("groupdata", "group_id=?", arrayOf(id))
-        remakeGroupListData()
-    }
+//    fun deleteGroupData(id: String?) {
+//        // データベースから削除する
+//        wdb.delete("groupdata", "group_id=?", arrayOf(id))
+//        remakeGroupListData()
+//    }
 
-    fun sortGroupListData() {
-        Collections.sort(groupList) { stringStringMap, t1 ->
-            var result: Int
-            result = Integer.valueOf(stringStringMap["group_order"]).compareTo(
-                Integer.valueOf(
-                    t1["group_order"]
-                )
-            )
-            if (result == 0) {
-                result = Integer.valueOf(stringStringMap["group_id"]).compareTo(
-                    Integer.valueOf(
-                        t1["group_id"]
-                    )
-                )
-            }
-            result
-        }
-    }
+//    fun sortGroupListData() {
+//        Collections.sort(groupList) { stringStringMap, t1 ->
+//            var result: Int
+//            result = Integer.valueOf(stringStringMap["group_order"]).compareTo(
+//                Integer.valueOf(
+//                    t1["group_order"]
+//                )
+//            )
+//            if (result == 0) {
+//                result = Integer.valueOf(stringStringMap["group_id"]).compareTo(
+//                    Integer.valueOf(
+//                        t1["group_id"]
+//                    )
+//                )
+//            }
+//            result
+//        }
+//    }
 
     private val groupCursor: Cursor
         private get() = rdb.query(
@@ -357,23 +358,23 @@ class ListDataManager private constructor(private val context: Context) {
             null
         )
 
-    private fun remakeGroupListData() {
-        groupList.clear()
-        val cur = groupCursor
-        var mov = cur.moveToFirst()
-        var order = 1
-        while (mov) {
-            data = HashMap()
-            data["group_id"] = cur.getString(0)
-            data["group_order"] = Integer.toString(order)
-            data["name"] = cur.getString(2)
-            groupList.add(data)
-            mov = cur.moveToNext()
-            order++
-        }
-        cur.close()
-        sortGroupListData()
-    }
+//    private fun remakeGroupListData() {
+//        groupList.clear()
+//        val cur = groupCursor
+//        var mov = cur.moveToFirst()
+//        var order = 1
+//        while (mov) {
+//            data = HashMap()
+//            data["group_id"] = cur.getString(0)
+//            data["group_order"] = Integer.toString(order)
+//            data["name"] = cur.getString(2)
+//            groupList.add(data)
+//            mov = cur.moveToNext()
+//            order++
+//        }
+//        cur.close()
+//        sortGroupListData()
+//    }
 
     companion object {
         const val SORT_ID = "id"

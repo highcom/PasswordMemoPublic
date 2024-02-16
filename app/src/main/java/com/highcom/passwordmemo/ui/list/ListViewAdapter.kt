@@ -235,9 +235,9 @@ class ListViewAdapter(
         val rearrangePasswordList = ArrayList<PasswordEntity>()
         // 元のIDの並びを保持と並べ替えができるリストに入れ替える
         origPasswordList?.let {
-            for (comic in origPasswordList!!) {
-                origPasswordIds.add(comic.id)
-                rearrangePasswordList.add(comic)
+            for (entity in it) {
+                origPasswordIds.add(entity.id)
+                rearrangePasswordList.add(entity)
             }
         }
         // 引数で渡された位置で並べ替え

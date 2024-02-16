@@ -9,10 +9,23 @@ import kotlinx.coroutines.flow.Flow
  * @property groupDao グループデータアクセスオブジェクト
  */
 class PasswordMemoRepository(private val passwordDao: PasswordDao, private val groupDao: GroupDao) {
-    /** パスワード一覧データ */
-    val passwordList: Flow<List<PasswordEntity>> = passwordDao.getPasswordList()
     /** グループ一覧データ */
     val groupList: Flow<List<GroupEntity>> = groupDao.getGroupList()
+
+    /**
+     * パスワード一覧データ取得処理
+     * グループIDの指定があれば指定されたグループに対するパスワード一覧データを取得する
+     *
+     * @param groupId グループID
+     * @return パスワード一覧データ
+     */
+    fun getPasswordList(groupId: Long): Flow<List<PasswordEntity>> {
+        return if (groupId == 1L) {
+            passwordDao.getPasswordList()
+        } else {
+            passwordDao.getSelectGroupPasswordList(groupId)
+        }
+    }
 
     /**
      * パスワードデータ追加
@@ -59,6 +72,15 @@ class PasswordMemoRepository(private val passwordDao: PasswordDao, private val g
     }
 
     /**
+     * 指定されたグループIDを初期グループIDにリセットする
+     *
+     * @param groupId リセットするグループID
+     */
+    suspend fun resetGroupId(groupId: Long) {
+        passwordDao.resetGroupId(groupId)
+    }
+
+    /**
      * グループデータ追加
      *
      * @param groupEntity グループデータ
@@ -92,5 +114,13 @@ class PasswordMemoRepository(private val passwordDao: PasswordDao, private val g
      */
     suspend fun deleteGroup(groupId: Long) {
         groupDao.deleteGroup(groupId)
+    }
+
+    /**
+     * グループデータ全削除
+     *
+     */
+    suspend fun deleteAllGroup() {
+        groupDao.deleteAllGroup()
     }
 }

@@ -22,6 +22,14 @@ interface PasswordDao {
     fun getPasswordList(): Flow<List<PasswordEntity>>
 
     /**
+     * 選択グループのパスワードデータ一覧取得
+     *
+     * @return 選択グループのパスワードデータ
+     */
+    @Query("SELECT * FROM passworddata WHERE group_id = :groupId ORDER BY id ASC")
+    fun getSelectGroupPasswordList(groupId: Long): Flow<List<PasswordEntity>>
+
+    /**
      * パスワードデータ追加
      *
      * @param passwordEntity パスワードデータ
@@ -59,4 +67,12 @@ interface PasswordDao {
      */
     @Query("DELETE FROM passworddata")
     suspend fun deleteAllPassword()
+
+    /**
+     * 指定されたグループIDを初期グループIDにリセットする
+     *
+     * @param groupId リセットするグループID
+     */
+    @Query("UPDATE passworddata SET group_id=1 WHERE group_id = :groupId")
+    suspend fun resetGroupId(groupId: Long)
 }
