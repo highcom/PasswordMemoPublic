@@ -7,52 +7,52 @@ import net.sqlcipher.Cursor
 import net.sqlcipher.database.SQLiteDatabase
 import java.util.Collections
 
-class ListDataManager private constructor(private val context: Context) {
-    private var groupId: Long = 1
-    val rdb: SQLiteDatabase
-    val wdb: SQLiteDatabase
-    private lateinit var data: MutableMap<String?, String?>
-    val dataList = ArrayList<Map<String?, String?>>()
-    private lateinit var groupData: MutableMap<String?, String?>
-    val groupList: MutableList<Map<String?, String?>>
-    private var sortKey: String?
-
-    init {
-        SQLiteDatabase.loadLibs(context)
-        sortKey = "id"
-        val helper = ListDataOpenHelper(context)
-        // onUpgradeを呼び出すために先にWritableDatabaseを先に呼び出す
-        wdb = helper.getWritableDatabase(context.getString(R.string.db_secret_key))
-        rdb = helper.getReadableDatabase(context.getString(R.string.db_secret_key))
-        val cur = cursor
-        var mov = cur.moveToFirst()
-        while (mov) {
-            data = HashMap()
-            data["id"] = cur.getString(0)
-            data["title"] = cur.getString(1)
-            data["account"] = cur.getString(2)
-            data["password"] = cur.getString(3)
-            data["url"] = cur.getString(4)
-            data["group_id"] = cur.getString(5)
-            data["memo"] = cur.getString(6)
-            data["inputdate"] = cur.getString(7)
-            dataList.add(data)
-            mov = cur.moveToNext()
-        }
-        cur.close()
+//class ListDataManager private constructor(private val context: Context) {
+//    private var groupId: Long = 1
+//    val rdb: SQLiteDatabase
+//    val wdb: SQLiteDatabase
+//    private lateinit var data: MutableMap<String?, String?>
+//    val dataList = ArrayList<Map<String?, String?>>()
+//    private lateinit var groupData: MutableMap<String?, String?>
+//    val groupList: MutableList<Map<String?, String?>>
+//    private var sortKey: String?
+//
+//    init {
+//        SQLiteDatabase.loadLibs(context)
+//        sortKey = "id"
+//        val helper = ListDataOpenHelper(context)
+//        // onUpgradeを呼び出すために先にWritableDatabaseを先に呼び出す
+//        wdb = helper.getWritableDatabase(context.getString(R.string.db_secret_key))
+//        rdb = helper.getReadableDatabase(context.getString(R.string.db_secret_key))
+//        val cur = cursor
+//        var mov = cur.moveToFirst()
+//        while (mov) {
+//            data = HashMap()
+//            data["id"] = cur.getString(0)
+//            data["title"] = cur.getString(1)
+//            data["account"] = cur.getString(2)
+//            data["password"] = cur.getString(3)
+//            data["url"] = cur.getString(4)
+//            data["group_id"] = cur.getString(5)
+//            data["memo"] = cur.getString(6)
+//            data["inputdate"] = cur.getString(7)
+//            dataList.add(data)
+//            mov = cur.moveToNext()
+//        }
+//        cur.close()
 //        sortListData(sortKey)
-        groupList = ArrayList()
-        val gcur = groupCursor
-        var gmov = gcur.moveToFirst()
-        while (gmov) {
-            groupData = HashMap()
-            groupData["group_id"] = gcur.getString(0)
-            groupData["group_order"] = gcur.getString(1)
-            groupData["name"] = gcur.getString(2)
-            groupList.add(groupData)
-            gmov = gcur.moveToNext()
-        }
-        // グループデータがない場合はデフォルトデータとして「すべて」を必ず追加」
+//        groupList = ArrayList()
+//        val gcur = groupCursor
+//        var gmov = gcur.moveToFirst()
+//        while (gmov) {
+//            groupData = HashMap()
+//            groupData["group_id"] = gcur.getString(0)
+//            groupData["group_order"] = gcur.getString(1)
+//            groupData["name"] = gcur.getString(2)
+//            groupList.add(groupData)
+//            gmov = gcur.moveToNext()
+//        }
+//        // グループデータがない場合はデフォルトデータとして「すべて」を必ず追加」
 //        if (groupList.size == 0) {
 //            groupData = HashMap()
 //            groupData["group_id"] = "1"
@@ -60,10 +60,10 @@ class ListDataManager private constructor(private val context: Context) {
 //            groupData["name"] = context.getString(R.string.list_title)
 //            setGroupData(false, groupData)
 //        }
-        gcur.close()
-        // TODO:必要ないソートをしていたから単純に削除で良い
+//        gcur.close()
+//        // TODO:必要ないソートをしていたから単純に削除で良い
 //        sortGroupListData()
-    }
+//    }
 
 //    fun setSelectGroupId(id: Long) {
 //        groupId = id
@@ -237,32 +237,32 @@ class ListDataManager private constructor(private val context: Context) {
 //        remakeListData()
 //    }
 
-    private val cursor: Cursor
-        private get() {
-            var selection: String? = null
-            if (groupId != 1L) {
-                selection = "group_id = $groupId"
-            }
-            return rdb.query(
-                "passworddata",
-                arrayOf(
-                    "id",
-                    "title",
-                    "account",
-                    "password",
-                    "url",
-                    "group_id",
-                    "memo",
-                    "inputdate"
-                ),
-                selection,
-                null,
-                null,
-                null,
-                "id ASC",
-                null
-            )
-        }
+//    private val cursor: Cursor
+//        private get() {
+//            var selection: String? = null
+//            if (groupId != 1L) {
+//                selection = "group_id = $groupId"
+//            }
+//            return rdb.query(
+//                "passworddata",
+//                arrayOf(
+//                    "id",
+//                    "title",
+//                    "account",
+//                    "password",
+//                    "url",
+//                    "group_id",
+//                    "memo",
+//                    "inputdate"
+//                ),
+//                selection,
+//                null,
+//                null,
+//                null,
+//                "id ASC",
+//                null
+//            )
+//        }
 
 //    fun rearrangeGroupData(fromPos: Int, toPos: Int) {
 //        var mov: Boolean
@@ -346,17 +346,17 @@ class ListDataManager private constructor(private val context: Context) {
 //        }
 //    }
 
-    private val groupCursor: Cursor
-        private get() = rdb.query(
-            "groupdata",
-            arrayOf("group_id", "group_order", "name"),
-            null,
-            null,
-            null,
-            null,
-            "group_order ASC",
-            null
-        )
+//    private val groupCursor: Cursor
+//        private get() = rdb.query(
+//            "groupdata",
+//            arrayOf("group_id", "group_order", "name"),
+//            null,
+//            null,
+//            null,
+//            null,
+//            "group_order ASC",
+//            null
+//        )
 
 //    private fun remakeGroupListData() {
 //        groupList.clear()
@@ -376,16 +376,16 @@ class ListDataManager private constructor(private val context: Context) {
 //        sortGroupListData()
 //    }
 
-    companion object {
-        const val SORT_ID = "id"
-        const val SORT_TITLE = "title"
-        const val SORT_INPUTDATE = "inputdate"
-        private var manager: ListDataManager? = null
-        fun getInstance(context: Context): ListDataManager? {
-            if (manager == null) {
-                manager = ListDataManager(context)
-            }
-            return manager
-        }
-    }
-}
+//    companion object {
+//        const val SORT_ID = "id"
+//        const val SORT_TITLE = "title"
+//        const val SORT_INPUTDATE = "inputdate"
+//        private var manager: ListDataManager? = null
+//        fun getInstance(context: Context): ListDataManager? {
+//            if (manager == null) {
+//                manager = ListDataManager(context)
+//            }
+//            return manager
+//        }
+//    }
+//}

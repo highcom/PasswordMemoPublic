@@ -18,8 +18,8 @@ class GroupListViewModel(private val repository: PasswordMemoRepository) : ViewM
         }
     }
 
-    private val _groupList = MutableStateFlow<List<GroupEntity>>(emptyList())
-    val groupList = _groupList.asStateFlow()
+    private val _groupList = repository.groupList
+    val groupList = _groupList
 
     fun insert(groupEntity: GroupEntity) = viewModelScope.launch { repository.insertGroup(groupEntity) }
     fun update(groupEntity: GroupEntity) = viewModelScope.launch { repository.updateGroup(groupEntity) }

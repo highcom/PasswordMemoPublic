@@ -17,21 +17,27 @@ import android.view.WindowManager
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.material.snackbar.Snackbar
-import com.highcom.passwordmemo.database.ListDataManager
+import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.util.login.LoginDataManager
+import kotlinx.coroutines.launch
 
 class ReferencePasswordActivity : AppCompatActivity() {
     private var loginDataManager: LoginDataManager? = null
-    private var listDataManager: ListDataManager? = null
     private var id: Long = 0
     private var groupId: Long = 0
     private var adContainerView: FrameLayout? = null
     private var mAdView: AdView? = null
+
+    private val groupListViewModel: GroupListViewModel by viewModels {
+        GroupListViewModel.Factory((application as PasswordMemoApplication).repository)
+    }
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +46,8 @@ class ReferencePasswordActivity : AppCompatActivity() {
         adContainerView?.post(Runnable { loadBanner() })
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         loginDataManager = LoginDataManager.Companion.getInstance(this)
-        listDataManager = ListDataManager.Companion.getInstance(this)
+        // TODO:動作確認したらコメントアウトを削除
+//        listDataManager = ListDataManager.Companion.getInstance(this)
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager!!.displayBackgroundSwitchEnable) {
@@ -56,11 +63,14 @@ class ReferencePasswordActivity : AppCompatActivity() {
         (findViewById<View>(R.id.editRefPassword) as EditText).setText(intent.getStringExtra("PASSWORD"))
         (findViewById<View>(R.id.editRefUrl) as EditText).setText(intent.getStringExtra("URL"))
         (findViewById<View>(R.id.editRefMemo) as EditText).setText(intent.getStringExtra("MEMO"))
-        val groupList = listDataManager!!.groupList
-        for (group in groupList!!) {
-            if (groupId == java.lang.Long.valueOf(group!!["group_id"])) {
-                (findViewById<View>(R.id.editRefGroup) as EditText).setText(group["name"])
-                break
+        lifecycleScope.launch {
+            groupListViewModel.groupList.collect { list ->
+                for (group in list) {
+                    if (groupId == group.groupId) {
+                        (findViewById<View>(R.id.editRefGroup) as EditText).setText(group.name)
+                        break
+                    }
+                }
             }
         }
 

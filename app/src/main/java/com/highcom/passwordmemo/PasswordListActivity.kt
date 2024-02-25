@@ -30,10 +30,9 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.highcom.passwordmemo.database.ListDataManager
 import com.highcom.passwordmemo.ui.DividerItemDecoration
-import com.highcom.passwordmemo.ui.list.ListViewAdapter
-import com.highcom.passwordmemo.ui.list.ListViewAdapter.AdapterListener
+import com.highcom.passwordmemo.ui.list.PasswordListAdapter
+import com.highcom.passwordmemo.ui.list.PasswordListAdapter.AdapterListener
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper.SimpleCallbackListener
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
@@ -49,12 +48,13 @@ import java.util.Locale
 class PasswordListActivity : AppCompatActivity(), AdapterListener {
     private var selectGroupName: String? = null
     private var loginDataManager: LoginDataManager? = null
-    private var listDataManager: ListDataManager? = null
+    // TODO:動作確認したらコメントアウトを削除
+//    private var listDataManager: ListDataManager? = null
     private var simpleCallbackHelper: SimpleCallbackHelper? = null
     private var adContainerView: FrameLayout? = null
     private var mAdView: AdView? = null
     var recyclerView: RecyclerView? = null
-    var adapter: ListViewAdapter? = null
+    var adapter: PasswordListAdapter? = null
     private var menu: Menu? = null
     private var currentMenuSelect = 0
     private var currentMemoVisible: Boolean? = null
@@ -124,7 +124,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
             }, options
         )
         loginDataManager = LoginDataManager.Companion.getInstance(this)
-        listDataManager = ListDataManager.Companion.getInstance(this)
+//        listDataManager = ListDataManager.Companion.getInstance(this)
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager!!.displayBackgroundSwitchEnable) {
@@ -134,9 +134,8 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         // TODO:動作確認したらコメントアウトを削除
 //        listDataManager!!.setSelectGroupId(loginDataManager!!.selectGroup)
 //        listDataManager!!.sortListData(loginDataManager!!.sortKey)
-        adapter = ListViewAdapter(
+        adapter = PasswordListAdapter(
             this,
-            listDataManager!!.dataList,
             loginDataManager,
             this
         )
@@ -172,12 +171,12 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
                         getString(R.string.delete),
                         BitmapFactory.decodeResource(resources, R.drawable.ic_delete),
                         Color.parseColor(getString(R.color.underlay_red)),
-                        viewHolder as ListViewAdapter.ViewHolder,
+                        viewHolder as PasswordListAdapter.ViewHolder,
                         object : UnderlayButtonClickListener {
                             override fun onClick(holder: RecyclerView.ViewHolder, pos: Int) {
                                 AlertDialog.Builder(this@PasswordListActivity)
                                     .setTitle(
-                                        getString(R.string.delete_title_head) + (holder as ListViewAdapter.ViewHolder).title?.text.toString() + getString(
+                                        getString(R.string.delete_title_head) + (holder as PasswordListAdapter.ViewHolder).title?.text.toString() + getString(
                                             R.string.delete_title
                                         )
                                     )
@@ -202,23 +201,23 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
                                 val intent =
                                     Intent(this@PasswordListActivity, InputPasswordActivity::class.java)
                                 // 選択アイテムを編集モードで設定
-                                intent.putExtra("ID", (holder as ListViewAdapter.ViewHolder).id)
+                                intent.putExtra("ID", (holder as PasswordListAdapter.ViewHolder).id)
                                 intent.putExtra("EDIT", true)
                                 intent.putExtra(
                                     "TITLE",
-                                    (holder as ListViewAdapter.ViewHolder).title?.text.toString()
+                                    (holder as PasswordListAdapter.ViewHolder).title?.text.toString()
                                 )
                                 intent.putExtra(
                                     "ACCOUNT",
-                                    (holder as ListViewAdapter.ViewHolder).account
+                                    (holder as PasswordListAdapter.ViewHolder).account
                                 )
                                 intent.putExtra(
                                     "PASSWORD",
-                                    (holder as ListViewAdapter.ViewHolder).password
+                                    (holder as PasswordListAdapter.ViewHolder).password
                                 )
-                                intent.putExtra("URL", (holder as ListViewAdapter.ViewHolder).url)
-                                intent.putExtra("GROUP", (holder as ListViewAdapter.ViewHolder).groupId)
-                                intent.putExtra("MEMO", (holder as ListViewAdapter.ViewHolder).memo)
+                                intent.putExtra("URL", (holder as PasswordListAdapter.ViewHolder).url)
+                                intent.putExtra("GROUP", (holder as PasswordListAdapter.ViewHolder).groupId)
+                                intent.putExtra("MEMO", (holder as PasswordListAdapter.ViewHolder).memo)
                                 startActivityForResult(intent, EDIT_DATA)
                             }
                         }
@@ -238,21 +237,21 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
                                 intent.putExtra("EDIT", false)
                                 intent.putExtra(
                                      "TITLE",
-                                     (holder as ListViewAdapter.ViewHolder).title?.text.toString() + " " + getString(
+                                     (holder as PasswordListAdapter.ViewHolder).title?.text.toString() + " " + getString(
                                         R.string.copy_title
                                     )
                                 )
                                 intent.putExtra(
                                      "ACCOUNT",
-                                    (holder as ListViewAdapter.ViewHolder).account
+                                    (holder as PasswordListAdapter.ViewHolder).account
                                 )
                                 intent.putExtra(
                                      "PASSWORD",
-                                    (holder as ListViewAdapter.ViewHolder).password
+                                    (holder as PasswordListAdapter.ViewHolder).password
                                 )
-                                intent.putExtra("URL", (holder as ListViewAdapter.ViewHolder).url)
-                                intent.putExtra("GROUP", (holder as ListViewAdapter.ViewHolder).groupId)
-                                intent.putExtra("MEMO", (holder as ListViewAdapter.ViewHolder).memo)
+                                intent.putExtra("URL", (holder as PasswordListAdapter.ViewHolder).url)
+                                intent.putExtra("GROUP", (holder as PasswordListAdapter.ViewHolder).groupId)
+                                intent.putExtra("MEMO", (holder as PasswordListAdapter.ViewHolder).memo)
                                 startActivityForResult(intent, EDIT_DATA)
                             }
                         }
@@ -314,9 +313,9 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         menuInflater.inflate(R.menu.menu_list, menu)
         this.menu = menu
         currentMenuSelect = when (loginDataManager!!.sortKey) {
-            ListDataManager.Companion.SORT_ID -> R.id.sort_default
-            ListDataManager.Companion.SORT_TITLE -> R.id.sort_title
-            ListDataManager.Companion.SORT_INPUTDATE -> R.id.sort_update
+            PasswordListAdapter.SORT_ID -> R.id.sort_default
+            PasswordListAdapter.SORT_TITLE -> R.id.sort_title
+            PasswordListAdapter.SORT_INPUTDATE -> R.id.sort_update
             else -> R.id.sort_default
         }
         // 現在選択されている選択アイコンを設定する
@@ -355,7 +354,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
                 // 編集状態の変更
                 // TODO:動作確認したらコメントアウトを削除
 //                listDataManager!!.sortListData(ListDataManager.Companion.SORT_ID)
-                adapter?.sortPasswordList(ListViewAdapter.SORT_ID)
+                adapter?.sortPasswordList(PasswordListAdapter.SORT_ID)
                 if (adapter?.editEnable == true) {
                     setCurrentSelectMenuTitle(menu!!.findItem(R.id.sort_default), R.id.sort_default)
                     adapter?.editEnable = false
@@ -365,37 +364,37 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
                 }
                 title = getString(R.string.sort_name_default) + "：" + selectGroupName
                 recyclerView!!.adapter = adapter
-                loginDataManager!!.setSortKey(ListDataManager.Companion.SORT_ID)
+                loginDataManager!!.setSortKey(PasswordListAdapter.SORT_ID)
             }
 
             R.id.sort_default -> {
                 setCurrentSelectMenuTitle(item, R.id.sort_default)
                 title = getString(R.string.sort_name_default) + "：" + selectGroupName
 //                listDataManager!!.sortListData(ListDataManager.Companion.SORT_ID)
-                adapter?.sortPasswordList(ListViewAdapter.SORT_ID)
+                adapter?.sortPasswordList(PasswordListAdapter.SORT_ID)
                 if (adapter?.editEnable == true) adapter?.editEnable = false
                 recyclerView!!.adapter = adapter
-                loginDataManager!!.setSortKey(ListDataManager.Companion.SORT_ID)
+                loginDataManager!!.setSortKey(PasswordListAdapter.SORT_ID)
             }
 
             R.id.sort_title -> {
                 setCurrentSelectMenuTitle(item, R.id.sort_title)
                 title = getString(R.string.sort_name_title) + "：" + selectGroupName
 //                listDataManager!!.sortListData(ListDataManager.Companion.SORT_TITLE)
-                adapter?.sortPasswordList(ListViewAdapter.SORT_TITLE)
+                adapter?.sortPasswordList(PasswordListAdapter.SORT_TITLE)
                 if (adapter?.editEnable == true) adapter?.editEnable = false
                 recyclerView!!.adapter = adapter
-                loginDataManager!!.setSortKey(ListDataManager.Companion.SORT_TITLE)
+                loginDataManager!!.setSortKey(PasswordListAdapter.SORT_TITLE)
             }
 
             R.id.sort_update -> {
                 setCurrentSelectMenuTitle(item, R.id.sort_update)
                 title = getString(R.string.sort_name_update) + "：" + selectGroupName
 //                listDataManager!!.sortListData(ListDataManager.Companion.SORT_INPUTDATE)
-                adapter?.sortPasswordList(ListViewAdapter.SORT_INPUTDATE)
+                adapter?.sortPasswordList(PasswordListAdapter.SORT_INPUTDATE)
                 if (adapter?.editEnable == true) adapter?.editEnable = false
                 recyclerView!!.adapter = adapter
-                loginDataManager!!.setSortKey(ListDataManager.Companion.SORT_INPUTDATE)
+                loginDataManager!!.setSortKey(PasswordListAdapter.SORT_INPUTDATE)
             }
 
             R.id.select_group -> {
@@ -463,9 +462,9 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
             }
         }
         title = when (loginDataManager!!.sortKey) {
-            ListDataManager.Companion.SORT_ID -> getString(R.string.sort_name_default) + "：" + selectGroupName
-            ListDataManager.Companion.SORT_TITLE -> getString(R.string.sort_name_title) + "：" + selectGroupName
-            ListDataManager.Companion.SORT_INPUTDATE -> getString(R.string.sort_name_update) + "：" + selectGroupName
+            PasswordListAdapter.SORT_ID -> getString(R.string.sort_name_default) + "：" + selectGroupName
+            PasswordListAdapter.SORT_TITLE -> getString(R.string.sort_name_title) + "：" + selectGroupName
+            PasswordListAdapter.SORT_INPUTDATE -> getString(R.string.sort_name_update) + "：" + selectGroupName
             else -> getString(R.string.sort_name_default) + "：" + selectGroupName
         }
     }
@@ -534,7 +533,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         // 入力画面を生成
         val intent = Intent(this@PasswordListActivity, ReferencePasswordActivity::class.java)
         // 選択アイテムを設定
-        val holder = view.tag as ListViewAdapter.ViewHolder
+        val holder = view.tag as PasswordListAdapter.ViewHolder
         intent.putExtra("ID", holder.id)
         intent.putExtra("TITLE", holder.title?.text.toString())
         intent.putExtra("ACCOUNT", holder.account)
@@ -549,16 +548,20 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == EDIT_DATA || requestCode == START_GROUP || requestCode == START_SETTING && resultCode == SettingActivity.Companion.NEED_UPDATE) {
             if (requestCode == START_GROUP) {
-                for (group in listDataManager!!.groupList) {
-                    if (java.lang.Long.valueOf(group!!["group_id"]) == loginDataManager!!.selectGroup) {
-                        selectGroupName = group["name"]
-                        title = when (loginDataManager!!.sortKey) {
-                            ListDataManager.Companion.SORT_ID -> getString(R.string.sort_name_default) + "：" + selectGroupName
-                            ListDataManager.Companion.SORT_TITLE -> getString(R.string.sort_name_title) + "：" + selectGroupName
-                            ListDataManager.Companion.SORT_INPUTDATE -> getString(R.string.sort_name_update) + "：" + selectGroupName
-                            else -> getString(R.string.sort_name_default) + "：" + selectGroupName
+                lifecycleScope.launch {
+                    groupListViewModel.groupList.collect {
+                        for (group in it) {
+                            if (group.groupId == loginDataManager!!.selectGroup) {
+                                selectGroupName = group.name
+                                title = when (loginDataManager!!.sortKey) {
+                                    PasswordListAdapter.SORT_ID -> getString(R.string.sort_name_default) + "：" + selectGroupName
+                                    PasswordListAdapter.SORT_TITLE -> getString(R.string.sort_name_title) + "：" + selectGroupName
+                                    PasswordListAdapter.SORT_INPUTDATE -> getString(R.string.sort_name_update) + "：" + selectGroupName
+                                    else -> getString(R.string.sort_name_default) + "：" + selectGroupName
+                                }
+                                break
+                            }
                         }
-                        break
                     }
                 }
             }

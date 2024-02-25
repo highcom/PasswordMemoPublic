@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
-import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.UiThread
@@ -16,7 +15,6 @@ import androidx.core.os.HandlerCompat
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.data.PasswordEntity
-import com.highcom.passwordmemo.database.ListDataManager
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import java.io.BufferedReader

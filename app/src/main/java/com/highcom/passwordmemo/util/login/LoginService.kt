@@ -15,7 +15,6 @@ import androidx.biometric.BiometricPrompt.PromptInfo
 import androidx.fragment.app.FragmentActivity
 import com.highcom.passwordmemo.PasswordListActivity
 import com.highcom.passwordmemo.R
-import com.highcom.passwordmemo.database.ListDataManager
 import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import java.util.concurrent.Executor
 

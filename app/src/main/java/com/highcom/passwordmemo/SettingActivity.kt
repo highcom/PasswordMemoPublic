@@ -20,6 +20,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.textfield.TextInputEditText
 import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
@@ -37,6 +38,7 @@ import com.highcom.passwordmemo.util.file.RestoreDbFile.RestoreDbFileListener
 import com.highcom.passwordmemo.util.file.SelectInputOutputFileDialog
 import com.highcom.passwordmemo.util.file.SelectInputOutputFileDialog.InputOutputFileDialogListener
 import com.highcom.passwordmemo.util.login.LoginDataManager
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -284,8 +286,10 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
                 }
 
                 OUTPUT_CSV -> {
-                    val outputExternalFile = OutputExternalFile(this)
-                    outputExternalFile.outputSelectFolder(uri)
+                    val outputExternalFile = OutputExternalFile(this, passwordListViewModel, groupListViewModel)
+                    lifecycleScope.launch {
+                        outputExternalFile.outputSelectFolder(uri)
+                    }
                 }
             }
         }

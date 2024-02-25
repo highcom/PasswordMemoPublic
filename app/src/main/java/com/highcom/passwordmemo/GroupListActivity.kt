@@ -27,7 +27,6 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.highcom.passwordmemo.data.GroupEntity
-import com.highcom.passwordmemo.database.ListDataManager
 import com.highcom.passwordmemo.ui.DividerItemDecoration
 import com.highcom.passwordmemo.ui.list.GroupListAdapter
 import com.highcom.passwordmemo.ui.list.GroupListAdapter.GroupAdapterListener
@@ -40,7 +39,8 @@ import kotlinx.coroutines.launch
 
 class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
     private var loginDataManager: LoginDataManager? = null
-    private var listDataManager: ListDataManager? = null
+    // TODO:動作確認したらコメントアウトを削除
+//    private var listDataManager: ListDataManager? = null
     private var adContainerView: FrameLayout? = null
     private var mAdView: AdView? = null
     var recyclerView: RecyclerView? = null
@@ -70,7 +70,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         title = getString(R.string.group_title) + getString(R.string.group_title_select)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         loginDataManager = LoginDataManager.Companion.getInstance(this)
-        listDataManager = ListDataManager.Companion.getInstance(this)
+//        listDataManager = ListDataManager.Companion.getInstance(this)
 
         // グループ名が空白のデータが存在していた場合には削除する
         // TODO:動作確認をしたらコメントアウトを削除
@@ -87,7 +87,6 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         }
         adapter = GroupListAdapter(
             this,
-            listDataManager!!.groupList,
             this
         )
         adapter?.textSize = loginDataManager!!.textSize
@@ -123,14 +122,18 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
 //            data["group_order"] = Integer.valueOf(listDataManager!!.groupList.size + 1).toString()
 //            data["name"] = ""
 //            listDataManager!!.setGroupData(false, data)
-            // TODO:groupList+1をアダプタから取得出来るように修正が必要
-            groupListViewModel.insert(GroupEntity(0, listDataManager!!.groupList.size + 1, ""))
-            adapter!!.notifyDataSetChanged()
-            // 新規作成時は対象のセルにフォーカスされるようにスクロールする
-            for (position in listDataManager!!.groupList.indices) {
-                if (listDataManager!!.groupList[position]["name"] == "") {
-                    recyclerView!!.smoothScrollToPosition(position)
-                    break
+            // TODO:groupList+1をアダプタから取得出来るように修正が必要(直ったのか確認)
+            lifecycleScope.launch {
+                groupListViewModel.groupList.collect { list ->
+                    groupListViewModel.insert(GroupEntity(0, list.size + 1, ""))
+                    adapter?.notifyDataSetChanged()
+                    // 新規作成時は対象のセルにフォーカスされるようにスクロールする
+                    for (position in list.indices) {
+                        if (list[position].name == "") {
+                            recyclerView!!.smoothScrollToPosition(position)
+                            break
+                        }
+                    }
                 }
             }
         })

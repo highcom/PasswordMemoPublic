@@ -18,7 +18,6 @@ import com.highcom.passwordmemo.util.TextSizeUtil
 
 class GroupListAdapter(
     context: Context,
-    private val listData: List<Map<String?, *>?>?,
     private val adapterListener: GroupAdapterListener
 ) : RecyclerView.Adapter<GroupViewHolder?>() {
     private val inflater: LayoutInflater
@@ -124,15 +123,15 @@ class GroupListAdapter(
     }
 
     override fun getItemCount(): Int {
-        return if (listData != null) {
-            listData.size + 1
+        return if (groupList != null) {
+            groupList!!.size + 1
         } else {
             0
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position >= listData!!.size) {
+        return if (position >= groupList!!.size) {
             TYPE_FOOTER
         } else TYPE_ITEM
     }
@@ -149,27 +148,26 @@ class GroupListAdapter(
 
     override fun onBindViewHolder(holder: GroupViewHolder, position: Int) {
         // フッターの場合にはデータをバインドしない
-        if (position >= listData!!.size) return
+        if (position >= groupList!!.size) return
         val layoutHeight = layoutHeightMap[textSize.toInt()]
         if (layoutHeight != null) {
             val params = holder!!.rowLinearLayout?.layoutParams
             params?.height = layoutHeight.toInt()
             holder.rowLinearLayout?.layoutParams = params
         }
-        val groupId = (listData[position] as HashMap<*, *>?)!!["group_id"].toString()
-        val groupOrder = (listData[position] as HashMap<*, *>?)!!["group_order"].toString()
-        val groupName = (listData[position] as HashMap<*, *>?)!!["name"].toString()
-        holder!!.groupId = java.lang.Long.valueOf(groupId)
-        holder.groupOrder = Integer.valueOf(groupOrder)
-        holder.groupName?.setText(groupName)
-        holder.groupName?.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
-        holder.itemView.tag = holder
-        // グループ名が空欄があった場合は新規追加時なのでフォーカスする
-        if (groupName == "") {
-            adapterListener.onGroupNameClicked(
-                holder.itemView.findViewById(R.id.groupName),
-                holder.groupId
-            )
+        groupList?.let {
+            holder.groupId = it[position].groupId
+            holder.groupOrder = it[position].groupOrder
+            holder.groupName?.setText(it[position].name)
+            holder.groupName?.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
+            holder.itemView.tag = holder
+            // グループ名が空欄があった場合は新規追加時なのでフォーカスする
+            if (it[position].name == "") {
+                adapterListener.onGroupNameClicked(
+                    holder.itemView.findViewById(R.id.groupName),
+                    holder.groupId
+                )
+            }
         }
         // 編集モードでも1番目の「すべて」は並べ替えさせない
         if (editEnable && holder.groupId != null && holder.groupId != 1L) {
