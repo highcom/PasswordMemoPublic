@@ -77,10 +77,6 @@ class InputPasswordActivity : AppCompatActivity() {
 
         // グループ選択スピナーの設定
         selectGroupSpinner = findViewById(R.id.selectGroup)
-        selectGroupNames = ArrayList()
-        val selectGroupAdapter =
-            SetTextSizeAdapter(this, selectGroupNames, loginDataManager!!.textSize.toInt())
-        selectGroupSpinner?.setAdapter(selectGroupAdapter)
         selectGroupSpinner?.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(adapterView: AdapterView<*>?, view: View, i: Int, l: Long) {
                 lifecycleScope.launch {
@@ -93,11 +89,15 @@ class InputPasswordActivity : AppCompatActivity() {
             override fun onNothingSelected(adapterView: AdapterView<*>?) {}
         })
 
+        selectGroupNames = ArrayList()
         lifecycleScope.launch {
             groupListViewModel.groupList.collect { list ->
                 for (group in list) {
                     selectGroupNames?.add(group.name)
                 }
+                val selectGroupAdapter =
+                    SetTextSizeAdapter(this@InputPasswordActivity, selectGroupNames, loginDataManager!!.textSize.toInt())
+                selectGroupSpinner?.setAdapter(selectGroupAdapter)
                 for (i in list.indices) {
                     if (groupId == list[i].groupId) {
                         selectGroupSpinner?.setSelection(i)
@@ -341,11 +341,11 @@ class InputPasswordActivity : AppCompatActivity() {
             TypedValue.COMPLEX_UNIT_DIP,
             size - 3
         )
-        val selectGroupAdapter =
-            SetTextSizeAdapter(this, selectGroupNames, loginDataManager!!.textSize.toInt())
-        selectGroupSpinner!!.adapter = selectGroupAdapter
         lifecycleScope.launch {
             groupListViewModel.groupList.collect { list ->
+                val selectGroupAdapter =
+                    SetTextSizeAdapter(this@InputPasswordActivity, selectGroupNames, loginDataManager!!.textSize.toInt())
+                selectGroupSpinner!!.adapter = selectGroupAdapter
                 for (i in list.indices) {
                     if (groupId == list[i].groupId) {
                         selectGroupSpinner?.setSelection(i)

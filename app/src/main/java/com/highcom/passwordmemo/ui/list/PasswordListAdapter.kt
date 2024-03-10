@@ -208,7 +208,7 @@ class PasswordListAdapter(
                 constraint: CharSequence?,
                 results: FilterResults?
             ) {
-                passwordList = results?.values as ArrayList<PasswordEntity>
+                passwordList = results?.values as List<PasswordEntity>
                 notifyDataSetChanged()
             }
         }

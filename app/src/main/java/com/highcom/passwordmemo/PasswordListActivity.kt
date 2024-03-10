@@ -544,10 +544,13 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         startActivityForResult(intent, EDIT_DATA)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == EDIT_DATA || requestCode == START_GROUP || requestCode == START_SETTING && resultCode == SettingActivity.Companion.NEED_UPDATE) {
             if (requestCode == START_GROUP) {
+                // 選択したグループを設定
+                passwordListViewModel.setSelectGroup(loginDataManager?.selectGroup ?: 1L)
                 lifecycleScope.launch {
                     groupListViewModel.groupList.collect {
                         for (group in it) {

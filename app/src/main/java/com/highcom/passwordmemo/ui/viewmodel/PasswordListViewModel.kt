@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.data.PasswordMemoRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class PasswordListViewModel(private val repository: PasswordMemoRepository) : ViewModel() {
@@ -19,12 +19,11 @@ class PasswordListViewModel(private val repository: PasswordMemoRepository) : Vi
         }
     }
 
-    private var _passwordList = MutableStateFlow<List<PasswordEntity>>(emptyList())
-    val passwordList = _passwordList.asStateFlow()
+    var passwordList: Flow<List<PasswordEntity>> = MutableStateFlow(emptyList())
 
     // TODO:loginDataManagerでグループをセットしている箇所にこのメソッドも呼び出す
     fun setSelectGroup(groupId: Long) {
-        _passwordList = repository.getPasswordList(groupId) as MutableStateFlow<List<PasswordEntity>>
+        passwordList = repository.getPasswordList(groupId)
     }
     fun insert(passwordEntity: PasswordEntity) = viewModelScope.launch { repository.insertPassword(passwordEntity) }
     fun update(passwordEntity: PasswordEntity) = viewModelScope.launch { repository.updatePassword(passwordEntity) }
