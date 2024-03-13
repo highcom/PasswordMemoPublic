@@ -35,7 +35,9 @@ import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper.SimpleCallbackListener
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.util.login.LoginDataManager
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
     private var loginDataManager: LoginDataManager? = null
@@ -100,13 +102,6 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
                 if (list.isEmpty()) {
                     groupListViewModel.insert(GroupEntity(1, 1, getString(R.string.list_title)))
                 }
-                // グループ名が空白のデータが存在していた場合には削除する
-                for (group in list) {
-                    if (group.name.isEmpty()) {
-                        groupListViewModel.delete(group.groupId)
-                        groupListViewModel.resetGroupId(group.groupId)
-                    }
-                }
                 adapter?.groupList = list
             }
         }
@@ -123,9 +118,9 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
 //            data["name"] = ""
 //            listDataManager!!.setGroupData(false, data)
             // TODO:groupList+1をアダプタから取得出来るように修正が必要(直ったのか確認)
+            groupListViewModel.insert(GroupEntity(0, (adapter?.groupList?.size ?: 0) + 1, ""))
             lifecycleScope.launch {
                 groupListViewModel.groupList.collect { list ->
-                    groupListViewModel.insert(GroupEntity(0, list.size + 1, ""))
                     adapter?.notifyDataSetChanged()
                     // 新規作成時は対象のセルにフォーカスされるようにスクロールする
                     for (position in list.indices) {
@@ -266,6 +261,19 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onStop() {
+        runBlocking {
+            val groupList = groupListViewModel.groupList.first()
+            // グループ名が空白のデータが存在していた場合には削除する
+            for (group in groupList) {
+                if (group.name.isEmpty()) {
+                    groupListViewModel.delete(group.groupId)
+                    groupListViewModel.resetGroupId(group.groupId)
+                }
+            }
+        }
+        super.onStop()
+    }
     public override fun onDestroy() {
         if (mAdView != null) mAdView!!.destroy()
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る

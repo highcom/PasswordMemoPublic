@@ -57,22 +57,20 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onClick(v: View) {
-        if (v != null) {
-            when (v.id) {
-                R.id.loginButton -> {
-                    val editPassword =
-                        (findViewById<View>(R.id.editMasterPassword) as TextInputEditText).text.toString()
-                    val naviMessage = loginService!!.passwordLogin(this, editPassword)
-                    if (naviMessage != null) naviText!!.text = naviMessage
-                }
-
-                R.id.biometricLoginButton -> loginService!!.biometricLogin(this)
-                else -> {}
+        when (v.id) {
+            R.id.loginButton -> {
+                val editPassword =
+                    (findViewById<View>(R.id.editMasterPassword) as TextInputEditText).text.toString()
+                val naviMessage = loginService!!.passwordLogin(this, editPassword)
+                if (naviMessage != null) naviText!!.text = naviMessage
             }
-            (findViewById<View>(R.id.editMasterPassword) as EditText).editableText.clear()
-            loginDataManager!!.updateSetting()
-            checkBiometricSetting()
+
+            R.id.biometricLoginButton -> loginService!!.biometricLogin(this)
+            else -> {}
         }
+        (findViewById<View>(R.id.editMasterPassword) as EditText).editableText.clear()
+        loginDataManager!!.updateSetting()
+        checkBiometricSetting()
     }
 
     @SuppressLint("ResourceType")
