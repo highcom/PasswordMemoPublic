@@ -22,7 +22,7 @@ data class PasswordEntity(
     @ColumnInfo(name = "id") var id: Long,
     @ColumnInfo(name = "title", defaultValue = "") var title: String,
     @ColumnInfo(name = "account", defaultValue = "") var account: String,
-    @ColumnInfo(name = "password", defaultValue = "1") var password: String,
+    @ColumnInfo(name = "password", defaultValue = "") var password: String,
     @ColumnInfo(name = "url", defaultValue = "") var url: String,
     @ColumnInfo(name = "group_id", defaultValue = "1") var groupId: Long,
     @ColumnInfo(name = "memo", defaultValue = "") var memo: String,
