@@ -12,22 +12,24 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.ui.list.GroupListAdapter.GroupViewHolder
 import com.highcom.passwordmemo.util.TextSizeUtil
 
 class GroupListAdapter(
     context: Context,
-    private val listData: List<Map<String?, *>?>?,
     private val adapterListener: GroupAdapterListener
 ) : RecyclerView.Adapter<GroupViewHolder?>() {
     private val inflater: LayoutInflater
     private val layoutHeightMap: Map<Int, Float>
+    /** 表示用グループ一覧データ */
+    var groupList: List<GroupEntity>? = null
     var textSize = 15f
     var editEnable = false
 
     interface GroupAdapterListener {
         fun onGroupNameClicked(view: View, groupId: Long?)
-        fun onGroupNameOutOfFocused(view: View, data: Map<String?, String?>)
+        fun onGroupNameOutOfFocused(view: View, groupEntity: GroupEntity)
     }
 
     inner class GroupViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -64,12 +66,18 @@ class GroupListAdapter(
                         if (groupName?.text.toString() == "") {
                             groupName?.setText(orgGroupName)
                         }
-                        val data: MutableMap<String?, String?> = HashMap()
-                        data["group_id"] = java.lang.Long.valueOf(groupId!!).toString()
-                        data["group_order"] = Integer.valueOf(groupOrder).toString()
-                        data["name"] = groupName?.text.toString()
+                        // TODO:動作に問題が無いことが確認できたら消す
+//                        val data: MutableMap<String?, String?> = HashMap()
+//                        data["group_id"] = java.lang.Long.valueOf(groupId!!).toString()
+//                        data["group_order"] = Integer.valueOf(groupOrder).toString()
+//                        data["name"] = groupName?.text.toString()
+                        val groupEntity = GroupEntity(
+                            groupId = groupId!!,
+                            groupOrder = groupOrder,
+                            name = groupName?.text.toString()
+                        )
                         // フォーカスが外れた時に内容が変更されていたら更新する
-                        adapterListener.onGroupNameOutOfFocused(view, data)
+                        adapterListener.onGroupNameOutOfFocused(view, groupEntity)
                     }
                 }
                 // キーボードのエンターが押下された場合
@@ -115,15 +123,15 @@ class GroupListAdapter(
     }
 
     override fun getItemCount(): Int {
-        return if (listData != null) {
-            listData.size + 1
+        return if (groupList != null) {
+            groupList!!.size + 1
         } else {
             0
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position >= listData!!.size) {
+        return if (position >= groupList!!.size) {
             TYPE_FOOTER
         } else TYPE_ITEM
     }
@@ -140,27 +148,26 @@ class GroupListAdapter(
 
     override fun onBindViewHolder(holder: GroupViewHolder, position: Int) {
         // フッターの場合にはデータをバインドしない
-        if (position >= listData!!.size) return
+        if (position >= groupList!!.size) return
         val layoutHeight = layoutHeightMap[textSize.toInt()]
         if (layoutHeight != null) {
             val params = holder!!.rowLinearLayout?.layoutParams
             params?.height = layoutHeight.toInt()
             holder.rowLinearLayout?.layoutParams = params
         }
-        val groupId = (listData[position] as HashMap<*, *>?)!!["group_id"].toString()
-        val groupOrder = (listData[position] as HashMap<*, *>?)!!["group_order"].toString()
-        val groupName = (listData[position] as HashMap<*, *>?)!!["name"].toString()
-        holder!!.groupId = java.lang.Long.valueOf(groupId)
-        holder.groupOrder = Integer.valueOf(groupOrder)
-        holder.groupName?.setText(groupName)
-        holder.groupName?.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
-        holder.itemView.tag = holder
-        // グループ名が空欄があった場合は新規追加時なのでフォーカスする
-        if (groupName == "") {
-            adapterListener.onGroupNameClicked(
-                holder.itemView.findViewById(R.id.groupName),
-                holder.groupId
-            )
+        groupList?.let {
+            holder.groupId = it[position].groupId
+            holder.groupOrder = it[position].groupOrder
+            holder.groupName?.setText(it[position].name)
+            holder.groupName?.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
+            holder.itemView.tag = holder
+            // グループ名が空欄があった場合は新規追加時なのでフォーカスする
+            if (it[position].name == "") {
+                adapterListener.onGroupNameClicked(
+                    holder.itemView.findViewById(R.id.groupName),
+                    holder.groupId
+                )
+            }
         }
         // 編集モードでも1番目の「すべて」は並べ替えさせない
         if (editEnable && holder.groupId != null && holder.groupId != 1L) {
@@ -168,6 +175,34 @@ class GroupListAdapter(
         } else {
             holder.groupRearrangeButton?.visibility = View.GONE
         }
+    }
+
+    /**
+     * グループデータ一覧の並べ替え処理
+     *
+     * @param fromPos 移動元の位置
+     * @param toPos 移動先の位置
+     * @return 並べ替え後のグループ一覧データ
+     */
+    fun rearrangeGroupList(fromPos: Int, toPos: Int): List<GroupEntity> {
+        var rearrangeList: ArrayList<GroupEntity> = ArrayList<GroupEntity>()
+        groupList?.let {
+            for (entity in it) {
+                rearrangeList.add(entity)
+            }
+        }
+        // 引数で渡された位置で並べ替え
+        val fromentity = rearrangeList[fromPos]
+        rearrangeList.removeAt(fromPos)
+        rearrangeList.add(toPos, fromentity)
+        // 再度順番を振り直す
+        var order = 1
+        for (entity in rearrangeList) {
+            entity.groupOrder = order
+            order++
+        }
+        groupList = rearrangeList
+        return rearrangeList
     }
 
     companion object {
