@@ -146,7 +146,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
 
         // 選択されているグループのパスワード一覧を設定する
         passwordListViewModel.setSelectGroup(loginDataManager?.selectGroup ?: 1L)
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenStarted {
             passwordListViewModel.passwordList.collect { list ->
                 adapter?.setList(list)
                 adapter?.sortPasswordList(loginDataManager?.sortKey)
