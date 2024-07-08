@@ -18,8 +18,7 @@ class GroupListViewModel(private val repository: PasswordMemoRepository) : ViewM
         }
     }
 
-    private val _groupList = repository.groupList
-    val groupList = _groupList
+    val groupList = repository.groupList
 
     fun insert(groupEntity: GroupEntity) = viewModelScope.launch { repository.insertGroup(groupEntity) }
     fun update(groupEntity: GroupEntity) = viewModelScope.launch { repository.updateGroup(groupEntity) }
