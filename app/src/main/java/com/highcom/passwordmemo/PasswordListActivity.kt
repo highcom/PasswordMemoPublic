@@ -150,6 +150,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
             passwordListViewModel.passwordList.collect { list ->
                 adapter?.setList(list)
                 adapter?.sortPasswordList(loginDataManager?.sortKey)
+                reflesh()
             }
         }
 
@@ -509,6 +510,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
     }
 
     // データの一覧を更新する
+    @SuppressLint("NotifyDataSetChanged")
     fun reflesh() {
         adapter!!.notifyDataSetChanged()
         // フィルタしている場合はフィルタデータの一覧も更新する

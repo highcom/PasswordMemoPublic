@@ -54,6 +54,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         GroupListViewModel.Factory((application as PasswordMemoApplication).repository)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_list)
@@ -103,6 +104,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
                     groupListViewModel.insert(GroupEntity(1, 1, getString(R.string.list_title)))
                 }
                 adapter?.groupList = list
+                adapter?.notifyDataSetChanged()
             }
         }
 
@@ -222,6 +224,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         )
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onResume() {
         super.onResume()
         var needRefresh = false
