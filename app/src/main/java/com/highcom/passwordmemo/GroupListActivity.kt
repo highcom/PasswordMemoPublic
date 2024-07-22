@@ -314,7 +314,9 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
             view.windowToken,
             InputMethodManager.HIDE_NOT_ALWAYS
         )
-        groupFab!!.visibility = View.VISIBLE
+        if (adapter?.editEnable == true) {
+            groupFab!!.visibility = View.VISIBLE
+        }
         view.isFocusable = false
         view.isFocusableInTouchMode = false
         view.requestFocus()

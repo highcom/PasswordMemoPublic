@@ -162,7 +162,7 @@ class GroupListAdapter(
             holder.groupName?.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
             holder.itemView.tag = holder
             // グループ名が空欄があった場合は新規追加時なのでフォーカスする
-            if (it[position].name == "") {
+            if (editEnable && it[position].name == "") {
                 adapterListener.onGroupNameClicked(
                     holder.itemView.findViewById(R.id.groupName),
                     holder.groupId
