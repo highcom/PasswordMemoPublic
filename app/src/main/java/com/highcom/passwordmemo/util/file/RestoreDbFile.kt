@@ -13,6 +13,7 @@ import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.os.HandlerCompat
 import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -40,7 +41,7 @@ class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListe
             val srcFile = File(srcPath)
             srcFile.renameTo(destFile)
             progressBar!!.progress = 100
-            val postExecutor: PostExecutor = PostExecutor()
+            val postExecutor = PostExecutor()
             _handler.post(postExecutor)
         }
     }
@@ -56,7 +57,8 @@ class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListe
                         "line.separator"
                     ) + getFileNameByUri(context, uri)
                 )
-                .setPositiveButton(R.string.ok) { dialog, which -> listener.restoreComplete() }
+                .setPositiveButton(R.string.ok) { _, _ -> }
+                .setOnDismissListener { listener.restoreComplete() }
                 .show()
         }
     }
@@ -139,7 +141,10 @@ class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListe
         AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.restore_db))
             .setMessage(context.getString(R.string.db_restore_confirm_message))
-            .setPositiveButton(R.string.execute) { dialog, which -> // 取込み中のプログレスバーを表示する
+            .setPositiveButton(R.string.execute) { dialog, which ->
+                // リストアする前にDBを閉じる
+                PasswordMemoRoomDatabase.closeDatabase()
+                // 取込み中のプログレスバーを表示する
                 progressAlertDialog = AlertDialog.Builder(context)
                     .setTitle(R.string.db_restore_processing)
                     .setView(activity.layoutInflater.inflate(R.layout.alert_progressbar, null))

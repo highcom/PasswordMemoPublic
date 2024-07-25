@@ -6,11 +6,25 @@ import com.highcom.passwordmemo.data.PasswordMemoRepository
 import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
 
 class PasswordMemoApplication : Application() {
+    private var _database: PasswordMemoRoomDatabase? = null
+    private var _repository: PasswordMemoRepository? = null
+
+    /** パスワードメモデータのアクセスリポジトリ */
+    val repository: PasswordMemoRepository
+        get() = _repository ?: throw IllegalStateException("Repository not initialized")
+
     override fun onCreate() {
         super.onCreate()
         ProcessLifecycleOwner.get().lifecycle.addObserver(PasswordMemoLifecycle())
+        initializeDatabaseAndRepository()
     }
 
-    val database by lazy { PasswordMemoRoomDatabase.getDatabase(this) }
-    val repository by lazy { PasswordMemoRepository(database.passwordDao(), database.groupDao()) }
+    // Method to initialize the database and repository
+    /**
+     * データベースとリポジトリの初期化処理
+     */
+    fun initializeDatabaseAndRepository() {
+        _database = PasswordMemoRoomDatabase.getDatabase(this)
+        _repository = PasswordMemoRepository(_database!!.passwordDao(), _database!!.groupDao())
+    }
 }

@@ -465,9 +465,12 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
     }
 
     override fun restoreComplete() {
+        // データベースとリポジトリを初期化する
+        (application as PasswordMemoApplication).initializeDatabaseAndRepository()
+        // 起動しているActivityをすべて削除し、新しいタスクでLoginActivityを起動する
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags =
-            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK // 起動しているActivityをすべて削除し、新しいタスクでLoginActivityを起動する
+            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
     }
 
