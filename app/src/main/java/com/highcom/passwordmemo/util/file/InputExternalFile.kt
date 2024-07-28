@@ -46,7 +46,7 @@ class InputExternalFile(private val activity: Activity,
             // 既存のデータは全て削除して初期グループのみ登録された状態にする
             // TODO:動作確認したらコメントアウトを削除
 //            ListDataManager.Companion.getInstance(activity)!!.deleteAllData()
-            passwordListViewModel.resetAll()
+            passwordListViewModel.deleteAll()
             val countUnit = passwordList?.size?.div(20) ?: 0
             var progressCount = 1
             // 結果が全て取り出せたらデータを登録していく
@@ -61,8 +61,8 @@ class InputExternalFile(private val activity: Activity,
                 }
             }
             // 最後にグループデータを登録する
+            groupListViewModel.deleteAll()
             for (entity in groupList!!) {
-                if (entity.groupId == 1L) continue
                 // TODO:動作確認したらコメントアウトを削除
 //                ListDataManager.Companion.getInstance(activity)!!.setGroupData(false, data)
                 groupListViewModel.insert(entity)

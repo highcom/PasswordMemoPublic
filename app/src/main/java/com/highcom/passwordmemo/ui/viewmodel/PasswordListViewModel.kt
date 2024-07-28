@@ -34,15 +34,4 @@ class PasswordListViewModel(private val repository: PasswordMemoRepository) : Vi
     fun update(passwordList: List<PasswordEntity>) = viewModelScope.launch { repository.updatePasswords(passwordList) }
     fun delete(id: Long) = viewModelScope.launch { repository.deletePassword(id) }
     fun deleteAll() = viewModelScope.launch { repository.deleteAllPassword() }
-
-    /**
-     * 全データの初期化処理
-     * パスワードデータとグループデータを削除して初期グループを登録し直す
-     *
-     */
-    fun resetAll() = viewModelScope.launch {
-        repository.deleteAllPassword()
-        repository.deleteAllGroup()
-        repository.insertGroup(GroupEntity(1, 1, ""))
-    }
 }
