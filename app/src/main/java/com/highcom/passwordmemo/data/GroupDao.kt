@@ -14,7 +14,7 @@ interface GroupDao {
      *
      * @return グループデータ
      */
-    @Query("SELECT * FROM groupdata ORDER BY group_id ASC")
+    @Query("SELECT * FROM groupdata ORDER BY group_order ASC")
     fun getGroupList(): Flow<List<GroupEntity>>
 
     /**
