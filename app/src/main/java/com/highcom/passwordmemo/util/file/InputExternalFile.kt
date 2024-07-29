@@ -15,8 +15,7 @@ import androidx.core.os.HandlerCompat
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.data.PasswordEntity
-import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
-import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
+import com.highcom.passwordmemo.ui.viewmodel.SettingViewModel
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStream
@@ -26,8 +25,7 @@ import java.util.Objects
 import java.util.concurrent.Executors
 
 class InputExternalFile(private val activity: Activity,
-                        private val passwordListViewModel: PasswordListViewModel,
-                        private val groupListViewModel: GroupListViewModel,
+                        private val settingViewModel: SettingViewModel,
                         private val listener: InputExternalFileListener) {
     private var passwordList: MutableList<PasswordEntity>? = null
     private var groupList: MutableList<GroupEntity>? = null
@@ -44,9 +42,9 @@ class InputExternalFile(private val activity: Activity,
         @WorkerThread
         override fun run() {
             // 既存のデータは全て削除してCSVから読み込んだデータを登録する
-            passwordListViewModel.reInsert(passwordList!!)
+            settingViewModel.reInsertPassword(passwordList!!)
             progressBar!!.progress = 50
-            groupListViewModel.reInsert(groupList!!)
+            settingViewModel.reInsertGroup(groupList!!)
             progressBar!!.progress = 100
             val postExecutor = PostExecutor()
             _handler.post(postExecutor)

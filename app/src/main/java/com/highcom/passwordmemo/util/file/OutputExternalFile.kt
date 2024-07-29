@@ -8,8 +8,7 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import com.highcom.passwordmemo.R
-import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
-import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
+import com.highcom.passwordmemo.ui.viewmodel.SettingViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -19,8 +18,7 @@ import java.io.FileNotFoundException
 import java.io.OutputStream
 
 class OutputExternalFile(private val context: Context,
-                         private val passwordListViewModel: PasswordListViewModel,
-                         private val groupListViewModel: GroupListViewModel
+                         private val settingViewModel: SettingViewModel
     ) {
     fun outputSelectFolder(uri: Uri?) {
         AlertDialog.Builder(context)
@@ -33,7 +31,7 @@ class OutputExternalFile(private val context: Context,
                     ) + System.getProperty("line.separator") + context.getString(R.string.output_message_rear)
             )
             .setPositiveButton(R.string.output_button) { dialog, which ->
-                passwordListViewModel.viewModelScope.launch(Dispatchers.IO) {
+                settingViewModel.viewModelScope.launch(Dispatchers.IO) {
                     exportDatabase(uri)
                 }
             }
@@ -45,7 +43,7 @@ class OutputExternalFile(private val context: Context,
         var result = true
         var outputStream: OutputStream? = null
 
-        val combineFlow = combine(passwordListViewModel.passwordList, groupListViewModel.groupList) { passwordList, groupList ->
+        val combineFlow = combine(settingViewModel.passwordList, settingViewModel.groupList) { passwordList, groupList ->
             passwordList to groupList
         }
 
