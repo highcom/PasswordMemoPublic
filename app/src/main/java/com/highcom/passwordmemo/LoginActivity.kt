@@ -17,7 +17,7 @@ import androidx.biometric.BiometricManager
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
+import com.highcom.passwordmemo.ui.viewmodel.LoginViewModel
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import com.highcom.passwordmemo.util.login.LoginService
 
@@ -27,8 +27,8 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     var naviText: TextView? = null
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
 
-    private val passwordListViewModel: PasswordListViewModel by viewModels {
-        PasswordListViewModel.Factory((application as PasswordMemoApplication).repository)
+    private val loginViewModel: LoginViewModel by viewModels {
+        LoginViewModel.Factory((application as PasswordMemoApplication).repository)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +36,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_login)
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
         loginDataManager = LoginDataManager.Companion.getInstance(this)
-        loginService = LoginService(loginDataManager, passwordListViewModel)
+        loginService = LoginService(loginDataManager, loginViewModel)
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager!!.displayBackgroundSwitchEnable) {

@@ -15,10 +15,12 @@ import androidx.biometric.BiometricPrompt.PromptInfo
 import androidx.fragment.app.FragmentActivity
 import com.highcom.passwordmemo.PasswordListActivity
 import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.data.GroupEntity
+import com.highcom.passwordmemo.ui.viewmodel.LoginViewModel
 import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import java.util.concurrent.Executor
 
-class LoginService(private var loginDataManager: LoginDataManager?, private val passwordListViewModel: PasswordListViewModel) {
+class LoginService(private var loginDataManager: LoginDataManager?, private val loginViewModel: LoginViewModel) {
     private var incorrectPwCount = 0
     var firstTime = false
     var firstPassword: String? = null
@@ -84,8 +86,8 @@ class LoginService(private var loginDataManager: LoginDataManager?, private val 
 //                val manager: ListDataManager? = ListDataManager.Companion.getInstance(activity)
 //                manager?.deleteAllData()
 //                manager?.closeData()
-                // TODO:グループの全削除と初期グループの登録を実施する必要がある
-                passwordListViewModel.deleteAll()
+                // パスワードデータとグループデータを削除して初期グループを作成する
+                loginViewModel.reset(GroupEntity(1, 1, activity.getString(R.string.list_title)))
                 // すべてのデータを削除したことを表示
                 val ts = Toast.makeText(
                     activity,
