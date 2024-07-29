@@ -21,10 +21,15 @@ class GroupListViewModel(private val repository: PasswordMemoRepository) : ViewM
     val groupList = repository.groupList
 
     fun insert(groupEntity: GroupEntity) = viewModelScope.launch { repository.insertGroup(groupEntity) }
+    fun insert(groupList: List<GroupEntity>) = viewModelScope.launch { repository.insertGroups(groupList) }
     fun update(groupEntity: GroupEntity) = viewModelScope.launch { repository.updateGroup(groupEntity) }
     fun update(groupList: List<GroupEntity>) = viewModelScope.launch { repository.updateGroups(groupList) }
     fun delete(id: Long) = viewModelScope.launch { repository.deleteGroup(id) }
     fun deleteAll() = viewModelScope.launch { repository.deleteAllGroup() }
+    fun reInsert(groupList: List<GroupEntity>) = viewModelScope.launch {
+        repository.deleteAllGroup()
+        repository.insertGroups(groupList)
+    }
 
     /**
      * 指定されたグループIDを処理グループIDにリセットする

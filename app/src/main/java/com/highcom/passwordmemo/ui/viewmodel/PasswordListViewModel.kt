@@ -30,8 +30,13 @@ class PasswordListViewModel(private val repository: PasswordMemoRepository) : Vi
         _groupIdFlow.value = groupId
     }
     fun insert(passwordEntity: PasswordEntity) = viewModelScope.launch { repository.insertPassword(passwordEntity) }
+    fun insert(passwordList: List<PasswordEntity>) = viewModelScope.launch { repository.insertPasswords(passwordList) }
     fun update(passwordEntity: PasswordEntity) = viewModelScope.launch { repository.updatePassword(passwordEntity) }
     fun update(passwordList: List<PasswordEntity>) = viewModelScope.launch { repository.updatePasswords(passwordList) }
     fun delete(id: Long) = viewModelScope.launch { repository.deletePassword(id) }
     fun deleteAll() = viewModelScope.launch { repository.deleteAllPassword() }
+    fun reInsert(passwordList: List<PasswordEntity>) = viewModelScope.launch {
+        repository.deleteAllPassword()
+        repository.insertPasswords(passwordList)
+    }
 }

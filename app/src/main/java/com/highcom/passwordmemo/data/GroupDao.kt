@@ -26,6 +26,14 @@ interface GroupDao {
     suspend fun insertGroup(groupEntity: GroupEntity)
 
     /**
+     * グループデータ一括追加
+     *
+     * @param groupList グループデータリスト
+     */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertGroups(groupList: List<GroupEntity>)
+
+    /**
      * グループデータ更新
      *
      * @param groupEntity グループデータ

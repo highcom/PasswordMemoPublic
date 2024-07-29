@@ -43,32 +43,12 @@ class InputExternalFile(private val activity: Activity,
     private inner class BackgroundTask(private val _handler: Handler) : Runnable {
         @WorkerThread
         override fun run() {
-            // 既存のデータは全て削除して初期グループのみ登録された状態にする
-            // TODO:動作確認したらコメントアウトを削除
-//            ListDataManager.Companion.getInstance(activity)!!.deleteAllData()
-            passwordListViewModel.deleteAll()
-            val countUnit = passwordList?.size?.div(20) ?: 0
-            var progressCount = 1
-            // 結果が全て取り出せたらデータを登録していく
-            for (entity in passwordList!!) {
-                passwordListViewModel.insert(entity)
-                if (countUnit > 0) {
-                    // 5パーセントずつ表示を更新する
-                    if (progressCount % countUnit == 0) {
-                        progressBar!!.progress = progressCount / countUnit * 5
-                    }
-                    progressCount++
-                }
-            }
-            // 最後にグループデータを登録する
-            groupListViewModel.deleteAll()
-            for (entity in groupList!!) {
-                // TODO:動作確認したらコメントアウトを削除
-//                ListDataManager.Companion.getInstance(activity)!!.setGroupData(false, data)
-                groupListViewModel.insert(entity)
-            }
+            // 既存のデータは全て削除してCSVから読み込んだデータを登録する
+            passwordListViewModel.reInsert(passwordList!!)
+            progressBar!!.progress = 50
+            groupListViewModel.reInsert(groupList!!)
             progressBar!!.progress = 100
-            val postExecutor: PostExecutor = PostExecutor()
+            val postExecutor = PostExecutor()
             _handler.post(postExecutor)
         }
     }
