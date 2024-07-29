@@ -15,8 +15,7 @@ import androidx.core.os.HandlerCompat
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.data.PasswordEntity
-import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
-import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
+import com.highcom.passwordmemo.ui.viewmodel.SettingViewModel
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStream
@@ -26,8 +25,7 @@ import java.util.Objects
 import java.util.concurrent.Executors
 
 class InputExternalFile(private val activity: Activity,
-                        private val passwordListViewModel: PasswordListViewModel,
-                        private val groupListViewModel: GroupListViewModel,
+                        private val settingViewModel: SettingViewModel,
                         private val listener: InputExternalFileListener) {
     private var passwordList: MutableList<PasswordEntity>? = null
     private var groupList: MutableList<GroupEntity>? = null
@@ -43,32 +41,12 @@ class InputExternalFile(private val activity: Activity,
     private inner class BackgroundTask(private val _handler: Handler) : Runnable {
         @WorkerThread
         override fun run() {
-            // 既存のデータは全て削除して初期グループのみ登録された状態にする
-            // TODO:動作確認したらコメントアウトを削除
-//            ListDataManager.Companion.getInstance(activity)!!.deleteAllData()
-            passwordListViewModel.resetAll()
-            val countUnit = passwordList?.size?.div(20) ?: 0
-            var progressCount = 1
-            // 結果が全て取り出せたらデータを登録していく
-            for (entity in passwordList!!) {
-                passwordListViewModel.insert(entity)
-                if (countUnit > 0) {
-                    // 5パーセントずつ表示を更新する
-                    if (progressCount % countUnit == 0) {
-                        progressBar!!.progress = progressCount / countUnit * 5
-                    }
-                    progressCount++
-                }
-            }
-            // 最後にグループデータを登録する
-            for (entity in groupList!!) {
-                if (entity.groupId == 1L) continue
-                // TODO:動作確認したらコメントアウトを削除
-//                ListDataManager.Companion.getInstance(activity)!!.setGroupData(false, data)
-                groupListViewModel.insert(entity)
-            }
+            // 既存のデータは全て削除してCSVから読み込んだデータを登録する
+            settingViewModel.reInsertPassword(passwordList!!)
+            progressBar!!.progress = 50
+            settingViewModel.reInsertGroup(groupList!!)
             progressBar!!.progress = 100
-            val postExecutor: PostExecutor = PostExecutor()
+            val postExecutor = PostExecutor()
             _handler.post(postExecutor)
         }
     }

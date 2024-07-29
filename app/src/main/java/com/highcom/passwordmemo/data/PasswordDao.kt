@@ -38,6 +38,14 @@ interface PasswordDao {
     suspend fun insertPassword(passwordEntity: PasswordEntity)
 
     /**
+     * パスワードデータ一括追加
+     *
+     * @param passwordList パスワードデータリスト
+     */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertPasswords(passwordList: List<PasswordEntity>)
+
+    /**
      * パスワードデータ更新
      *
      * @param passwordEntity パスワードデータ

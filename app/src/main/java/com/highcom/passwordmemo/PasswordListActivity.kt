@@ -146,10 +146,11 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
 
         // 選択されているグループのパスワード一覧を設定する
         passwordListViewModel.setSelectGroup(loginDataManager?.selectGroup ?: 1L)
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenStarted {
             passwordListViewModel.passwordList.collect { list ->
                 adapter?.setList(list)
                 adapter?.sortPasswordList(loginDataManager?.sortKey)
+                reflesh()
             }
         }
 
@@ -459,13 +460,14 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
                     // TODO:動作確認したらコメントアウトを削除
 //                    listDataManager!!.setSelectGroupId(1L)
                 }
+                // タイトルに選択しているグループ名を設定
+                title = when (loginDataManager!!.sortKey) {
+                    PasswordListAdapter.SORT_ID -> getString(R.string.sort_name_default) + "：" + selectGroupName
+                    PasswordListAdapter.SORT_TITLE -> getString(R.string.sort_name_title) + "：" + selectGroupName
+                    PasswordListAdapter.SORT_INPUTDATE -> getString(R.string.sort_name_update) + "：" + selectGroupName
+                    else -> getString(R.string.sort_name_default) + "：" + selectGroupName
+                }
             }
-        }
-        title = when (loginDataManager!!.sortKey) {
-            PasswordListAdapter.SORT_ID -> getString(R.string.sort_name_default) + "：" + selectGroupName
-            PasswordListAdapter.SORT_TITLE -> getString(R.string.sort_name_title) + "：" + selectGroupName
-            PasswordListAdapter.SORT_INPUTDATE -> getString(R.string.sort_name_update) + "：" + selectGroupName
-            else -> getString(R.string.sort_name_default) + "：" + selectGroupName
         }
     }
 
@@ -508,6 +510,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
     }
 
     // データの一覧を更新する
+    @SuppressLint("NotifyDataSetChanged")
     fun reflesh() {
         adapter!!.notifyDataSetChanged()
         // フィルタしている場合はフィルタデータの一覧も更新する

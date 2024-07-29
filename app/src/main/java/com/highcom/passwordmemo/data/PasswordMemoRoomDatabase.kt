@@ -193,6 +193,14 @@ abstract class PasswordMemoRoomDatabase : RoomDatabase() {
                 instance
             }
         }
+
+        /**
+         * データベースのクローズ処理
+         */
+        fun closeDatabase() {
+            INSTANCE?.close()
+            INSTANCE = null
+        }
     }
 
 }

@@ -14,7 +14,7 @@ interface GroupDao {
      *
      * @return グループデータ
      */
-    @Query("SELECT * FROM groupdata ORDER BY group_id ASC")
+    @Query("SELECT * FROM groupdata ORDER BY group_order ASC")
     fun getGroupList(): Flow<List<GroupEntity>>
 
     /**
@@ -24,6 +24,14 @@ interface GroupDao {
      */
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertGroup(groupEntity: GroupEntity)
+
+    /**
+     * グループデータ一括追加
+     *
+     * @param groupList グループデータリスト
+     */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertGroups(groupList: List<GroupEntity>)
 
     /**
      * グループデータ更新

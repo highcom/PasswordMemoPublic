@@ -23,8 +23,7 @@ import androidx.biometric.BiometricManager
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.textfield.TextInputEditText
 import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
-import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
-import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
+import com.highcom.passwordmemo.ui.viewmodel.SettingViewModel
 import com.highcom.passwordmemo.util.BackgroundColorUtil
 import com.highcom.passwordmemo.util.BackgroundColorUtil.BackgroundColorListener
 import com.highcom.passwordmemo.util.TextSizeUtil
@@ -49,11 +48,8 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
     var copyClipboardSpinner: Spinner? = null
     var copyClipboardNames: ArrayList<String?>? = null
 
-    private val passwordListViewModel: PasswordListViewModel by viewModels {
-        PasswordListViewModel.Factory((application as PasswordMemoApplication).repository)
-    }
-    private val groupListViewModel: GroupListViewModel by viewModels {
-        GroupListViewModel.Factory((application as PasswordMemoApplication).repository)
+    private val settingViewModel: SettingViewModel by viewModels {
+        SettingViewModel.Factory((application as PasswordMemoApplication).repository)
     }
 
     @SuppressLint("ResourceType")
@@ -281,12 +277,12 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
                 }
 
                 INPUT_CSV -> {
-                    val inputExternalFile = InputExternalFile(this, passwordListViewModel, groupListViewModel, this)
+                    val inputExternalFile = InputExternalFile(this, settingViewModel, this)
                     inputExternalFile.inputSelectFolder(uri)
                 }
 
                 OUTPUT_CSV -> {
-                    val outputExternalFile = OutputExternalFile(this, passwordListViewModel, groupListViewModel)
+                    val outputExternalFile = OutputExternalFile(this, settingViewModel)
                     lifecycleScope.launch {
                         outputExternalFile.outputSelectFolder(uri)
                     }
@@ -465,9 +461,12 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
     }
 
     override fun restoreComplete() {
+        // データベースとリポジトリを初期化する
+        (application as PasswordMemoApplication).initializeDatabaseAndRepository()
+        // 起動しているActivityをすべて削除し、新しいタスクでLoginActivityを起動する
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags =
-            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK // 起動しているActivityをすべて削除し、新しいタスクでLoginActivityを起動する
+            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
     }
 

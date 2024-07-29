@@ -37,6 +37,15 @@ class PasswordMemoRepository(private val passwordDao: PasswordDao, private val g
     }
 
     /**
+     * パスワードデータ追加
+     *
+     * @param passwordList パスワードデータリスト
+     */
+    suspend fun insertPasswords(passwordList: List<PasswordEntity>) {
+        passwordDao.insertPasswords(passwordList)
+    }
+
+    /**
      * パスワードデータ更新
      *
      * @param passwordEntity パスワードデータ
@@ -87,6 +96,15 @@ class PasswordMemoRepository(private val passwordDao: PasswordDao, private val g
      */
     suspend fun insertGroup(groupEntity: GroupEntity) {
         groupDao.insertGroup(groupEntity)
+    }
+
+    /**
+     * グループデータ一括追加
+     *
+     * @param groupList グループデータリスト
+     */
+    suspend fun insertGroups(groupList: List<GroupEntity>) {
+        groupDao.insertGroups(groupList)
     }
 
     /**

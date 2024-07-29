@@ -266,6 +266,7 @@ class PasswordListAdapter(
             }
             return@Comparator result
         }
+        origPasswordList = origPasswordList?.sortedWith(comparator)
         passwordList = passwordList?.sortedWith(comparator)
     }
 
