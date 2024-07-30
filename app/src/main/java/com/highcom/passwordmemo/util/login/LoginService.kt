@@ -82,7 +82,8 @@ class LoginService(private var loginDataManager: LoginDataManager?, private val 
             incorrectPwCount += 1
             if (incorrectPwCount >= 5) {
                 incorrectPwCount = 0
-//                loginDataManager!!.clearAllData()
+                // 設定されているマスターパスワードを削除する
+                loginDataManager!!.clearAllData()
 //                val manager: ListDataManager? = ListDataManager.Companion.getInstance(activity)
 //                manager?.deleteAllData()
 //                manager?.closeData()
