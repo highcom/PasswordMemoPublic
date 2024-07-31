@@ -46,8 +46,6 @@ class ReferencePasswordActivity : AppCompatActivity() {
         adContainerView?.post(Runnable { loadBanner() })
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         loginDataManager = LoginDataManager.Companion.getInstance(this)
-        // TODO:動作確認したらコメントアウトを削除
-//        listDataManager = ListDataManager.Companion.getInstance(this)
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager!!.displayBackgroundSwitchEnable) {
@@ -172,8 +170,6 @@ class ReferencePasswordActivity : AppCompatActivity() {
                 // 入力画面を生成
                 intent = Intent(this@ReferencePasswordActivity, InputPasswordActivity::class.java)
                 // 選択アイテムを複製モードで設定
-                // TODO:動作確認したらコメントアウトを削除
-//                intent.putExtra("ID", listDataManager?.newId)
                 intent.putExtra("EDIT", false)
                 intent.putExtra("TITLE", title.toString() + " " + getString(R.string.copy_title))
                 intent.putExtra(

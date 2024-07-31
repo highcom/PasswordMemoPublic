@@ -84,9 +84,6 @@ class LoginService(private var loginDataManager: LoginDataManager?, private val 
                 incorrectPwCount = 0
                 // 設定されているマスターパスワードを削除する
                 loginDataManager!!.clearAllData()
-//                val manager: ListDataManager? = ListDataManager.Companion.getInstance(activity)
-//                manager?.deleteAllData()
-//                manager?.closeData()
                 // パスワードデータとグループデータを削除して初期グループを作成する
                 loginViewModel.reset(GroupEntity(1, 1, activity.getString(R.string.list_title)))
                 // すべてのデータを削除したことを表示

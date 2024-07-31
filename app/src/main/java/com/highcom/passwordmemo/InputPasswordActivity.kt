@@ -67,8 +67,6 @@ class InputPasswordActivity : AppCompatActivity() {
         adContainerView = findViewById(R.id.adView_frame_input)
         adContainerView?.post(Runnable { loadBanner() })
         loginDataManager = LoginDataManager.Companion.getInstance(this)
-        // TODO:動作確認したらコメントアウトを削除
-//        listDataManager = ListDataManager.Companion.getInstance(this)
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager!!.displayBackgroundSwitchEnable) {

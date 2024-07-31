@@ -48,8 +48,6 @@ import java.util.Locale
 class PasswordListActivity : AppCompatActivity(), AdapterListener {
     private var selectGroupName: String? = null
     private var loginDataManager: LoginDataManager? = null
-    // TODO:動作確認したらコメントアウトを削除
-//    private var listDataManager: ListDataManager? = null
     private var simpleCallbackHelper: SimpleCallbackHelper? = null
     private var adContainerView: FrameLayout? = null
     private var mAdView: AdView? = null
@@ -131,9 +129,6 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
         currentMemoVisible = loginDataManager!!.memoVisibleSwitchEnable
-        // TODO:動作確認したらコメントアウトを削除
-//        listDataManager!!.setSelectGroupId(loginDataManager!!.selectGroup)
-//        listDataManager!!.sortListData(loginDataManager!!.sortKey)
         adapter = PasswordListAdapter(
             this,
             loginDataManager,
@@ -233,8 +228,6 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
                                 val intent =
                                     Intent(this@PasswordListActivity, InputPasswordActivity::class.java)
                                 // 選択アイテムを複製モードで設定
-                                // TODO:動作確認したらコメントアウトを削除
-//                                intent.putExtra("ID", listDataManager?.newId)
                                 intent.putExtra("EDIT", false)
                                 intent.putExtra(
                                      "TITLE",
@@ -264,8 +257,6 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
             val intent = Intent(this@PasswordListActivity, InputPasswordActivity::class.java)
-            // TODO:動作確認したらコメントアウトを削除
-//            intent.putExtra("ID", listDataManager?.newId)
             intent.putExtra("EDIT", false)
             startActivityForResult(intent, EDIT_DATA)
         }
@@ -353,8 +344,6 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
 
             R.id.edit_mode -> {
                 // 編集状態の変更
-                // TODO:動作確認したらコメントアウトを削除
-//                listDataManager!!.sortListData(ListDataManager.Companion.SORT_ID)
                 adapter?.sortPasswordList(PasswordListAdapter.SORT_ID)
                 if (adapter?.editEnable == true) {
                     setCurrentSelectMenuTitle(menu!!.findItem(R.id.sort_default), R.id.sort_default)
@@ -436,15 +425,6 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         )
         selectGroupName = getString(R.string.list_title)
         var isSelectGroupExist = false
-        // TODO:動作確認したらコメントアウトを削除
-//        for (group in listDataManager!!.groupList) {
-//            if (java.lang.Long.valueOf(group!!["group_id"]) == loginDataManager!!.selectGroup) {
-//                selectGroupName = group["name"]
-//                listDataManager!!.setSelectGroupId(loginDataManager!!.selectGroup)
-//                isSelectGroupExist = true
-//                break
-//            }
-//        }
         lifecycleScope.launch {
             groupListViewModel.groupList.collect { list ->
                 for (entity in list) {
@@ -457,8 +437,6 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
                 if (!isSelectGroupExist) {
                     loginDataManager!!.setSelectGroup(1L)
                     passwordListViewModel.setSelectGroup(1L)
-                    // TODO:動作確認したらコメントアウトを削除
-//                    listDataManager!!.setSelectGroupId(1L)
                 }
                 // タイトルに選択しているグループ名を設定
                 title = when (loginDataManager!!.sortKey) {
@@ -518,8 +496,6 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
     }
 
     public override fun onDestroy() {
-        // TODO:動作確認をしたらコメントアウトを削除
-//        listDataManager!!.closeData()
         if (mAdView != null) mAdView!!.destroy()
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
         if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.isBackground) {
@@ -584,11 +560,6 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
             target: RecyclerView.ViewHolder
         ): Boolean {
             if (adapter?.editEnable == true && TextUtils.isEmpty(seachViewWord)) {
-                // TODO:動作に問題が無いことが確認できたら消す
-//                val fromPos = viewHolder.adapterPosition
-//                val toPos = target.adapterPosition
-//                adapter!!.notifyItemMoved(fromPos, toPos)
-//                listDataManager!!.rearrangeData(fromPos, toPos)
                 // 移動元位置は最初のイベント時の値を保持する
                 if (fromPos == -1) fromPos = viewHolder.adapterPosition
                 // 通知用の移動元位置は毎回更新する
@@ -605,8 +576,6 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder
         ) {
-            // TODO:動作に問題が無いことが確認できたら消す
-//            recyclerView.adapter = adapter
             // 入れ替え完了後に最後に一度DBの更新をする
             val rearrangePasswordList = adapter?.rearrangePasswordList(fromPos, toPos)
             rearrangePasswordList?.let { passwordListViewModel.update(rearrangePasswordList) }

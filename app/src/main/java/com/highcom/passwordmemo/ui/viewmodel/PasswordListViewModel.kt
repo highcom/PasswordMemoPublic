@@ -24,7 +24,6 @@ class PasswordListViewModel(private val repository: PasswordMemoRepository) : Vi
         repository.getPasswordList(id)
     }
 
-    // TODO:loginDataManagerでグループをセットしている箇所にこのメソッドも呼び出す
     fun setSelectGroup(groupId: Long) {
         _groupIdFlow.value = groupId
     }

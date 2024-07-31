@@ -41,8 +41,6 @@ import kotlinx.coroutines.runBlocking
 
 class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
     private var loginDataManager: LoginDataManager? = null
-    // TODO:動作確認したらコメントアウトを削除
-//    private var listDataManager: ListDataManager? = null
     private var adContainerView: FrameLayout? = null
     private var mAdView: AdView? = null
     var recyclerView: RecyclerView? = null
@@ -73,17 +71,6 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         title = getString(R.string.group_title) + getString(R.string.group_title_select)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         loginDataManager = LoginDataManager.Companion.getInstance(this)
-//        listDataManager = ListDataManager.Companion.getInstance(this)
-
-        // グループ名が空白のデータが存在していた場合には削除する
-        // TODO:動作確認をしたらコメントアウトを削除
-//        val groupList = listDataManager!!.groupList
-//        for (group in groupList!!) {
-//            if (group!!["name"] == "") {
-//                listDataManager!!.deleteGroupData(group["group_id"])
-//                listDataManager!!.resetGroupIdData(java.lang.Long.valueOf(group["group_id"]))
-//            }
-//        }
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager?.displayBackgroundSwitchEnable == true) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
@@ -127,12 +114,6 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         recyclerView!!.addItemDecoration(itemDecoration)
         groupFab = findViewById(R.id.groupFab)
         groupFab?.setOnClickListener(View.OnClickListener {
-//            val data: MutableMap<String?, String?> = HashMap()
-//            data["group_id"] = listDataManager?.newGroupId.toString()
-//            data["group_order"] = Integer.valueOf(listDataManager!!.groupList.size + 1).toString()
-//            data["name"] = ""
-//            listDataManager!!.setGroupData(false, data)
-            // TODO:groupList+1をアダプタから取得出来るように修正が必要(直ったのか確認)
             groupListViewModel.insert(GroupEntity(0, (adapter?.groupList?.size ?: 0) + 1, ""))
             lifecycleScope.launch {
                 groupListViewModel.groupList.collect { list ->
@@ -181,8 +162,6 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
                                         }
                                         if (loginDataManager?.selectGroup == (holder as GroupViewHolder).groupId) {
                                             loginDataManager?.setSelectGroup(1L)
-                                            // TODO:動作確認をしたらコメントアウトを削除
-//                                            listDataManager?.setSelectGroupId(1L)
                                         }
                                         simpleCallbackHelper?.resetSwipePos()
                                         adapter!!.notifyDataSetChanged()
@@ -294,8 +273,6 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         if (mAdView != null) mAdView!!.destroy()
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
         if (loginDataManager?.displayBackgroundSwitchEnable == true && PasswordMemoLifecycle.Companion.isBackground) {
-            // TODO:動作確認をしたらコメントアウトを削除
-//            listDataManager?.closeData()
             finishAffinity()
         }
         super.onDestroy()
@@ -314,8 +291,6 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
             }
         } else {
             loginDataManager?.setSelectGroup(groupId!!)
-            // TODO:動作確認をしたらコメントアウトを削除
-//            listDataManager?.setSelectGroupId(groupId!!)
             finish()
         }
     }
@@ -339,12 +314,9 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
             groupListViewModel.resetGroupId(groupEntity.groupId)
             if (loginDataManager?.selectGroup == groupEntity.groupId) {
                 loginDataManager?.setSelectGroup(1L)
-                // TODO:動作確認をしたらコメントアウトを削除
-//                listDataManager?.setSelectGroupId(1L)
             }
             return
         }
-//        listDataManager!!.setGroupData(true, data)
         groupListViewModel.update(groupEntity)
     }
 
@@ -359,13 +331,6 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
             // グループ名が入力されていない場合は移動させない
             if ((viewHolder as GroupViewHolder).groupName?.text.toString() == "" || (target as GroupViewHolder).groupName?.text.toString() == "") return false
             // グループ名が入力途中でDB反映されていないデータも並び替えさせない
-            // TODO:動作に問題が無いことが確認できたら消す
-//            val groupList = listDataManager!!.groupList
-//            for (group in groupList!!) {
-//                if (group!!["group_id"] == viewHolder.groupId.toString() || group["group_id"] == target.groupId.toString()) {
-//                    if (group["name"] == "") return false
-//                }
-//            }
             adapter?.groupList?.let {
                 for (entity in it) {
                     if (entity.groupId == viewHolder.groupId || entity.groupId == target.groupId) {
@@ -373,14 +338,6 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
                     }
                 }
             }
-            // TODO:動作に問題が無いことが確認できたら消す
-//            val fromPos = viewHolder.getAdapterPosition()
-//            val toPos = target.getAdapterPosition()
-//            // 1番目のデータは「すべて」なので並べ替え不可にする
-//            if (fromPos == 0 || toPos == 0) return false
-//            adapter!!.notifyItemMoved(fromPos, toPos)
-//            listDataManager!!.rearrangeGroupData(fromPos, toPos)
-//            return true
             // 移動元位置は最初のイベント時の値を保持する
             if (fromPos == -1) fromPos = viewHolder.adapterPosition
             // 通知用の移動元位置は毎回更新する
@@ -397,8 +354,6 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder
         ) {
-            // TODO:動作に問題が無いことが確認できたら消す
-//            recyclerView.adapter = adapter
             // 入れ替え完了後に最後に一度DBの更新をする
             val rearrangeList = adapter?.rearrangeGroupList(fromPos, toPos)
             rearrangeList?.let { groupListViewModel.update(rearrangeList) }

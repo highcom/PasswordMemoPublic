@@ -66,11 +66,6 @@ class GroupListAdapter(
                         if (groupName?.text.toString() == "") {
                             groupName?.setText(orgGroupName)
                         }
-                        // TODO:動作に問題が無いことが確認できたら消す
-//                        val data: MutableMap<String?, String?> = HashMap()
-//                        data["group_id"] = java.lang.Long.valueOf(groupId!!).toString()
-//                        data["group_order"] = Integer.valueOf(groupOrder).toString()
-//                        data["name"] = groupName?.text.toString()
                         val groupEntity = GroupEntity(
                             groupId = groupId!!,
                             groupOrder = groupOrder,
