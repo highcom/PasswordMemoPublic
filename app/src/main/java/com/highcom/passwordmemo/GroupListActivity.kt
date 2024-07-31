@@ -98,6 +98,15 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         recyclerView!!.adapter = adapter
 
         lifecycleScope.launch {
+            val initGroupList = groupListViewModel.groupList.first()
+            // グループ名が空白のデータが存在していた場合には削除する
+            for (group in initGroupList) {
+                if (group.name.isEmpty()) {
+                    groupListViewModel.delete(group.groupId)
+                    groupListViewModel.resetGroupId(group.groupId)
+                }
+            }
+            // グループリストの監視をする
             groupListViewModel.groupList.collect { list ->
                 // グループデータがない場合はデフォルトデータとして「すべて」を必ず追加」
                 if (list.isEmpty()) {
