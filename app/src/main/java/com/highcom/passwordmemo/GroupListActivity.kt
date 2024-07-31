@@ -105,6 +105,10 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
                     groupListViewModel.delete(group.groupId)
                     groupListViewModel.resetGroupId(group.groupId)
                 }
+                // 削除するデータが選択されていた場合には「すべて」にリセットする
+                if (loginDataManager?.selectGroup == group.groupId) {
+                    loginDataManager?.setSelectGroup(1L)
+                }
             }
             // グループリストの監視をする
             groupListViewModel.groupList.collect { list ->
