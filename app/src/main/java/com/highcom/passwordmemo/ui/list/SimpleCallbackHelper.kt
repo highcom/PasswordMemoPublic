@@ -21,6 +21,7 @@ import java.util.LinkedList
 import java.util.Queue
 import kotlin.properties.Delegates
 
+@SuppressLint("ClickableViewAccessibility")
 abstract class SimpleCallbackHelper(
     context: Context?,
     private val recyclerView: RecyclerView?,
@@ -55,7 +56,8 @@ abstract class SimpleCallbackHelper(
             return true
         }
     }
-    private val onTouchListener = OnTouchListener { view, e ->
+    @SuppressLint("ClickableViewAccessibility")
+    private val onTouchListener = OnTouchListener { _, e ->
         if (swipedPos < 0) return@OnTouchListener false
         val point = Point(e.rawX.toInt(), e.rawY.toInt())
         val swipedViewHolder = recyclerView!!.findViewHolderForAdapterPosition(swipedPos)
@@ -82,8 +84,8 @@ abstract class SimpleCallbackHelper(
         isMoved = false
         buttonsBuffer = HashMap()
         recoverQueue = object : LinkedList<Int>() {
-            override fun add(o: Int): Boolean {
-                return if (contains(o)) false else super.add(o)
+            override fun add(element: Int): Boolean {
+                return if (contains(element)) false else super.add(element)
             }
         }
         attachSwipe()
@@ -117,6 +119,7 @@ abstract class SimpleCallbackHelper(
         isMoved = true
     }
 
+    @Suppress("DEPRECATION")
     @SuppressLint("ResourceType")
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         if (viewHolder.itemView.id == R.id.row_footer) return
@@ -150,6 +153,7 @@ abstract class SimpleCallbackHelper(
         return 5.0f * defaultValue
     }
 
+    @Suppress("DEPRECATION")
     override fun onChildDraw(
         c: Canvas,
         recyclerView: RecyclerView,
@@ -194,8 +198,10 @@ abstract class SimpleCallbackHelper(
     private fun recoverSwipedItem() {
         while (!recoverQueue.isEmpty()) {
             val pos = recoverQueue.poll()
-            if (pos > -1) {
-                recyclerView!!.adapter!!.notifyItemChanged(pos)
+            if (pos != null) {
+                if (pos > -1) {
+                    recyclerView!!.adapter!!.notifyItemChanged(pos)
+                }
             }
         }
     }
@@ -226,7 +232,7 @@ abstract class SimpleCallbackHelper(
         }
     }
 
-    fun attachSwipe() {
+    private fun attachSwipe() {
         val itemTouchHelper = ItemTouchHelper(this)
         itemTouchHelper.attachToRecyclerView(recyclerView)
     }
@@ -264,8 +270,8 @@ abstract class SimpleCallbackHelper(
             p.color = Color.WHITE
             p.textSize = FONT_SIZE_DP.toFloat()
             val r = Rect()
-            val cHeight = rect.height()
-            val cWidth = rect.width()
+//            val cHeight = rect.height()
+//            val cWidth = rect.width()
             p.textAlign = Paint.Align.LEFT
             p.getTextBounds(text, 0, text.length, r)
             // テキストを表示する場合はここを有効にする
@@ -273,8 +279,7 @@ abstract class SimpleCallbackHelper(
 //            float y = cHeight / 2f + r.height() / 2f - r.bottom;
 //            c.drawText(text, rect.left + x, rect.top + y, p);
             // 画像を表示する
-            val imgRect: RectF
-            imgRect = if (rect.right - rect.left > rect.bottom - rect.top) {
+            val imgRect: RectF = if (rect.right - rect.left > rect.bottom - rect.top) {
                 // 横が長くなった場合には高さに合わせてクリップする
                 val center = rect.left + (rect.right - rect.left) / 2
                 val span = (rect.bottom - rect.top) / 2

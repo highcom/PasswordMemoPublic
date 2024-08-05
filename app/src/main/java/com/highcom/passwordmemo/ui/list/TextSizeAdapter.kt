@@ -24,7 +24,7 @@ class TextSizeAdapter(
 
     init {
         inflater = LayoutInflater.from(context)
-        val res = context.resources
+        context.resources
     }
 
     override fun getCount(): Int {
@@ -39,6 +39,7 @@ class TextSizeAdapter(
         return position.toLong()
     }
 
+    @Suppress("NAME_SHADOWING")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         var convertView = convertView
         val holder: TextSizeViewHolder

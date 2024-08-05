@@ -23,7 +23,7 @@ import java.util.concurrent.Executor
 class LoginService(private var loginDataManager: LoginDataManager?, private val loginViewModel: LoginViewModel) {
     private var incorrectPwCount = 0
     var firstTime = false
-    var firstPassword: String? = null
+    private var firstPassword: String? = null
     private var rotateAnimation: Animation? = null
     var navigateText: TextView? = null
     var masterKeyIcon: ImageView? = null
@@ -56,7 +56,7 @@ class LoginService(private var loginDataManager: LoginDataManager?, private val 
                 loginDataManager!!.setMasterPassword(editPassword)
                 // ログイン中の表示に切り替える
                 firstTime = true
-                navigateText?.setText(activity.getString(R.string.login_success))
+                navigateText?.text = activity.getString(R.string.login_success)
                 masterKeyIcon?.startAnimation(rotateAnimation)
             } else {
                 // 一度目の入力と異なることを伝える
@@ -72,7 +72,7 @@ class LoginService(private var loginDataManager: LoginDataManager?, private val 
         } else if (editPassword == masterPassword) {
             // ログイン中の表示に切り替える
             firstTime = false
-            navigateText?.setText(activity.getString(R.string.login_success))
+            navigateText?.text = activity.getString(R.string.login_success)
             masterKeyIcon?.startAnimation(rotateAnimation)
         } else if (!loginDataManager!!.deleteSwitchEnable) {
             // データ削除機能が無効の場合にはエラー表示を行うだけ
@@ -108,6 +108,7 @@ class LoginService(private var loginDataManager: LoginDataManager?, private val 
         if (masterKeyIcon != null) masterKeyIcon!!.clearAnimation()
     }
 
+    @Suppress("DEPRECATION")
     private val handler = Handler()
     private val executor = Executor { command -> handler.post(command) }
     fun biometricLogin(activity: Activity) {
@@ -144,7 +145,7 @@ class LoginService(private var loginDataManager: LoginDataManager?, private val 
                     super.onAuthenticationSucceeded(result)
                     // ログイン中の表示に切り替える
                     firstTime = false
-                    navigateText?.setText(activity.getString(R.string.login_success))
+                    navigateText?.text = activity.getString(R.string.login_success)
                     masterKeyIcon?.startAnimation(rotateAnimation)
                 }
 
@@ -163,7 +164,7 @@ class LoginService(private var loginDataManager: LoginDataManager?, private val 
         biometricPrompt.authenticate(promptInfo)
     }
 
-    private fun login(activity: Activity, first_time: Boolean) {
+    private fun login(activity: Activity, firstTime: Boolean) {
         incorrectPwCount = 0
         firstPassword = null
         // キーボードは閉じる
@@ -176,7 +177,7 @@ class LoginService(private var loginDataManager: LoginDataManager?, private val 
             )
         }
         val intent = Intent(activity, PasswordListActivity::class.java)
-        intent.putExtra("FIRST_TIME", first_time)
+        intent.putExtra("FIRST_TIME", firstTime)
         activity.startActivity(intent)
     }
 }

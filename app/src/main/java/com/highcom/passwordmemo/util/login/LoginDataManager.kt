@@ -113,7 +113,7 @@ class LoginDataManager private constructor(activity: Activity) {
     }
 
     val isMasterPasswordCreated: Boolean
-        get() = if (masterPassword != null) true else false
+        get() = masterPassword != null
 
     fun setMasterPassword(password: String?) {
         try {
@@ -129,11 +129,12 @@ class LoginDataManager private constructor(activity: Activity) {
         updateSetting()
     }
 
+    @Suppress("DEPRECATION")
     private fun checkBackgroundColor(context: Context) {
         val backgroundColorUtil = BackgroundColorUtil(context, null)
         if (!backgroundColorUtil.isColorExists(sharedPref.getInt("backgroundColor", 0))) {
             sharedPref.edit().putInt("backgroundColor", context.resources.getColor(R.color.white))
-                .commit()
+                .apply()
         }
     }
 

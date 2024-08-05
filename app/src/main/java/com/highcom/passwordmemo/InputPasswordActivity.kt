@@ -48,10 +48,10 @@ class InputPasswordActivity : AppCompatActivity() {
     private var passwordCount = 0
     private var isLowerCaseOnly = false
     private var generatePassword: String? = null
-    var generatePasswordText: EditText? = null
+    private var generatePasswordText: EditText? = null
     private var groupId: Long = 0
-    var selectGroupSpinner: Spinner? = null
-    var selectGroupNames: ArrayList<String?>? = null
+    private var selectGroupSpinner: Spinner? = null
+    private var selectGroupNames: ArrayList<String?>? = null
     private var selectGroupId: Long? = null
 
     private val passwordListViewModel: PasswordListViewModel by viewModels {
@@ -65,7 +65,7 @@ class InputPasswordActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input_password)
         adContainerView = findViewById(R.id.adView_frame_input)
-        adContainerView?.post(Runnable { loadBanner() })
+        adContainerView?.post { loadBanner() }
         loginDataManager = LoginDataManager.Companion.getInstance(this)
 
         // バックグラウンドでは画面の中身が見えないようにする
@@ -75,8 +75,8 @@ class InputPasswordActivity : AppCompatActivity() {
 
         // グループ選択スピナーの設定
         selectGroupSpinner = findViewById(R.id.selectGroup)
-        selectGroupSpinner?.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(adapterView: AdapterView<*>?, view: View, i: Int, l: Long) {
+        selectGroupSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, i: Int, l: Long) {
                 lifecycleScope.launch {
                     groupListViewModel.groupList.collect {
                         selectGroupId = it[i].groupId
@@ -85,7 +85,7 @@ class InputPasswordActivity : AppCompatActivity() {
             }
 
             override fun onNothingSelected(adapterView: AdapterView<*>?) {}
-        })
+        }
 
         selectGroupNames = ArrayList()
         lifecycleScope.launch {
@@ -95,7 +95,7 @@ class InputPasswordActivity : AppCompatActivity() {
                 }
                 val selectGroupAdapter =
                     SetTextSizeAdapter(this@InputPasswordActivity, selectGroupNames, loginDataManager!!.textSize.toInt())
-                selectGroupSpinner?.setAdapter(selectGroupAdapter)
+                selectGroupSpinner?.adapter = selectGroupAdapter
                 for (i in list.indices) {
                     if (groupId == list[i].groupId) {
                         selectGroupSpinner?.setSelection(i)
@@ -141,6 +141,7 @@ class InputPasswordActivity : AppCompatActivity() {
         mAdView!!.loadAd(adRequest)
     }
 
+    @Suppress("DEPRECATION")
     private val adSize: AdSize
         get() {
             // Determine the screen width (less decorations) to use for the ad width.
@@ -207,7 +208,7 @@ class InputPasswordActivity : AppCompatActivity() {
         val passwordRadio = generatePasswordView.findViewById<RadioGroup>(R.id.passwordKindMenu)
         passwordRadio.check(R.id.radioLettersNumbers)
         passwordKind = passwordRadio.checkedRadioButtonId
-        passwordRadio.setOnCheckedChangeListener { group, checkedId ->
+        passwordRadio.setOnCheckedChangeListener { _, checkedId ->
             passwordKind = checkedId
             generatePasswordString()
         }
@@ -232,7 +233,7 @@ class InputPasswordActivity : AppCompatActivity() {
         passwordPicker.minValue = 4
         passwordPicker.value = 8
         passwordCount = passwordPicker.value
-        passwordPicker.setOnValueChangedListener { picker, oldVal, newVal ->
+        passwordPicker.setOnValueChangedListener { _, _, newVal ->
             passwordCount = newVal
             generatePasswordString()
         }
@@ -267,12 +268,16 @@ class InputPasswordActivity : AppCompatActivity() {
 
     // パスワード文字列生成
     private fun generatePasswordString() {
-        generatePassword = if (passwordKind == R.id.radioNumbers) {
-            RandomStringUtils.randomNumeric(passwordCount)
-        } else if (passwordKind == R.id.radioLettersNumbers) {
-            RandomStringUtils.randomAlphanumeric(passwordCount)
-        } else {
-            RandomStringUtils.randomGraph(passwordCount)
+        generatePassword = when (passwordKind) {
+            R.id.radioNumbers -> {
+                RandomStringUtils.randomNumeric(passwordCount)
+            }
+            R.id.radioLettersNumbers -> {
+                RandomStringUtils.randomAlphanumeric(passwordCount)
+            }
+            else -> {
+                RandomStringUtils.randomGraph(passwordCount)
+            }
         }
         if (isLowerCaseOnly) {
             generatePasswordText!!.setText(generatePassword?.lowercase(Locale.getDefault()))
@@ -281,8 +286,9 @@ class InputPasswordActivity : AppCompatActivity() {
         }
     }
 
-    val nowDate: String
+    private val nowDate: String
         // 現在の日付取得処理
+        @SuppressLint("SimpleDateFormat")
         get() {
             val date = Date()
             val sdf = SimpleDateFormat("yyyy/MM/dd")

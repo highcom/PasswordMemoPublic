@@ -19,7 +19,7 @@ class DividerItemDecoration(context: Context, orientation: Int) : ItemDecoration
         setOrientation(orientation)
     }
 
-    fun setOrientation(orientation: Int) {
+    private fun setOrientation(orientation: Int) {
         require(!(orientation != HORIZONTAL_LIST && orientation != VERTICAL_LIST)) { "invalid orientation" }
         mOrientation = orientation
     }
@@ -32,7 +32,7 @@ class DividerItemDecoration(context: Context, orientation: Int) : ItemDecoration
         }
     }
 
-    fun drawVertical(c: Canvas?, parent: RecyclerView) {
+    private fun drawVertical(c: Canvas?, parent: RecyclerView) {
         val left = parent.paddingLeft
         val right = parent.width - parent.paddingRight
         val childCount = parent.childCount
@@ -47,7 +47,7 @@ class DividerItemDecoration(context: Context, orientation: Int) : ItemDecoration
         }
     }
 
-    fun drawHorizontal(c: Canvas?, parent: RecyclerView) {
+    private fun drawHorizontal(c: Canvas?, parent: RecyclerView) {
         val top = parent.paddingTop
         val bottom = parent.height - parent.paddingBottom
         val childCount = parent.childCount
@@ -62,6 +62,7 @@ class DividerItemDecoration(context: Context, orientation: Int) : ItemDecoration
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun getItemOffsets(outRect: Rect, itemPosition: Int, parent: RecyclerView) {
         if (mOrientation == VERTICAL_LIST) {
             outRect[0, 0, 0] = mDivider!!.intrinsicHeight

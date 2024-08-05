@@ -1,5 +1,6 @@
 package com.highcom.passwordmemo.ui.list
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -48,7 +49,7 @@ class PasswordListAdapter(
         var groupId: Long? = null
         var memo: String? = null
         var date: TextView? = null
-        var rearrangebtn: ImageButton? = null
+        private var rearrangebtn: ImageButton? = null
         var memoView: TextView? = null
 
         init {
@@ -117,30 +118,34 @@ class PasswordListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return if (viewType == TYPE_ITEM) {
-            ViewHolder(
-                inflater.inflate(
-                    R.layout.row,
-                    parent,
-                    false
+        return when (viewType) {
+            TYPE_ITEM -> {
+                ViewHolder(
+                    inflater.inflate(
+                        R.layout.row,
+                        parent,
+                        false
+                    )
                 )
-            )
-        } else if (viewType == TYPE_FOOTER) {
-            ViewHolder(
-                inflater.inflate(
-                    R.layout.row_footer,
-                    parent,
-                    false
+            }
+            TYPE_FOOTER -> {
+                ViewHolder(
+                    inflater.inflate(
+                        R.layout.row_footer,
+                        parent,
+                        false
+                    )
                 )
-            )
-        } else {
-            ViewHolder(
-                inflater.inflate(
-                    R.layout.row,
-                    parent,
-                    false
+            }
+            else -> {
+                ViewHolder(
+                    inflater.inflate(
+                        R.layout.row,
+                        parent,
+                        false
+                    )
                 )
-            )
+            }
         }
     }
 
@@ -149,7 +154,7 @@ class PasswordListAdapter(
         if (position >= passwordList!!.size) return
         val layoutHeight = layoutHeightMap[textSize.toInt()]
         if (layoutHeight != null) {
-            val params = holder!!.rowLinearLayout?.layoutParams
+            val params = holder.rowLinearLayout?.layoutParams
             params?.height = layoutHeight.toInt()
             holder.rowLinearLayout?.layoutParams = params
         }
@@ -190,7 +195,7 @@ class PasswordListAdapter(
                 val results = ArrayList<PasswordEntity>()
                 if (origPasswordList == null) origPasswordList = passwordList
                 if (constraint != null) {
-                    if (origPasswordList != null && origPasswordList!!.size > 0) {
+                    if (origPasswordList != null && origPasswordList!!.isNotEmpty()) {
                         for (entity in origPasswordList!!) {
                             if (entity.title.lowercase(Locale.getDefault())
                                     .contains(constraint.toString())
@@ -204,6 +209,7 @@ class PasswordListAdapter(
                 return oReturn
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             override fun publishResults(
                 constraint: CharSequence?,
                 results: FilterResults?

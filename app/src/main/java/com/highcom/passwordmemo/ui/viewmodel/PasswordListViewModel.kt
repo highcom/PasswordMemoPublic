@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.data.PasswordMemoRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -20,6 +21,7 @@ class PasswordListViewModel(private val repository: PasswordMemoRepository) : Vi
     }
 
     private val _groupIdFlow = MutableStateFlow(1L)
+    @ExperimentalCoroutinesApi
     val passwordList: Flow<List<PasswordEntity>> = _groupIdFlow.flatMapLatest { id ->
         repository.getPasswordList(id)
     }

@@ -21,8 +21,7 @@ class BackgroundColorAdapter(
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view: View
-        view = convertView ?: mInflater.inflate(mResource, null)
+        val view: View = convertView ?: mInflater.inflate(mResource, null)
 
         // リストビューに表示する要素を取得
         val item = mItems[position]

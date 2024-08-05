@@ -60,14 +60,14 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         MobileAds.initialize(this) { }
         MobileAds.setRequestConfiguration(
             RequestConfiguration.Builder().setTestDeviceIds(
-                mutableListOf(
+                /* testDeviceIds = */ mutableListOf(
                     "874848BA4D9A6B9B0A256F7862A47A31",
                     "A02A04D245766C519D07D09F0E258E1E"
                 )
             ).build()
         )
         adContainerView = findViewById(R.id.adView_groupFrame)
-        adContainerView?.post(Runnable { loadBanner() })
+        adContainerView?.post { loadBanner() }
         title = getString(R.string.group_title) + getString(R.string.group_title_select)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         loginDataManager = LoginDataManager.Companion.getInstance(this)
@@ -113,7 +113,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
             DividerItemDecoration(this, DividerItemDecoration.Companion.VERTICAL_LIST)
         recyclerView!!.addItemDecoration(itemDecoration)
         groupFab = findViewById(R.id.groupFab)
-        groupFab?.setOnClickListener(View.OnClickListener {
+        groupFab?.setOnClickListener {
             groupListViewModel.insert(GroupEntity(0, (adapter?.groupList?.size ?: 0) + 1, ""))
             lifecycleScope.launch {
                 groupListViewModel.groupList.collect { list ->
@@ -127,8 +127,8 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
                     }
                 }
             }
-        })
-        if (adapter?.editEnable == false) groupFab?.setVisibility(View.GONE)
+        }
+        if (adapter?.editEnable == false) groupFab?.visibility = View.GONE
         val scale = resources.displayMetrics.density
         // ドラックアンドドロップの操作を実装する
         simpleCallbackHelper =
@@ -155,12 +155,12 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
                                         )
                                     )
                                     .setMessage(getString(R.string.delete_message))
-                                    .setPositiveButton(getString(R.string.delete_execute)) { dialog1: DialogInterface?, which: Int ->
-                                        (holder as GroupViewHolder).groupId?.let {
+                                    .setPositiveButton(getString(R.string.delete_execute)) { _: DialogInterface?, _: Int ->
+                                        holder.groupId?.let {
                                             groupListViewModel.delete(it)
                                             groupListViewModel.resetGroupId(it)
                                         }
-                                        if (loginDataManager?.selectGroup == (holder as GroupViewHolder).groupId) {
+                                        if (loginDataManager?.selectGroup == holder.groupId) {
                                             loginDataManager?.setSelectGroup(1L)
                                         }
                                         simpleCallbackHelper?.resetSwipePos()
@@ -190,8 +190,9 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         mAdView!!.loadAd(adRequest)
     }
 
+    @Suppress("DEPRECATION")
     private val adSize: AdSize
-        private get() {
+        get() {
             // Determine the screen width (less decorations) to use for the ad width.
             val display = windowManager.defaultDisplay
             val outMetrics = DisplayMetrics()
@@ -287,7 +288,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
                 view.requestFocus()
                 val inputMethodManager =
                     getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                inputMethodManager?.showSoftInput(view, 0)
+                inputMethodManager.showSoftInput(view, 0)
             }
         } else {
             loginDataManager?.setSelectGroup(groupId!!)
@@ -323,6 +324,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
     inner class GroupListCallbackListener : SimpleCallbackListener {
         private var fromPos = -1
         private var toPos = -1
+        @Suppress("DEPRECATION")
         override fun onSimpleCallbackMove(
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder

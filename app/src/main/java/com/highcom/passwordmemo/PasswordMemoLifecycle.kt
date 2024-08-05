@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.highcom.passwordmemo
 
 import androidx.lifecycle.Lifecycle

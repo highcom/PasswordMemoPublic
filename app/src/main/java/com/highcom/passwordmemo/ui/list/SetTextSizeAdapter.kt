@@ -1,5 +1,6 @@
 package com.highcom.passwordmemo.ui.list
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -22,7 +23,7 @@ class SetTextSizeAdapter(
 
     init {
         inflater = LayoutInflater.from(context)
-        val res = context.resources
+        context.resources
     }
 
     override fun getCount(): Int {
@@ -37,6 +38,8 @@ class SetTextSizeAdapter(
         return position.toLong()
     }
 
+    @SuppressLint("InflateParams")
+    @Suppress("NAME_SHADOWING")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         var convertView = convertView
         val holder: TextSizeViewHolder

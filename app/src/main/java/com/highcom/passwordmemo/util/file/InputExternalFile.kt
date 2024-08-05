@@ -1,5 +1,6 @@
 package com.highcom.passwordmemo.util.file
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
@@ -17,10 +18,8 @@ import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.ui.viewmodel.SettingViewModel
 import java.io.BufferedReader
-import java.io.File
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.io.PrintWriter
 import java.util.Objects
 import java.util.concurrent.Executors
 
@@ -78,7 +77,7 @@ class InputExternalFile(private val activity: Activity,
                     uri
                 ) + System.getProperty("line.separator") + activity.getString(R.string.input_message_rear)
             )
-            .setPositiveButton(R.string.input_button) { dialog, which ->
+            .setPositiveButton(R.string.input_button) { _, _ ->
                 if (importDatabase(uri)) {
                     execImportDatabase()
                 } else {
@@ -90,8 +89,6 @@ class InputExternalFile(private val activity: Activity,
     }
 
     private fun importDatabase(uri: Uri?): Boolean {
-        var file: File
-        val printWriter: PrintWriter? = null
         var inputStream: InputStream? = null
         try {
             // 文字コードを判定し、判定できなければデフォルトをutf8とする
@@ -200,11 +197,12 @@ class InputExternalFile(private val activity: Activity,
         return true
     }
 
+    @SuppressLint("InflateParams")
     private fun execImportDatabase() {
         AlertDialog.Builder(activity)
             .setTitle(activity.getString(R.string.input_csv))
             .setMessage(activity.getString(R.string.csv_input_confirm_message))
-            .setPositiveButton(R.string.execute) { dialog, which -> // 取込み中のプログレスバーを表示する
+            .setPositiveButton(R.string.execute) { _, _ -> // 取込み中のプログレスバーを表示する
                 progressAlertDialog = AlertDialog.Builder(activity)
                     .setTitle(R.string.csv_input_processing)
                     .setView(activity.layoutInflater.inflate(R.layout.alert_progressbar, null))
@@ -217,7 +215,7 @@ class InputExternalFile(private val activity: Activity,
                 // ワーカースレッドで取込みを開始する
                 val mainLooper = Looper.getMainLooper()
                 val handler = HandlerCompat.createAsync(mainLooper)
-                val backgroundTask: BackgroundTask = BackgroundTask(handler)
+                val backgroundTask = BackgroundTask(handler)
                 val executorService = Executors.newSingleThreadExecutor()
                 executorService.submit(backgroundTask)
             }

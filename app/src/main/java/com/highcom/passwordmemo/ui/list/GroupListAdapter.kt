@@ -36,7 +36,7 @@ class GroupListAdapter(
         var rowLinearLayout: LinearLayout? = null
         var groupId: Long? = null
         var groupOrder = 0
-        var groupImage: ImageButton? = null
+        private var groupImage: ImageButton? = null
         var groupName: EditText? = null
         private var orgGroupName = ""
         var groupRearrangeButton: ImageButton? = null
@@ -76,7 +76,7 @@ class GroupListAdapter(
                     }
                 }
                 // キーボードのエンターが押下された場合
-                groupName?.setOnEditorActionListener { textView, i, keyEvent ->
+                groupName?.setOnEditorActionListener { textView, i, _ ->
                     if (i == EditorInfo.IME_ACTION_DONE) {
                         textView.isFocusable = false
                         textView.isFocusableInTouchMode = false
@@ -132,12 +132,16 @@ class GroupListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupViewHolder {
-        return if (viewType == TYPE_ITEM) {
-            GroupViewHolder(inflater.inflate(R.layout.row_group, parent, false))
-        } else if (viewType == TYPE_FOOTER) {
-            GroupViewHolder(inflater.inflate(R.layout.row_footer, parent, false))
-        } else {
-            GroupViewHolder(inflater.inflate(R.layout.row_group, parent, false))
+        return when (viewType) {
+            TYPE_ITEM -> {
+                GroupViewHolder(inflater.inflate(R.layout.row_group, parent, false))
+            }
+            TYPE_FOOTER -> {
+                GroupViewHolder(inflater.inflate(R.layout.row_footer, parent, false))
+            }
+            else -> {
+                GroupViewHolder(inflater.inflate(R.layout.row_group, parent, false))
+            }
         }
     }
 
@@ -146,7 +150,7 @@ class GroupListAdapter(
         if (position >= groupList!!.size) return
         val layoutHeight = layoutHeightMap[textSize.toInt()]
         if (layoutHeight != null) {
-            val params = holder!!.rowLinearLayout?.layoutParams
+            val params = holder.rowLinearLayout?.layoutParams
             params?.height = layoutHeight.toInt()
             holder.rowLinearLayout?.layoutParams = params
         }
@@ -180,7 +184,7 @@ class GroupListAdapter(
      * @return 並べ替え後のグループ一覧データ
      */
     fun rearrangeGroupList(fromPos: Int, toPos: Int): List<GroupEntity> {
-        var rearrangeList: ArrayList<GroupEntity> = ArrayList<GroupEntity>()
+        val rearrangeList: ArrayList<GroupEntity> = ArrayList()
         groupList?.let {
             for (entity in it) {
                 rearrangeList.add(entity)

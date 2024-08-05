@@ -1,5 +1,6 @@
 package com.highcom.passwordmemo.util.file
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
@@ -80,12 +81,12 @@ class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListe
                         uri
                     ) + System.getProperty("line.separator") + context.getString(R.string.restore_message_rear)
                 )
-                .setPositiveButton(R.string.restore_button) { dialog, which ->
+                .setPositiveButton(R.string.restore_button) { _, _ ->
                     if (restoreDatabase(uri)) {
                         execRestoreDatabase()
                     }
                 }
-                .setNegativeButton(R.string.cancel) { dialog, which ->
+                .setNegativeButton(R.string.cancel) { _, _ ->
                     val path = context.getDatabasePath("PasswordMemoDB_tmp").path
                     val file = File(path)
                     file.delete()
@@ -95,7 +96,7 @@ class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListe
             AlertDialog.Builder(context)
                 .setTitle(context.getString(R.string.restore_db))
                 .setMessage(context.getString(R.string.restore_message_error_file))
-                .setPositiveButton(R.string.ok) { dialog, which ->
+                .setPositiveButton(R.string.ok) { _, _ ->
                     val path = context.getDatabasePath("PasswordMemoDB_tmp").path
                     val file = File(path)
                     file.delete()
@@ -137,11 +138,12 @@ class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListe
         return true
     }
 
+    @SuppressLint("InflateParams")
     private fun execRestoreDatabase() {
         AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.restore_db))
             .setMessage(context.getString(R.string.db_restore_confirm_message))
-            .setPositiveButton(R.string.execute) { dialog, which ->
+            .setPositiveButton(R.string.execute) { _, _ ->
                 // リストアする前にDBを閉じる
                 PasswordMemoRoomDatabase.closeDatabase()
                 // 取込み中のプログレスバーを表示する
@@ -161,7 +163,7 @@ class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListe
                 val executorService = Executors.newSingleThreadExecutor()
                 executorService.submit(backgroundTask)
             }
-            .setNegativeButton(R.string.cancel) { dialog, which ->
+            .setNegativeButton(R.string.cancel) { _, _ ->
                 val path = context.getDatabasePath("PasswordMemoDB_tmp").path
                 val file = File(path)
                 file.delete()

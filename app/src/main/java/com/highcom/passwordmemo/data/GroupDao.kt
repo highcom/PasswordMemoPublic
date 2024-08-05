@@ -52,7 +52,7 @@ interface GroupDao {
     /**
      * グループデータ削除
      *
-     * @param id グループID
+     * @param groupId グループID
      */
     @Query("DELETE FROM groupdata WHERE group_id = :groupId")
     suspend fun deleteGroup(groupId: Long)

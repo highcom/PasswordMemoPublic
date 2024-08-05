@@ -44,15 +44,17 @@ import java.util.Date
 class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeListener,
     InputOutputFileDialogListener, RestoreDbFileListener, InputExternalFileListener {
     private var loginDataManager: LoginDataManager? = null
+    @Suppress("DEPRECATION")
     private val handler = Handler()
-    var copyClipboardSpinner: Spinner? = null
-    var copyClipboardNames: ArrayList<String?>? = null
+    private var copyClipboardSpinner: Spinner? = null
+    private var copyClipboardNames: ArrayList<String?>? = null
 
     private val settingViewModel: SettingViewModel by viewModels {
         SettingViewModel.Factory((application as PasswordMemoApplication).repository)
     }
 
-    @SuppressLint("ResourceType")
+    @Suppress("DEPRECATION")
+    @SuppressLint("ResourceType", "UseSwitchCompatOrMaterialCode")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setting)
@@ -73,7 +75,7 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         // データ削除スイッチ処理
         val deleteSwitch = findViewById<View>(R.id.deleteSwitch) as Switch
         deleteSwitch.isChecked = loginDataManager!!.deleteSwitchEnable
-        deleteSwitch.setOnCheckedChangeListener { compoundButton, b ->
+        deleteSwitch.setOnCheckedChangeListener { _, b ->
             loginDataManager!!.setDeleteSwitchEnable(b)
         }
 
@@ -87,14 +89,14 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
             biometricLoginSwitch.isChecked = loginDataManager!!.biometricLoginSwitchEnable
             biometricLoginSwitch.isEnabled = true
         }
-        biometricLoginSwitch.setOnCheckedChangeListener { compoundButton, b ->
+        biometricLoginSwitch.setOnCheckedChangeListener { _, b ->
             loginDataManager!!.setBiometricLoginSwitchEnable(b)
         }
 
         // バックグラウンド時の非表示設定
         val displayBackgroundSwitch = findViewById<View>(R.id.displayBackgroundSwitch) as Switch
         displayBackgroundSwitch.isChecked = loginDataManager!!.displayBackgroundSwitchEnable
-        displayBackgroundSwitch.setOnCheckedChangeListener { compoundButton, b ->
+        displayBackgroundSwitch.setOnCheckedChangeListener { _, b ->
             loginDataManager!!.setDisplayBackgroundSwitchEnable(b)
             restartPasswordMemoActivity()
         }
@@ -102,14 +104,14 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         // メモ表示スイッチ処理
         val memoVisibleSwitch = findViewById<View>(R.id.memoVisibleSwitch) as Switch
         memoVisibleSwitch.isChecked = loginDataManager!!.memoVisibleSwitchEnable
-        memoVisibleSwitch.setOnCheckedChangeListener { compoundButton, b ->
+        memoVisibleSwitch.setOnCheckedChangeListener { _, b ->
             loginDataManager!!.setMemoVisibleSwitchEnable(b)
         }
 
         // パスワード表示スイッチ処理
         val passwordVisibleSwitch = findViewById<View>(R.id.passwordVisibleSwitch) as Switch
         passwordVisibleSwitch.isChecked = loginDataManager!!.passwordVisibleSwitchEnable
-        passwordVisibleSwitch.setOnCheckedChangeListener { compoundButton, b ->
+        passwordVisibleSwitch.setOnCheckedChangeListener { _, b ->
             loginDataManager!!.setPasswordVisibleSwitchEnable(b)
         }
 
@@ -126,15 +128,15 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         copyClipboardNames!!.add(getString(R.string.copy_with_tap))
         val copyClipboardAdapter =
             SetTextSizeAdapter(this, copyClipboardNames, loginDataManager!!.textSize.toInt())
-        copyClipboardSpinner?.setAdapter(copyClipboardAdapter)
+        copyClipboardSpinner?.adapter = copyClipboardAdapter
         copyClipboardSpinner?.setSelection(loginDataManager!!.copyClipboard)
-        copyClipboardSpinner?.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+        copyClipboardSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, i: Int, l: Long) {
                 loginDataManager!!.setCopyClipboard(i)
             }
 
             override fun onNothingSelected(adapterView: AdapterView<*>?) {}
-        })
+        }
 
         // DBバックアップ復元ボタン処理
         val dbBackupBtn = findViewById<View>(R.id.dbBackupButton) as Button
@@ -173,8 +175,8 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         }
 
         // プライバシーポリシーボタン処理
-        val PrivacyPolicyBtn = findViewById<View>(R.id.PrivacyPolicyButton) as Button
-        PrivacyPolicyBtn.setOnClickListener {
+        val privacyPolicyBtn = findViewById<View>(R.id.PrivacyPolicyButton) as Button
+        privacyPolicyBtn.setOnClickListener {
             val uri = Uri.parse("https://high-commu.amebaownd.com/pages/2891722/page_201905200001")
             val intent = Intent(Intent.ACTION_VIEW, uri)
             startActivity(intent)
@@ -211,17 +213,23 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
     }
 
     override fun onSelectOperationClicked(path: String?) {
-        if (path == getString(R.string.restore_db)) {
-            confirmRestoreSelectFile()
-        } else if (path == getString(R.string.backup_db)) {
-            confirmBackupSelectFile()
-        } else if (path == getString(R.string.input_csv)) {
-            confirmInputSelectFile()
-        } else if (path == getString(R.string.output_csv)) {
-            confirmOutputSelectFile()
+        when (path) {
+            getString(R.string.restore_db) -> {
+                confirmRestoreSelectFile()
+            }
+            getString(R.string.backup_db) -> {
+                confirmBackupSelectFile()
+            }
+            getString(R.string.input_csv) -> {
+                confirmInputSelectFile()
+            }
+            getString(R.string.output_csv) -> {
+                confirmOutputSelectFile()
+            }
         }
     }
 
+    @Suppress("DEPRECATION")
     private fun confirmRestoreSelectFile() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
@@ -229,8 +237,9 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         startActivityForResult(intent, RESTORE_DB)
     }
 
+    @Suppress("DEPRECATION")
     private fun confirmBackupSelectFile() {
-        val fileName = "PasswordMemoDB_" + nowDateString + ".db"
+        val fileName = "PasswordMemoDB_$nowDateString.db"
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "*/db"
@@ -238,6 +247,7 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         startActivityForResult(intent, BACKUP_DB)
     }
 
+    @Suppress("DEPRECATION")
     private fun confirmInputSelectFile() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
@@ -245,8 +255,9 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         startActivityForResult(intent, INPUT_CSV)
     }
 
+    @Suppress("DEPRECATION")
     private fun confirmOutputSelectFile() {
-        val fileName = "PasswordListFile_" + nowDateString + ".csv"
+        val fileName = "PasswordListFile_$nowDateString.csv"
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "text/csv"
@@ -255,12 +266,15 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
     }
 
     private val nowDateString: String
-        private get() {
+        @SuppressLint("SimpleDateFormat")
+        get() {
             val date = Date()
             val sdf = SimpleDateFormat("yyyyMMdd")
             return sdf.format(date)
         }
 
+    @Deprecated("Deprecated in Java")
+    @Suppress("DEPRECATION")
     public override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
         if (resultCode == RESULT_OK && resultData!!.data != null) {
@@ -296,6 +310,7 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         backgroundColorUtil.createBackgroundColorDialog(this)
     }
 
+    @SuppressLint("InflateParams")
     private fun editMasterPassword() {
         val alertDialog = AlertDialog.Builder(this)
             .setTitle(R.string.change_master_password)
@@ -331,6 +346,7 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         })
     }
 
+    @SuppressLint("InflateParams")
     private fun operationInstructionDialog() {
         val alertDialog = AlertDialog.Builder(this)
             .setTitle(R.string.operation_instruction)

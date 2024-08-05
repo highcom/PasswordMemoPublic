@@ -23,13 +23,14 @@ import com.highcom.passwordmemo.util.login.LoginService
 
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
     private var loginDataManager: LoginDataManager? = null
-    var loginService: LoginService? = null
-    var naviText: TextView? = null
+    private var loginService: LoginService? = null
+    private var naviText: TextView? = null
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
 
     private val loginViewModel: LoginViewModel by viewModels {
         LoginViewModel.Factory((application as PasswordMemoApplication).repository)
     }
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.AppTheme)
@@ -123,6 +124,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
             return
         }
         val biometricManager = BiometricManager.from(this)
+        @Suppress("DEPRECATION")
         when (biometricManager.canAuthenticate()) {
             BiometricManager.BIOMETRIC_SUCCESS -> {
                 findViewById<View>(R.id.biometricLoginButton).visibility = View.VISIBLE
@@ -145,6 +147,11 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
                         "#CCCCCC"
                     )
                 )
+            }
+
+            BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED,
+            BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED,
+            BiometricManager.BIOMETRIC_STATUS_UNKNOWN -> {
             }
         }
     }

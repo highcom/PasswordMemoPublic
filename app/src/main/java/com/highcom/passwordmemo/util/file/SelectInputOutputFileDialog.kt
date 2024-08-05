@@ -37,19 +37,14 @@ class SelectInputOutputFileDialog(
                 items[0] = context.getString(R.string.input_csv)
                 items[1] = context.getString(R.string.output_csv)
             }
-
-            else -> {
-                items[0] = context.getString(R.string.input_csv)
-                items[1] = context.getString(R.string.output_csv)
-            }
         }
     }
 
     fun createOpenFileDialog(): AlertDialog.Builder {
         val builder = AlertDialog.Builder(context)
         builder.setTitle(context.getString(R.string.select_operation))
-            .setSingleChoiceItems(items, checkedItem) { dialog, which -> checkedItem = which }
-            .setPositiveButton(R.string.next) { dialog, which ->
+            .setSingleChoiceItems(items, checkedItem) { _, which -> checkedItem = which }
+            .setPositiveButton(R.string.next) { _, _ ->
                 if (checkedItem == 0 || checkedItem == 1) {
                     inputOutputFileDialogListener.onSelectOperationClicked(items[checkedItem])
                 } else {

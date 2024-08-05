@@ -24,7 +24,7 @@ class BackupDbFile(private val context: Context) {
                         "/"
                     ) + System.getProperty("line.separator") + context.getString(R.string.backup_message_rear)
             )
-            .setPositiveButton(R.string.backup_button) { dialog, which -> backupDatabase(uri) }
+            .setPositiveButton(R.string.backup_button) { _, _ -> backupDatabase(uri) }
             .setNegativeButton(R.string.cancel, null)
             .show()
     }
@@ -45,7 +45,7 @@ class BackupDbFile(private val context: Context) {
             AlertDialog.Builder(context)
                 .setTitle(context.getString(R.string.backup_db))
                 .setMessage(context.getString(R.string.no_access_message))
-                .setPositiveButton(R.string.move) { dialog, which ->
+                .setPositiveButton(R.string.move) { _, _ ->
                     val intent = Intent()
                     intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                     intent.data = Uri.parse("package:" + context.packageName)

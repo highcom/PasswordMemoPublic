@@ -30,7 +30,7 @@ class OutputExternalFile(private val context: Context,
                         "/"
                     ) + System.getProperty("line.separator") + context.getString(R.string.output_message_rear)
             )
-            .setPositiveButton(R.string.output_button) { dialog, which ->
+            .setPositiveButton(R.string.output_button) { _, _ ->
                 settingViewModel.viewModelScope.launch(Dispatchers.IO) {
                     exportDatabase(uri)
                 }
@@ -53,7 +53,9 @@ class OutputExternalFile(private val context: Context,
             //Write the name of the table and the name of the columns (comma separated values) in the .csv file.
             val header =
                 "TITLE,ACCOUNT,PASSWORD,URL,GROUP,MEMO,INPUTDATE" + System.getProperty("line.separator")
-            outputStream!!.write(header.toByteArray())
+            withContext(Dispatchers.IO) {
+                outputStream!!.write(header.toByteArray())
+            }
             for (passwordEntity in passwordList) {
                 val title = passwordEntity.title
                 val account = passwordEntity.account
@@ -70,17 +72,19 @@ class OutputExternalFile(private val context: Context,
                 val memo = passwordEntity.memo.replace("\n", "  ")
                 val inputdate = passwordEntity.inputDate
                 val record =
-                    title + "," + account + "," + password + "," + url + "," + group + "," + memo + "," + inputdate + System.getProperty(
+                    "$title,$account,$password,$url,$group,$memo,$inputdate" + System.getProperty(
                         "line.separator"
                     )
-                outputStream?.write(record.toByteArray())
+                withContext(Dispatchers.IO) {
+                    outputStream?.write(record.toByteArray())
+                }
             }
         } catch (exc: FileNotFoundException) {
             withContext(Dispatchers.Main) {
                 AlertDialog.Builder(context)
                     .setTitle(context.getString(R.string.output_csv))
                     .setMessage(context.getString(R.string.no_access_message))
-                    .setPositiveButton(R.string.move) { dialog, which ->
+                    .setPositiveButton(R.string.move) { _, _ ->
                         val intent = Intent()
                         intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                         intent.data = Uri.parse("package:" + context.packageName)
@@ -103,7 +107,9 @@ class OutputExternalFile(private val context: Context,
         } finally {
             if (outputStream != null) {
                 try {
-                    outputStream.close()
+                    withContext(Dispatchers.IO) {
+                        outputStream.close()
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

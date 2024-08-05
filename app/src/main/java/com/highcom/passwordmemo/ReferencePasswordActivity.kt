@@ -38,12 +38,13 @@ class ReferencePasswordActivity : AppCompatActivity() {
     private val groupListViewModel: GroupListViewModel by viewModels {
         GroupListViewModel.Factory((application as PasswordMemoApplication).repository)
     }
+    @Suppress("NAME_SHADOWING")
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reference_password)
         adContainerView = findViewById(R.id.adView_frame_reference)
-        adContainerView?.post(Runnable { loadBanner() })
+        adContainerView?.post { loadBanner() }
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         loginDataManager = LoginDataManager.Companion.getInstance(this)
 
@@ -76,7 +77,7 @@ class ReferencePasswordActivity : AppCompatActivity() {
         val accountText = findViewById<View>(R.id.editRefAccount) as EditText
         accountText.setOnClickListener { v ->
             if (loginDataManager!!.copyClipboard == OPERATION_TAP) {
-                CopyClipBoard(
+                copyClipBoard(
                     v,
                     (findViewById<View>(R.id.editRefAccount) as EditText).text.toString()
                 )
@@ -84,7 +85,7 @@ class ReferencePasswordActivity : AppCompatActivity() {
         }
         accountText.setOnLongClickListener { arg0 ->
             if (loginDataManager!!.copyClipboard == OPERATION_LONGPRESS) {
-                CopyClipBoard(
+                copyClipBoard(
                     arg0,
                     (findViewById<View>(R.id.editRefAccount) as EditText).text.toString()
                 )
@@ -98,7 +99,7 @@ class ReferencePasswordActivity : AppCompatActivity() {
         // パスワードをクリックor長押し時の処理
         passwordText.setOnClickListener { v ->
             if (loginDataManager!!.copyClipboard == OPERATION_TAP) {
-                CopyClipBoard(
+                copyClipBoard(
                     v,
                     (findViewById<View>(R.id.editRefPassword) as EditText).text.toString()
                 )
@@ -106,7 +107,7 @@ class ReferencePasswordActivity : AppCompatActivity() {
         }
         passwordText.setOnLongClickListener { arg0 ->
             if (loginDataManager!!.copyClipboard == OPERATION_LONGPRESS) {
-                CopyClipBoard(
+                copyClipBoard(
                     arg0,
                     (findViewById<View>(R.id.editRefPassword) as EditText).text.toString()
                 )
@@ -139,8 +140,9 @@ class ReferencePasswordActivity : AppCompatActivity() {
         mAdView!!.loadAd(adRequest)
     }
 
+    @Suppress("DEPRECATION")
     private val adSize: AdSize
-        private get() {
+        get() {
             // Determine the screen width (less decorations) to use for the ad width.
             val display = windowManager.defaultDisplay
             val outMetrics = DisplayMetrics()
@@ -239,9 +241,9 @@ class ReferencePasswordActivity : AppCompatActivity() {
     }
 
     // クリップボードにコピーする処理
-    fun CopyClipBoard(view: View?, allText: String) {
+    private fun copyClipBoard(view: View?, allText: String) {
         // クリップボードへの格納成功時は成功メッセージをトーストで表示
-        val result = SetClipData(allText)
+        val result = setClipData(allText)
         if (result) {
             Snackbar.make(view!!, getString(R.string.copy_clipboard_success), Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
@@ -252,7 +254,7 @@ class ReferencePasswordActivity : AppCompatActivity() {
     }
 
     // テキストデータをクリップボードに格納する
-    private fun SetClipData(allText: String): Boolean {
+    private fun setClipData(allText: String): Boolean {
         return try {
             //クリップボードに格納するItemを作成
             val item = ClipData.Item(allText)
