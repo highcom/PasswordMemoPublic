@@ -128,7 +128,7 @@ class PasswordMemoRepository(private val passwordDao: PasswordDao, private val g
     /**
      * グループデータ削除
      *
-     * @param id グループID
+     * @param groupId グループID
      */
     suspend fun deleteGroup(groupId: Long) {
         groupDao.deleteGroup(groupId)

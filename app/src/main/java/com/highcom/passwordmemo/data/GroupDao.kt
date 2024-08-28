@@ -7,6 +7,9 @@ import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * グループデータアクセスオブジェクト
+ */
 @Dao
 interface GroupDao {
     /**
@@ -52,7 +55,7 @@ interface GroupDao {
     /**
      * グループデータ削除
      *
-     * @param id グループID
+     * @param groupId グループID
      */
     @Query("DELETE FROM groupdata WHERE group_id = :groupId")
     suspend fun deleteGroup(groupId: Long)

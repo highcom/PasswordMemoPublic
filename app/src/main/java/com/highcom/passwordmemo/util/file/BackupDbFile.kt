@@ -13,7 +13,17 @@ import java.io.FileNotFoundException
 import java.io.InputStream
 import java.io.OutputStream
 
+/**
+ * DBファイルのバックアップ処理クラス
+ *
+ * @property context コンテキスト
+ */
 class BackupDbFile(private val context: Context) {
+    /**
+     * DBファイルバックアップ先フォルダ確認ダイアログ表示処理
+     *
+     * @param uri バックアップ先URI
+     */
     fun backupSelectFolder(uri: Uri?) {
         AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.backup_db))
@@ -24,11 +34,17 @@ class BackupDbFile(private val context: Context) {
                         "/"
                     ) + System.getProperty("line.separator") + context.getString(R.string.backup_message_rear)
             )
-            .setPositiveButton(R.string.backup_button) { dialog, which -> backupDatabase(uri) }
+            .setPositiveButton(R.string.backup_button) { _, _ -> backupDatabase(uri) }
             .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
+    /**
+     * DBファイルバックアップ処理
+     *
+     * @param uri バックアップ先URI
+     * @return バックアップ完了可否
+     */
     private fun backupDatabase(uri: Uri?): Boolean {
         var outputStream: OutputStream? = null
         try {
@@ -45,7 +61,7 @@ class BackupDbFile(private val context: Context) {
             AlertDialog.Builder(context)
                 .setTitle(context.getString(R.string.backup_db))
                 .setMessage(context.getString(R.string.no_access_message))
-                .setPositiveButton(R.string.move) { dialog, which ->
+                .setPositiveButton(R.string.move) { _, _ ->
                     val intent = Intent()
                     intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                     intent.data = Uri.parse("package:" + context.packageName)

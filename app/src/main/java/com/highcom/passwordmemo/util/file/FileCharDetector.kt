@@ -1,12 +1,25 @@
 package com.highcom.passwordmemo.util.file
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.util.Log
 import org.mozilla.universalchardet.UniversalDetector
 import java.io.IOException
 
+/**
+ * ファイルの文字コード判定クラス
+ *
+ * @property mContext コンテキスト
+ * @property mUri ファイルのURI
+ */
 class FileCharDetector(private val mContext: Context, private val mUri: Uri?) {
+    /**
+     * 文字コード検出処理
+     *
+     * @return 文字コード
+     */
+    @SuppressLint("Recycle")
     @Throws(IOException::class)
     fun detect(): String? {
         val buf = ByteArray(4096)

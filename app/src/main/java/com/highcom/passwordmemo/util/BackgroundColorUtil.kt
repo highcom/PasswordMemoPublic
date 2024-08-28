@@ -11,16 +11,36 @@ import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.ui.list.BackgroundColorAdapter
 import com.highcom.passwordmemo.ui.list.BackgroundColorItem
 
+/**
+ * 背景色設定に関するユーティリティクラス
+ *
+ * @constructor
+ * 背景色設定に関するユーティリティコンストラクタ
+ *
+ * @param context コンテキスト
+ * @param listener 背景色設定通知用リスナー
+ */
+@Suppress("DEPRECATION")
 class BackgroundColorUtil(context: Context, listener: BackgroundColorListener?) {
-    private val colors: IntArray
-    var backgroundColorListener: BackgroundColorListener?
+    /** 背景色一覧 */
+    private val colors: IntArray = IntArray(8)
+    /** 背景色設定通知用リスナー */
+    private var backgroundColorListener: BackgroundColorListener?
 
+    /**
+     * 背景色設定通知用リスナークラス
+     *
+     */
     interface BackgroundColorListener {
+        /**
+         * 背景色選択処理
+         *
+         * @param color 選択背景色
+         */
         fun onSelectColorClicked(color: Int)
     }
 
     init {
-        colors = IntArray(8)
         colors[0] = context.resources.getColor(R.color.white)
         colors[1] = context.resources.getColor(R.color.lightgray)
         colors[2] = context.resources.getColor(R.color.lightcyan)
@@ -32,6 +52,12 @@ class BackgroundColorUtil(context: Context, listener: BackgroundColorListener?) 
         backgroundColorListener = listener
     }
 
+    /**
+     * 指定された背景色値があるかどうか
+     *
+     * @param color 指定した背景色
+     * @return 指定された背景色の有無
+     */
     fun isColorExists(@ColorInt color: Int): Boolean {
         for (i in 0..7) {
             if (colors[i] == color) return true
@@ -39,7 +65,13 @@ class BackgroundColorUtil(context: Context, listener: BackgroundColorListener?) 
         return false
     }
 
-    @SuppressLint("ResourceType")
+    /**
+     * 背景色選択ダイアログ生成処理
+     *
+     * @param activity アクティビティ
+     * @return 背景色選択ダイアログ
+     */
+    @SuppressLint("ResourceType", "InflateParams")
     fun createBackgroundColorDialog(activity: Activity): AlertDialog {
         val alertDialog = AlertDialog.Builder(activity)
             .setView(activity.layoutInflater.inflate(R.layout.alert_background_color, null))
@@ -62,7 +94,7 @@ class BackgroundColorUtil(context: Context, listener: BackgroundColorListener?) 
         colorItems.add(BackgroundColorItem(activity.getString(R.string.color_palegreen), colors[7]))
         val adapter = BackgroundColorAdapter(activity, R.layout.row_background_color, colorItems)
         listView.adapter = adapter
-        listView.onItemClickListener = OnItemClickListener { adapterView, view, i, l ->
+        listView.onItemClickListener = OnItemClickListener { _, _, i, _ ->
             backgroundColorListener!!.onSelectColorClicked(colors[i])
             alertDialog.dismiss()
         }

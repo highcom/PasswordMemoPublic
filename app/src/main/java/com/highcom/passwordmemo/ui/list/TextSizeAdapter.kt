@@ -9,6 +9,17 @@ import android.widget.BaseAdapter
 import android.widget.TextView
 import com.highcom.passwordmemo.R
 
+/**
+ * テキストサイズ一覧表示用アダプタ
+ *
+ * @property layoutID テキストサイズ描画レイアウトID
+ * @property names テキストサイズ名称一覧
+ * @property sizes テキストサイズ
+ * @constructor
+ * テキストサイズ一覧表示用アダプタコンストラクタ
+ *
+ * @param context コンテキスト
+ */
 class TextSizeAdapter(
     context: Context,
     private val layoutID: Int,
@@ -16,29 +27,60 @@ class TextSizeAdapter(
     private val sizes: IntArray
 ) : BaseAdapter() {
     private val inflater: LayoutInflater
-    private val mColor = 0
 
+    /**
+     * テキストサイズ表示用ビューホルダークラス
+     *
+     */
     internal class TextSizeViewHolder {
+        /** テキストサイズ表示ビュー */
         var textView: TextView? = null
     }
 
     init {
         inflater = LayoutInflater.from(context)
-        val res = context.resources
+        context.resources
     }
 
+    /**
+     * テキストサイズ一覧数取得処理
+     *
+     * @return テキストサイズ一覧数
+     */
     override fun getCount(): Int {
         return names.size
     }
 
+    /**
+     * 対象アイテム取得処理
+     *
+     * @param position 対象位置
+     * @return 対象アイテム
+     */
     override fun getItem(position: Int): Any {
         return position
     }
 
+    /**
+     * 対象アイテムID取得処理
+     *
+     * @param position 対象位置
+     * @return 対象アイテムID
+     */
     override fun getItemId(position: Int): Long {
         return position.toLong()
     }
 
+    /**
+     * 対象アイテムビュー取得処理
+     * 対象のビューにテキストサイズ名称とテキストサイズを設定する
+     *
+     * @param position 対象位置
+     * @param convertView 対象ビュー
+     * @param parent 親のビューグループ
+     * @return 生成したビュー
+     */
+    @Suppress("NAME_SHADOWING")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         var convertView = convertView
         val holder: TextSizeViewHolder

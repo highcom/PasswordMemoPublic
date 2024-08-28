@@ -5,8 +5,15 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.highcom.passwordmemo.data.PasswordMemoRepository
 import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
 
+/**
+ * パスワードメモアプリ用Applicationクラス
+ * * データベースやリポジトリの初期化処理を行う
+ *
+ */
 class PasswordMemoApplication : Application() {
+    /** パスワードメモ用データベース */
     private var _database: PasswordMemoRoomDatabase? = null
+    /** パスワードメモデータのアクセスリポジトリ */
     private var _repository: PasswordMemoRepository? = null
 
     /** パスワードメモデータのアクセスリポジトリ */
