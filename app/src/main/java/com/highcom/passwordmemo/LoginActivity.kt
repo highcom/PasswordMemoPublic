@@ -21,15 +21,24 @@ import com.highcom.passwordmemo.ui.viewmodel.LoginViewModel
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import com.highcom.passwordmemo.util.login.LoginService
 
+/**
+ * ログイン画面アクティビティ
+ *
+ */
 class LoginActivity : AppCompatActivity(), View.OnClickListener {
+    /** ログインデータ管理 */
     private var loginDataManager: LoginDataManager? = null
+    /** ログイン処理サービス */
     private var loginService: LoginService? = null
+    /** ログイン時の案内メッセージ */
     private var naviText: TextView? = null
+    /** Firebase解析 */
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
-
+    /** ログインビューモデル */
     private val loginViewModel: LoginViewModel by viewModels {
         LoginViewModel.Factory((application as PasswordMemoApplication).repository)
     }
+
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +66,11 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         biometricloginbtn.setOnClickListener(this)
     }
 
+    /**
+     * ログインボタン押下時処理
+     *
+     * @param v ログインボタンビュー
+     */
     override fun onClick(v: View) {
         when (v.id) {
             R.id.loginButton -> {
@@ -109,11 +123,18 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    /**
+     * 生体認証ログイン設定の判定処理
+     * * 生体認証の有効無効設定によってボタンの活性状態を変更する
+     *
+     */
     private fun checkBiometricSetting() {
         if (!loginDataManager!!.biometricLoginSwitchEnable) {
+            // 生体認証ログインが無効の場合は非表示
             findViewById<View>(R.id.biometricLoginButton).visibility = View.INVISIBLE
             return
         } else if (!loginDataManager!!.isMasterPasswordCreated) {
+            // 生体認証ログインが有効でマスターパスワードが作成済みなら有効化
             findViewById<View>(R.id.biometricLoginButton).visibility = View.VISIBLE
             findViewById<View>(R.id.biometricLoginButton).isEnabled = false
             (findViewById<View>(R.id.biometricLoginButton) as ImageButton).setColorFilter(
@@ -124,6 +145,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
             return
         }
         val biometricManager = BiometricManager.from(this)
+        // 生体認証判定を行う
         @Suppress("DEPRECATION")
         when (biometricManager.canAuthenticate()) {
             BiometricManager.BIOMETRIC_SUCCESS -> {
@@ -156,6 +178,11 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    /**
+     * テキストサイズ設定処理
+     *
+     * @param size 指定テキストサイズ
+     */
     private fun setTextSize(size: Float) {
         (findViewById<View>(R.id.navigateText) as TextView).setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,

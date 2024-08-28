@@ -17,9 +17,21 @@ import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.io.OutputStream
 
+/**
+ * 外部ファイル出力処理クラス
+ * * DBデータをCSV形式のファイルとして出力する
+ *
+ * @property context コンテキスト
+ * @property settingViewModel 設定画面ビューモデル
+ */
 class OutputExternalFile(private val context: Context,
                          private val settingViewModel: SettingViewModel
     ) {
+    /**
+     * CSVファイル出力先確認ダイアログ表示処理
+     *
+     * @param uri ファイル出力先URI
+     */
     fun outputSelectFolder(uri: Uri?) {
         AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.output_csv))
@@ -39,6 +51,13 @@ class OutputExternalFile(private val context: Context,
             .show()
     }
 
+    /**
+     * CSVファイル出力実行処理
+     * * DBデータをCSV形式に変換してファイル出力する
+     *
+     * @param uri 出力先ファイルURI
+     * @return 出力完了可否
+     */
     private suspend fun exportDatabase(uri: Uri?): Boolean {
         var result = true
         var outputStream: OutputStream? = null

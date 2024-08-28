@@ -39,15 +39,26 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
+/**
+ * グループ一覧画面アクティビティ
+ *
+ */
 class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
+    /** ログインデータ管理 */
     private var loginDataManager: LoginDataManager? = null
+    /** 広告用コンテナ */
     private var adContainerView: FrameLayout? = null
+    /** 広告ビュー */
     private var mAdView: AdView? = null
+    /** グループ一覧用リサイクラービュー */
     var recyclerView: RecyclerView? = null
+    /** グループ追加フローティングボタン */
     private var groupFab: FloatingActionButton? = null
+    /** グループ一覧用アダプタ */
     var adapter: GroupListAdapter? = null
+    /** スワイプボタン表示用通知ヘルパー */
     private var simpleCallbackHelper: SimpleCallbackHelper? = null
-
+    /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels {
         GroupListViewModel.Factory((application as PasswordMemoApplication).repository)
     }
@@ -176,6 +187,10 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
             }
     }
 
+    /**
+     * バナー広告ロード処理
+     *
+     */
     private fun loadBanner() {
         // Create an ad request.
         mAdView = AdView(this)
@@ -190,6 +205,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         mAdView!!.loadAd(adRequest)
     }
 
+    /** 広告サイズ設定 */
     @Suppress("DEPRECATION")
     private val adSize: AdSize
         get() {
@@ -321,9 +337,23 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         groupListViewModel.update(groupEntity)
     }
 
+    /**
+     * グループ一覧通知用リスナークラス
+     *
+     */
     inner class GroupListCallbackListener : SimpleCallbackListener {
+        /** 移動元位置 */
         private var fromPos = -1
+        /** 移動先位置 */
         private var toPos = -1
+
+        /**
+         * 並べ替え中の移動処理
+         *
+         * @param viewHolder 移動元ビュー
+         * @param target 移動先ビュー
+         * @return
+         */
         @Suppress("DEPRECATION")
         override fun onSimpleCallbackMove(
             viewHolder: RecyclerView.ViewHolder,
@@ -352,6 +382,12 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
             return true
         }
 
+        /**
+         * 並べ替え完了後処理
+         *
+         * @param recyclerView ビュー全体
+         * @param viewHolder 操作対象ビュー
+         */
         override fun clearSimpleCallbackView(
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder

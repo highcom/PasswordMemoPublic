@@ -13,7 +13,17 @@ import java.io.FileNotFoundException
 import java.io.InputStream
 import java.io.OutputStream
 
+/**
+ * DBファイルのバックアップ処理クラス
+ *
+ * @property context コンテキスト
+ */
 class BackupDbFile(private val context: Context) {
+    /**
+     * DBファイルバックアップ先フォルダ確認ダイアログ表示処理
+     *
+     * @param uri バックアップ先URI
+     */
     fun backupSelectFolder(uri: Uri?) {
         AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.backup_db))
@@ -29,6 +39,12 @@ class BackupDbFile(private val context: Context) {
             .show()
     }
 
+    /**
+     * DBファイルバックアップ処理
+     *
+     * @param uri バックアップ先URI
+     * @return バックアップ完了可否
+     */
     private fun backupDatabase(uri: Uri?): Boolean {
         var outputStream: OutputStream? = null
         try {

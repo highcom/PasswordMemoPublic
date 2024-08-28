@@ -42,29 +42,45 @@ import jp.co.recruit_mp.android.rmp_appirater.RmpAppirater
 import jp.co.recruit_mp.android.rmp_appirater.RmpAppirater.ShowRateDialogCondition
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import java.util.Arrays
 import java.util.Date
 import java.util.Locale
 
+/**
+ * パスワード一覧画面アクティビティ
+ *
+ */
 class PasswordListActivity : AppCompatActivity(), AdapterListener {
+    /** 選択グループ名称 */
     private var selectGroupName: String? = null
+    /** ログインデータ管理 */
     private var loginDataManager: LoginDataManager? = null
+    /** スワイプボタン表示用通知ヘルパー */
     private var simpleCallbackHelper: SimpleCallbackHelper? = null
+    /** 広告コンテナ */
     private var adContainerView: FrameLayout? = null
+    /** 広告ビュー */
     private var mAdView: AdView? = null
+    /** パスワード一覧表示用リサイクラービュー */
     var recyclerView: RecyclerView? = null
+    /** パスワード一覧用アダプタ */
     var adapter: PasswordListAdapter? = null
+    /** 操作メニュー */
     private var menu: Menu? = null
+    /** 現在洗濯中のメニュー */
     private var currentMenuSelect = 0
+    /** 現在のメモ表示設定 */
     private var currentMemoVisible: Boolean? = null
+    /** 検索文字列 */
     var seachViewWord: String? = null
-
+    /** パスワード一覧ビューモデル */
     private val passwordListViewModel: PasswordListViewModel by viewModels {
         PasswordListViewModel.Factory((application as PasswordMemoApplication).repository)
     }
+    /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels {
         GroupListViewModel.Factory((application as PasswordMemoApplication).repository)
     }
+
     @Suppress("DEPRECATION")
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -273,6 +289,10 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         }
     }
 
+    /**
+     * バナー広告ロード処理
+     *
+     */
     private fun loadBanner() {
         // Create an ad request.
         mAdView = AdView(this)
@@ -287,6 +307,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         mAdView!!.loadAd(adRequest)
     }
 
+    /** 広告サイズ設定 */
     @Suppress("DEPRECATION")
     private val adSize: AdSize
         get() {
@@ -318,6 +339,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         val selectMenuTitle = menu.findItem(currentMenuSelect).title.toString()
             .replace(getString(R.string.no_select_menu_icon), getString(R.string.select_menu_icon))
         menu.findItem(currentMenuSelect).title = selectMenuTitle
+        // 検索窓の動作を設定する
         val searchMenuItem = menu.findItem(R.id.menu_search_view)
         val searchView = searchMenuItem.actionView as SearchView?
         val searchAutoComplete =
@@ -341,12 +363,13 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
     @Suppress("DEPRECATION")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            // 戻るボタン
             android.R.id.home -> {
                 // 編集状態は解除する
                 adapter?.editEnable = false
                 finish()
             }
-
+            // 編集モード
             R.id.edit_mode -> {
                 // 編集状態の変更
                 adapter?.sortPasswordList(PasswordListAdapter.SORT_ID)
@@ -361,7 +384,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
                 recyclerView!!.adapter = adapter
                 loginDataManager!!.setSortKey(PasswordListAdapter.SORT_ID)
             }
-
+            // 標準ソート
             R.id.sort_default -> {
                 setCurrentSelectMenuTitle(item, R.id.sort_default)
                 title = getString(R.string.sort_name_default) + "：" + selectGroupName
@@ -370,7 +393,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
                 recyclerView!!.adapter = adapter
                 loginDataManager!!.setSortKey(PasswordListAdapter.SORT_ID)
             }
-
+            // タイトルソート
             R.id.sort_title -> {
                 setCurrentSelectMenuTitle(item, R.id.sort_title)
                 title = getString(R.string.sort_name_title) + "：" + selectGroupName
@@ -379,7 +402,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
                 recyclerView!!.adapter = adapter
                 loginDataManager!!.setSortKey(PasswordListAdapter.SORT_TITLE)
             }
-
+            // 更新日ソート
             R.id.sort_update -> {
                 setCurrentSelectMenuTitle(item, R.id.sort_update)
                 title = getString(R.string.sort_name_update) + "：" + selectGroupName
@@ -388,13 +411,13 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
                 recyclerView!!.adapter = adapter
                 loginDataManager!!.setSortKey(PasswordListAdapter.SORT_INPUTDATE)
             }
-
+            // グループ選択
             R.id.select_group -> {
                 // 設定画面へ遷移
                 val intentGroup = Intent(this@PasswordListActivity, GroupListActivity::class.java)
                 startActivityForResult(intentGroup, START_GROUP)
             }
-
+            // 設定メニュー
             R.id.setting_menu -> {
                 // 設定画面へ遷移
                 val intent = Intent(this@PasswordListActivity, SettingActivity::class.java)
@@ -406,6 +429,12 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         return super.onOptionsItemSelected(item)
     }
 
+    /**
+     * 現在選択されているメニューに合わせた表示設定処理
+     *
+     * @param item メニュー
+     * @param id 選択メニューID
+     */
     private fun setCurrentSelectMenuTitle(item: MenuItem, id: Int) {
         // 現在選択されているメニューの選択アイコンを戻す
         val currentMenuTitle = menu!!.findItem(currentMenuSelect).title.toString()
@@ -467,6 +496,10 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         if (needRefresh) reflesh()
     }
 
+    /**
+     * 操作説明ダイアログ生成処理
+     *
+     */
     @SuppressLint("InflateParams")
     private fun operationInstructionDialog() {
         val alertDialog = android.app.AlertDialog.Builder(this)
@@ -480,7 +513,10 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
             .setOnClickListener { alertDialog.dismiss() }
     }
 
-    // 入力文字列に応じてフィルタをする
+    /**
+     * 検索文字列に応じたパスワード一覧のフィルタ処理
+     *
+     */
     fun setSearchWordFilter() {
         val filter = (recyclerView!!.adapter as Filterable?)!!.filter
         if (TextUtils.isEmpty(seachViewWord)) {
@@ -490,7 +526,10 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         }
     }
 
-    // データの一覧を更新する
+    /**
+     * パスワードデータ一覧更新処理
+     *
+     */
     @SuppressLint("NotifyDataSetChanged")
     fun reflesh() {
         adapter!!.notifyDataSetChanged()
@@ -507,6 +546,11 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         super.onDestroy()
     }
 
+    /**
+     * パスワード一覧の項目タップ時の処理
+     *
+     * @param view タップされた項目のビュー
+     */
     @Suppress("DEPRECATION")
     override fun onAdapterClicked(view: View) {
         // 編集状態の場合は入力画面に遷移しない
@@ -527,6 +571,13 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         startActivityForResult(intent, EDIT_DATA)
     }
 
+    /**
+     * 各画面から戻ってきた際の更新処理
+     *
+     * @param requestCode 要求コード
+     * @param resultCode 結果コード
+     * @param data 戻り値データ
+     */
     @Suppress("DEPRECATION")
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -556,10 +607,23 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
         }
     }
 
-
+    /**
+     * パスワード一覧応答通知リスナークラス
+     *
+     */
     inner class PasswordListCallbackListener : SimpleCallbackListener {
+        /** 移動元位置 */
         private var fromPos = -1
+        /** 移動先位置 */
         private var toPos = -1
+
+        /**
+         * 並べ替え中の移動処理
+         *
+         * @param viewHolder 移動元ビュー
+         * @param target 移動先ビュー
+         * @return
+         */
         @Suppress("DEPRECATION")
         override fun onSimpleCallbackMove(
             viewHolder: RecyclerView.ViewHolder,
@@ -578,6 +642,12 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
             return false
         }
 
+        /**
+         * 並べ替え完了後処理
+         *
+         * @param recyclerView ビュー全体
+         * @param viewHolder 操作対象ビュー
+         */
         override fun clearSimpleCallbackView(
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder
@@ -592,8 +662,11 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
     }
 
     companion object {
+        /** データ編集要求コード */
         private const val EDIT_DATA = 1001
+        /** 設定画面遷移要求コード */
         private const val START_SETTING = 1002
+        /** グループ一覧画面遷移要求コード */
         private const val START_GROUP = 1003
     }
 }

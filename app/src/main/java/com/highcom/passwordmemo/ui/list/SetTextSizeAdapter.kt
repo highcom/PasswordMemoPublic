@@ -10,6 +10,16 @@ import android.widget.BaseAdapter
 import android.widget.TextView
 import com.highcom.passwordmemo.R
 
+/**
+ * テキストサイズ表示用アダプタ
+ *
+ * @property names テキストサイズ名称一覧
+ * @property size テキストサイズ
+ * @constructor
+ * テキストサイズ表示用アダプタコンストラクタ
+ *
+ * @param context コンテキスト
+ */
 class SetTextSizeAdapter(
     context: Context,
     private val names: List<String?>?,
@@ -17,7 +27,12 @@ class SetTextSizeAdapter(
 ) : BaseAdapter() {
     private val inflater: LayoutInflater
 
+    /**
+     * テキストサイズビューホルダー
+     *
+     */
     internal class TextSizeViewHolder {
+        /** テキストサイズ名称ビュー */
         var textView: TextView? = null
     }
 
@@ -26,18 +41,43 @@ class SetTextSizeAdapter(
         context.resources
     }
 
+    /**
+     * テキストサイズ一覧数取得処理
+     *
+     * @return データ数
+     */
     override fun getCount(): Int {
         return names!!.size
     }
 
+    /**
+     * テキストサイズアイテム取得処理
+     *
+     * @param position 取得位置
+     * @return アイテムデータ
+     */
     override fun getItem(position: Int): Any {
         return position
     }
 
+    /**
+     * テキストサイズID取得処理
+     *
+     * @param position 取得位置
+     * @return アイテムID
+     */
     override fun getItemId(position: Int): Long {
         return position.toLong()
     }
 
+    /**
+     * テキストサイズビュー取得処理
+     *
+     * @param position 取得位置
+     * @param convertView 変換ビュー
+     * @param parent 親のビューグループ
+     * @return テキストサイズビュー
+     */
     @SuppressLint("InflateParams")
     @Suppress("NAME_SHADOWING")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {

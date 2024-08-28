@@ -17,20 +17,44 @@ import com.highcom.passwordmemo.PasswordListActivity
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.ui.viewmodel.LoginViewModel
-import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import java.util.concurrent.Executor
 
+/**
+ * ログイン処理に関するサービスクラス
+ *
+ * @property loginDataManager ログインデータ管理
+ * @property loginViewModel ログインビューモデル
+ */
 class LoginService(private var loginDataManager: LoginDataManager?, private val loginViewModel: LoginViewModel) {
+    /** パスワード誤り回数 */
     private var incorrectPwCount = 0
+    /** 初回ログインかどうか */
     var firstTime = false
+    /** マスターパスワード作成時の1回目の入力値 */
     private var firstPassword: String? = null
+    /** 鍵アイコンの回転アニメーション */
     private var rotateAnimation: Animation? = null
+    /** ログイン時の案内メッセージ */
     var navigateText: TextView? = null
+    /** 鍵アイコン */
     var masterKeyIcon: ImageView? = null
+
+    /**
+     * マスターパスワード作成時の1回目の入力値クリア処理
+     *
+     */
     fun clearFirstEditPassword() {
         firstPassword = null
     }
 
+    /**
+     * パスワードログイン判定メッセージ取得処理
+     * * パスワードの生成が必要か照合したかの判定処理をしてメッセージを返却する
+     *
+     * @param activity アクティビティ
+     * @param editPassword 入力パスワード
+     * @return 判定メッセージ
+     */
     fun passwordLogin(activity: Activity, editPassword: String): String? {
         navigateText = activity.findViewById(R.id.navigateText)
         masterKeyIcon = activity.findViewById(R.id.masterKeyIcon)
@@ -104,6 +128,10 @@ class LoginService(private var loginDataManager: LoginDataManager?, private val 
         return message
     }
 
+    /**
+     * 鍵アイコンのアニメーションクリア処理
+     *
+     */
     fun clearAnimation() {
         if (masterKeyIcon != null) masterKeyIcon!!.clearAnimation()
     }
@@ -111,6 +139,12 @@ class LoginService(private var loginDataManager: LoginDataManager?, private val 
     @Suppress("DEPRECATION")
     private val handler = Handler()
     private val executor = Executor { command -> handler.post(command) }
+
+    /**
+     * 生体認証ログイン処理
+     *
+     * @param activity アクティビティ
+     */
     fun biometricLogin(activity: Activity) {
         navigateText = activity.findViewById(R.id.navigateText)
         masterKeyIcon = activity.findViewById(R.id.masterKeyIcon)
@@ -164,6 +198,13 @@ class LoginService(private var loginDataManager: LoginDataManager?, private val 
         biometricPrompt.authenticate(promptInfo)
     }
 
+    /**
+     * ログイン処理
+     * * パスワード誤り回数などをリセットして次画面に遷移する
+     *
+     * @param activity アクティビティ
+     * @param firstTime 初回ログインかどうか
+     */
     private fun login(activity: Activity, firstTime: Boolean) {
         incorrectPwCount = 0
         firstPassword = null

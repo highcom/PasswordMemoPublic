@@ -8,8 +8,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 
+/**
+ * リサイクラービューのアイテムに対する分割線の描画クラス
+ *
+ * @constructor
+ * コンストラクタ
+ *
+ * @param context コンテキスト
+ * @param orientation リスト方向
+ */
 class DividerItemDecoration(context: Context, orientation: Int) : ItemDecoration() {
+    /** 分割線描画 */
     private val mDivider: Drawable?
+    /** リスト方向 */
     private var mOrientation = 0
 
     init {
@@ -19,11 +30,23 @@ class DividerItemDecoration(context: Context, orientation: Int) : ItemDecoration
         setOrientation(orientation)
     }
 
+    /**
+     * リスト方向設定処理
+     *
+     * @param orientation リスト方向
+     */
     private fun setOrientation(orientation: Int) {
         require(!(orientation != HORIZONTAL_LIST && orientation != VERTICAL_LIST)) { "invalid orientation" }
         mOrientation = orientation
     }
 
+    /**
+     * 描画処理
+     *
+     * @param c 描画用キャンバス
+     * @param parent 親のビュー
+     * @param state 操作状態
+     */
     override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         if (mOrientation == VERTICAL_LIST) {
             drawVertical(c, parent)
@@ -32,6 +55,12 @@ class DividerItemDecoration(context: Context, orientation: Int) : ItemDecoration
         }
     }
 
+    /**
+     * 垂直方向リストの分割線描画処理
+     *
+     * @param c 描画用キャンバス
+     * @param parent 親ビュー
+     */
     private fun drawVertical(c: Canvas?, parent: RecyclerView) {
         val left = parent.paddingLeft
         val right = parent.width - parent.paddingRight
@@ -47,6 +76,12 @@ class DividerItemDecoration(context: Context, orientation: Int) : ItemDecoration
         }
     }
 
+    /**
+     * 水平方向リストの分割線描画処理
+     *
+     * @param c 描画用キャンバス
+     * @param parent 親ビュー
+     */
     private fun drawHorizontal(c: Canvas?, parent: RecyclerView) {
         val top = parent.paddingTop
         val bottom = parent.height - parent.paddingBottom
@@ -62,6 +97,13 @@ class DividerItemDecoration(context: Context, orientation: Int) : ItemDecoration
         }
     }
 
+    /**
+     * アイテムに対するオフセット位置取得処理
+     *
+     * @param outRect 外枠
+     * @param itemPosition アイテム位置
+     * @param parent 親ビュー
+     */
     @Deprecated("Deprecated in Java")
     override fun getItemOffsets(outRect: Rect, itemPosition: Int, parent: RecyclerView) {
         if (mOrientation == VERTICAL_LIST) {
@@ -72,10 +114,13 @@ class DividerItemDecoration(context: Context, orientation: Int) : ItemDecoration
     }
 
     companion object {
+        /** 分割線の属性 */
         private val ATTRS = intArrayOf(
             android.R.attr.listDivider
         )
+        /** 水平方向リスト値 */
         const val HORIZONTAL_LIST = LinearLayoutManager.HORIZONTAL
+        /** 垂直方向リスト値 */
         const val VERTICAL_LIST = LinearLayoutManager.VERTICAL
     }
 }

@@ -41,14 +41,22 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 
+/**
+ * 設定画面アクティビティ
+ *
+ */
 class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeListener,
     InputOutputFileDialogListener, RestoreDbFileListener, InputExternalFileListener {
+    /** ログインデータ管理 */
     private var loginDataManager: LoginDataManager? = null
+    /** 処理ハンドラ */
     @Suppress("DEPRECATION")
     private val handler = Handler()
+    /** クリップボードコピー設定用リスナー */
     private var copyClipboardSpinner: Spinner? = null
+    /** クリップボードコピー設定名 */
     private var copyClipboardNames: ArrayList<String?>? = null
-
+    /** 設定ビューモデル */
     private val settingViewModel: SettingViewModel by viewModels {
         SettingViewModel.Factory((application as PasswordMemoApplication).repository)
     }
@@ -186,6 +194,10 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         setTextSize(loginDataManager!!.textSize)
     }
 
+    /**
+     * パスワードメモアプリの再起動処理
+     *
+     */
     private fun restartPasswordMemoActivity() {
         val ts = Toast.makeText(this, getString(R.string.restart_message), Toast.LENGTH_SHORT)
         ts.show()
@@ -193,25 +205,43 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         handler.postDelayed(restartRunnable, 500)
     }
 
+    /**
+     * 全アクティビティを破棄して新規アクティビティを生成する処理
+     *
+     */
     private fun executeRestart() {
         val intent = Intent(this, LoginActivity::class.java)
+        // 起動しているActivityをすべて削除し、新しいタスクでMainActivityを起動する
         intent.flags =
-            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK // 起動しているActivityをすべて削除し、新しいタスクでMainActivityを起動する
+            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
     }
 
-    // パスワード変更完了時の表示
+    /**
+     * パスワード変更完了時の通知処理
+     *
+     */
     private fun passwordChangeComplete() {
         val ts =
             Toast.makeText(this, getString(R.string.password_change_message), Toast.LENGTH_SHORT)
         ts.show()
     }
 
+    /**
+     * ファイル入出力選択ダイアログ表示処理
+     *
+     * @param operation 選択操作
+     */
     private fun confirmSelectOperation(operation: SelectInputOutputFileDialog.Operation) {
         val selectInputOutputFileDialog = SelectInputOutputFileDialog(this, operation, this)
         selectInputOutputFileDialog.createOpenFileDialog().show()
     }
 
+    /**
+     * 操作選択処理
+     *
+     * @param path 選択操作名称
+     */
     override fun onSelectOperationClicked(path: String?) {
         when (path) {
             getString(R.string.restore_db) -> {
@@ -229,6 +259,10 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         }
     }
 
+    /**
+     * DB復元ファイル選択アクティビティ遷移処理
+     *
+     */
     @Suppress("DEPRECATION")
     private fun confirmRestoreSelectFile() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
@@ -237,6 +271,10 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         startActivityForResult(intent, RESTORE_DB)
     }
 
+    /**
+     * DBバックアップファイル選択アクティビティ遷移処理
+     *
+     */
     @Suppress("DEPRECATION")
     private fun confirmBackupSelectFile() {
         val fileName = "PasswordMemoDB_$nowDateString.db"
@@ -247,6 +285,10 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         startActivityForResult(intent, BACKUP_DB)
     }
 
+    /**
+     * CSV入力ファイル選択アクティビティ遷移処理
+     *
+     */
     @Suppress("DEPRECATION")
     private fun confirmInputSelectFile() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
@@ -255,6 +297,10 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         startActivityForResult(intent, INPUT_CSV)
     }
 
+    /**
+     * CSV出力ファイル選択アクティビティ遷移処理
+     *
+     */
     @Suppress("DEPRECATION")
     private fun confirmOutputSelectFile() {
         val fileName = "PasswordListFile_$nowDateString.csv"
@@ -265,6 +311,7 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         startActivityForResult(intent, OUTPUT_CSV)
     }
 
+    /** 現在日付 */
     private val nowDateString: String
         @SuppressLint("SimpleDateFormat")
         get() {
@@ -280,21 +327,22 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         if (resultCode == RESULT_OK && resultData!!.data != null) {
             val uri = resultData.data
             when (requestCode) {
+                // DB復元
                 RESTORE_DB -> {
                     val restoreDbFile = RestoreDbFile(this, this)
                     restoreDbFile.restoreSelectFolder(uri)
                 }
-
+                // DBバックアップ
                 BACKUP_DB -> {
                     val backupDbFile = BackupDbFile(this)
                     backupDbFile.backupSelectFolder(uri)
                 }
-
+                // CSV入力
                 INPUT_CSV -> {
                     val inputExternalFile = InputExternalFile(this, settingViewModel, this)
                     inputExternalFile.inputSelectFolder(uri)
                 }
-
+                // CSV出力
                 OUTPUT_CSV -> {
                     val outputExternalFile = OutputExternalFile(this, settingViewModel)
                     lifecycleScope.launch {
@@ -305,11 +353,19 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         }
     }
 
+    /**
+     * 背景色選択ダイアログ生成処理
+     *
+     */
     private fun colorSelectDialog() {
         val backgroundColorUtil = BackgroundColorUtil(applicationContext, this)
         backgroundColorUtil.createBackgroundColorDialog(this)
     }
 
+    /**
+     * マスターパスワード編集処理
+     *
+     */
     @SuppressLint("InflateParams")
     private fun editMasterPassword() {
         val alertDialog = AlertDialog.Builder(this)
@@ -346,6 +402,10 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         })
     }
 
+    /**
+     * 操作説明ダイアログ表示処理
+     *
+     */
     @SuppressLint("InflateParams")
     private fun operationInstructionDialog() {
         val alertDialog = AlertDialog.Builder(this)
@@ -358,6 +418,11 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
             .setOnClickListener { alertDialog.dismiss() }
     }
 
+    /**
+     * 背景色選択処理
+     *
+     * @param color 選択背景色
+     */
     @SuppressLint("ResourceType")
     override fun onSelectColorClicked(color: Int) {
         (findViewById<View>(R.id.settingView) as ScrollView).setBackgroundColor(color)
@@ -371,11 +436,21 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         return super.onOptionsItemSelected(item)
     }
 
+    /**
+     * テキストサイズ選択処理
+     *
+     * @param size 選択テキストサイズ
+     */
     override fun onTextSizeSelected(size: Float) {
         setTextSize(size)
         loginDataManager!!.setTextSize(size)
     }
 
+    /**
+     * テキストサイズ設定処理
+     *
+     * @param size 指定テキストサイズ
+     */
     private fun setTextSize(size: Float) {
         // レイアウトが崩れるので詳細説明のテキストはサイズ変更しない
         (findViewById<View>(R.id.deleteSwitch) as Switch).setTextSize(
@@ -476,6 +551,10 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         )
     }
 
+    /**
+     * DB復元完了時処理
+     *
+     */
     override fun restoreComplete() {
         // データベースとリポジトリを初期化する
         (application as PasswordMemoApplication).initializeDatabaseAndRepository()
@@ -486,23 +565,32 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         startActivity(intent)
     }
 
+    /**
+     * CSV入力完了時処理
+     *
+     */
     override fun importComplete() {
         setResult(NEED_UPDATE)
     }
 
     public override fun onDestroy() {
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
-        if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.isBackground) {
+        if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.isBackground) {
             finishAffinity()
         }
         super.onDestroy()
     }
 
     companion object {
+        /** 更新が必要 */
         const val NEED_UPDATE = 1
+        /** DB復元操作 */
         private const val RESTORE_DB = 1001
+        /** DBバックアップ操作 */
         private const val BACKUP_DB = 1002
+        /** CSV入力操作 */
         private const val INPUT_CSV = 1003
+        /** CSV復元操作 */
         private const val OUTPUT_CSV = 1004
     }
 }

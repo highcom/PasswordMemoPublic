@@ -9,7 +9,12 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.highcom.passwordmemo.util.login.LoginDataManager
 
+/**
+ * ライセンス画面アクティビティ
+ *
+ */
 class LicenseActivity : AppCompatActivity() {
+    /** ログインデータ管理 */
     private var loginDataManager: LoginDataManager? = null
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -38,28 +38,48 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * パスワード入力画面アクティビティ
+ *
+ */
 class InputPasswordActivity : AppCompatActivity() {
+    /** パスワードデータID */
     private var id: Long = 0
+    /** 広告コンテナ */
     private var adContainerView: FrameLayout? = null
+    /** 広告ビュー */
     private var mAdView: AdView? = null
+    /** 編集モードかどうか */
     private var editState = false
+    /** ログインデータ管理 */
     private var loginDataManager: LoginDataManager? = null
+    /** パスワード自動生成種別 */
     private var passwordKind = 0
+    /** パスワード自動生成文字数 */
     private var passwordCount = 0
+    /** パスワード自動生が成小文字のみかどうか */
     private var isLowerCaseOnly = false
+    /** 自動生成パスワード */
     private var generatePassword: String? = null
+    /** 自動生成パスワードテキストビュー */
     private var generatePasswordText: EditText? = null
+    /** 編集モードでの既存の選択グループID */
     private var groupId: Long = 0
+    /** グループ選択スピナー */
     private var selectGroupSpinner: Spinner? = null
+    /** グループ名称一覧 */
     private var selectGroupNames: ArrayList<String?>? = null
+    /** 選択グループID */
     private var selectGroupId: Long? = null
-
+    /** パスワード一覧ビューモデル */
     private val passwordListViewModel: PasswordListViewModel by viewModels {
         PasswordListViewModel.Factory((application as PasswordMemoApplication).repository)
     }
+    /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels {
         GroupListViewModel.Factory((application as PasswordMemoApplication).repository)
     }
+
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,6 +147,10 @@ class InputPasswordActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
     }
 
+    /**
+     * バナー広告ロード処理
+     *
+     */
     private fun loadBanner() {
         // Create an ad request.
         mAdView = AdView(this)
@@ -141,6 +165,7 @@ class InputPasswordActivity : AppCompatActivity() {
         mAdView!!.loadAd(adRequest)
     }
 
+    /** 広告サイズ設定 */
     @Suppress("DEPRECATION")
     private val adSize: AdSize
         get() {
@@ -201,7 +226,10 @@ class InputPasswordActivity : AppCompatActivity() {
         setTextSize(loginDataManager!!.textSize)
     }
 
-    // パスワード生成ダイアログ
+    /**
+     * パスワード自動生成用ダイアログ表示処理
+     *
+     */
     private fun generatePasswordDialog() {
         val generatePasswordView = layoutInflater.inflate(R.layout.alert_generate_password, null)
         // 文字種別ラジオボタンの初期値を設定
@@ -266,19 +294,26 @@ class InputPasswordActivity : AppCompatActivity() {
         generatePasswordString()
     }
 
-    // パスワード文字列生成
+    /**
+     * パスワード文字列自動生成処理
+     *
+     */
     private fun generatePasswordString() {
         generatePassword = when (passwordKind) {
             R.id.radioNumbers -> {
+                // 数字のみ
                 RandomStringUtils.randomNumeric(passwordCount)
             }
             R.id.radioLettersNumbers -> {
+                // 数字＋文字
                 RandomStringUtils.randomAlphanumeric(passwordCount)
             }
             else -> {
+                // 数字＋文字＋記号
                 RandomStringUtils.randomGraph(passwordCount)
             }
         }
+        // 小文字のみでの生成かどうか
         if (isLowerCaseOnly) {
             generatePasswordText!!.setText(generatePassword?.lowercase(Locale.getDefault()))
         } else {
@@ -286,6 +321,7 @@ class InputPasswordActivity : AppCompatActivity() {
         }
     }
 
+    /** 現在日付 */
     private val nowDate: String
         // 現在の日付取得処理
         @SuppressLint("SimpleDateFormat")
@@ -304,6 +340,11 @@ class InputPasswordActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    /**
+     * テキストサイズ設定処理
+     *
+     * @param size 指定テキストサイズ
+     */
     private fun setTextSize(size: Float) {
         (findViewById<View>(R.id.titleView) as TextView).setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,

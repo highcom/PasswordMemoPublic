@@ -28,16 +28,26 @@ import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import kotlinx.coroutines.launch
 
+/**
+ * パスワード参照画面アクティビティ
+ *
+ */
 class ReferencePasswordActivity : AppCompatActivity() {
+    /** ログインデータ管理 */
     private var loginDataManager: LoginDataManager? = null
+    /** パスワードデータID */
     private var id: Long = 0
+    /** グループID */
     private var groupId: Long = 0
+    /** 広告コンテナ */
     private var adContainerView: FrameLayout? = null
+    /** 広告ビュー */
     private var mAdView: AdView? = null
-
+    /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels {
         GroupListViewModel.Factory((application as PasswordMemoApplication).repository)
     }
+
     @Suppress("NAME_SHADOWING")
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +56,7 @@ class ReferencePasswordActivity : AppCompatActivity() {
         adContainerView = findViewById(R.id.adView_frame_reference)
         adContainerView?.post { loadBanner() }
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        loginDataManager = LoginDataManager.Companion.getInstance(this)
+        loginDataManager = LoginDataManager.getInstance(this)
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager!!.displayBackgroundSwitchEnable) {
@@ -126,6 +136,10 @@ class ReferencePasswordActivity : AppCompatActivity() {
         })
     }
 
+    /**
+     * バナー広告ロード処理
+     *
+     */
     private fun loadBanner() {
         // Create an ad request.
         mAdView = AdView(this)
@@ -140,6 +154,7 @@ class ReferencePasswordActivity : AppCompatActivity() {
         mAdView!!.loadAd(adRequest)
     }
 
+    /** 広告サイズ設定 */
     @Suppress("DEPRECATION")
     private val adSize: AdSize
         get() {
@@ -167,7 +182,9 @@ class ReferencePasswordActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val intent: Intent
         when (item.itemId) {
+            // 戻るボタン
             android.R.id.home -> finish()
+            // 複製して編集
             R.id.action_copy -> {
                 // 入力画面を生成
                 intent = Intent(this@ReferencePasswordActivity, InputPasswordActivity::class.java)
@@ -194,7 +211,7 @@ class ReferencePasswordActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             }
-
+            // 編集
             R.id.action_edit -> {
                 // 入力画面を生成
                 intent = Intent(this@ReferencePasswordActivity, InputPasswordActivity::class.java)
@@ -240,7 +257,12 @@ class ReferencePasswordActivity : AppCompatActivity() {
         setTextSize(loginDataManager!!.textSize)
     }
 
-    // クリップボードにコピーする処理
+    /**
+     * クリップボードコピー処理
+     *
+     * @param view 通知用ビュー
+     * @param allText コピー対象文字列
+     */
     private fun copyClipBoard(view: View?, allText: String) {
         // クリップボードへの格納成功時は成功メッセージをトーストで表示
         val result = setClipData(allText)
@@ -253,7 +275,12 @@ class ReferencePasswordActivity : AppCompatActivity() {
         }
     }
 
-    // テキストデータをクリップボードに格納する
+    /**
+     * テキストデータをクリップボードに格納する処理
+     *
+     * @param allText 格納対象文字列
+     * @return 格納できたかどうか
+     */
     private fun setClipData(allText: String): Boolean {
         return try {
             //クリップボードに格納するItemを作成
@@ -284,6 +311,11 @@ class ReferencePasswordActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    /**
+     * テキストサイズ設定処理
+     *
+     * @param size 指定テキストサイズ
+     */
     private fun setTextSize(size: Float) {
         (findViewById<View>(R.id.accountRefView) as TextView).setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -324,7 +356,9 @@ class ReferencePasswordActivity : AppCompatActivity() {
     }
 
     companion object {
+        /** 長押し操作 */
         private const val OPERATION_LONGPRESS = 0
+        /** タップ操作 */
         private const val OPERATION_TAP = 1
     }
 }

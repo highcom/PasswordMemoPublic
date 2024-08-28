@@ -9,6 +9,16 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.highcom.passwordmemo.R
 
+/**
+ * 背景色一覧表示用アダプタ
+ *
+ * @property mResource リソースID
+ * @property mItems 背景色一覧データ
+ * @constructor
+ * 背景色一覧表示用アダプタコンストラクタ
+ *
+ * @param context コンテキスト
+ */
 class BackgroundColorAdapter(
     context: Context,
     private val mResource: Int,

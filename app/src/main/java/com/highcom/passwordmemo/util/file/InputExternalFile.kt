@@ -23,24 +23,55 @@ import java.io.InputStreamReader
 import java.util.Objects
 import java.util.concurrent.Executors
 
+/**
+ * 外部ファイル取込処理クラス
+ * * CSV形式のファイルを取り込む
+ *
+ * @property activity ダイアログ表示用アクティビティ
+ * @property settingViewModel ビューモデル
+ * @property listener 完了通知用リスナー
+ */
 class InputExternalFile(private val activity: Activity,
                         private val settingViewModel: SettingViewModel,
                         private val listener: InputExternalFileListener) {
+    /** パスワード一覧データ */
     private var passwordList: MutableList<PasswordEntity>? = null
+    /** グループ一覧データ */
     private var groupList: MutableList<GroupEntity>? = null
+    /** パスワードデータID */
     private var id = 0L
+    /** 取込ファイルURI */
     private var uri: Uri? = null
+    /** 取込処理中のプログレスダイアログ */
     private var progressAlertDialog: AlertDialog? = null
+    /** 取込処理中のプログレスバー */
     private var progressBar: ProgressBar? = null
 
+    /**
+     * ファイル取込完了通知用リスナークラス
+     *
+     */
     interface InputExternalFileListener {
+        /**
+         * 取込完了通知処理
+         *
+         */
         fun importComplete()
     }
 
+    /**
+     * ファイル取込処理用バックグラウンドタスク
+     *
+     * @property _handler 処理ハンドラ
+     */
     private inner class BackgroundTask(private val _handler: Handler) : Runnable {
+        /**
+         * ファイル取込実行処理
+         * 既存のデータは全て削除してCSVから読み込んだデータを登録する
+         *
+         */
         @WorkerThread
         override fun run() {
-            // 既存のデータは全て削除してCSVから読み込んだデータを登録する
             settingViewModel.reInsertPassword(passwordList!!)
             progressBar!!.progress = 50
             settingViewModel.reInsertGroup(groupList!!)
@@ -50,7 +81,15 @@ class InputExternalFile(private val activity: Activity,
         }
     }
 
+    /**
+     * バックグラウンド実行後のランナークラス
+     *
+     */
     private inner class PostExecutor : Runnable {
+        /**
+         * バックグラウンド実行後処理
+         *
+         */
         @UiThread
         override fun run() {
             progressAlertDialog!!.dismiss()
@@ -67,6 +106,11 @@ class InputExternalFile(private val activity: Activity,
         }
     }
 
+    /**
+     * CSVファイル取込元フォルダ選択確認ダイアログ表示処理
+     *
+     * @param uri 取込元ファイルURI
+     */
     fun inputSelectFolder(uri: Uri?) {
         this.uri = uri
         AlertDialog.Builder(activity)
@@ -88,6 +132,13 @@ class InputExternalFile(private val activity: Activity,
             .show()
     }
 
+    /**
+     * CSVファイル取込処理
+     * * CSVファイルを1行ずつ読み取りエンティティデータへ変換してリストデータを作成する
+     *
+     * @param uri 取込元ファイルURI
+     * @return 取込完了可否
+     */
     private fun importDatabase(uri: Uri?): Boolean {
         var inputStream: InputStream? = null
         try {
@@ -197,6 +248,11 @@ class InputExternalFile(private val activity: Activity,
         return true
     }
 
+    /**
+     * CSVファイル取込実行処理
+     * * エンティティへ変換されたデータリストをDBへ取込を実行する
+     *
+     */
     @SuppressLint("InflateParams")
     private fun execImportDatabase() {
         AlertDialog.Builder(activity)
@@ -223,6 +279,10 @@ class InputExternalFile(private val activity: Activity,
             .show()
     }
 
+    /**
+     * CSVファイル取込失敗ダイアログ表示処理
+     *
+     */
     private fun failedImportDatabase() {
         if (id == HEADER_RECORD) {
             // ヘッダが正しくないエラーを表示する
@@ -248,6 +308,13 @@ class InputExternalFile(private val activity: Activity,
         }
     }
 
+    /**
+     * URIからファイルパス名を取得する処理
+     *
+     * @param activity コンテキスト
+     * @param uri ファイルURI
+     * @return ファイルパス名
+     */
     private fun getFileNameByUri(activity: Context, uri: Uri?): String {
         var fileName = ""
         val projection = arrayOf(MediaStore.MediaColumns.DISPLAY_NAME)
@@ -265,7 +332,9 @@ class InputExternalFile(private val activity: Activity,
     }
 
     companion object {
+        /** ヘッダーレコード行 */
         private const val HEADER_RECORD = 1L
+        /** 取込最大レコード数 */
         private const val MAX_RECORD = 10000
     }
 }
