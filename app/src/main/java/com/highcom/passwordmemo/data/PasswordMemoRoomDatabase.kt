@@ -1,5 +1,6 @@
 package com.highcom.passwordmemo.data
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.room.Database
@@ -8,7 +9,6 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.highcom.passwordmemo.R
-import net.sqlcipher.Cursor
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SQLiteDatabaseHook
 import net.sqlcipher.database.SupportFactory
@@ -36,7 +36,7 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
             )
             // 旧テーブルのデータを全て一時テーブルに追加
             database.execSQL("""
-                INSERT INTO passworddata_tmp (id,title,account,password,url,memo,inputdate)
+                INSERT OR IGNORE INTO passworddata_tmp (id,title,account,password,url,memo,inputdate)
                 SELECT id,title,account,password,url,memo,inputdate FROM passworddata
                 """.trimIndent()
             )
@@ -68,6 +68,7 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
 }
 
 val MIGRATION_3_4 = object : Migration(3, 4) {
+    @SuppressLint("Range")
     override fun migrate(database: SupportSQLiteDatabase) {
         database.beginTransaction()
         try {
@@ -85,9 +86,27 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 )
                 """.trimIndent()
             )
+
+            // 以前のバージョンではidがプライマリキーになってないので重複していた可能性がある
+            // なので改めて1から順番にIDを再設定する
+            var newId = 1
+            val cursor = database.query("SELECT id FROM passworddata ORDER BY id;")
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    val currentId = cursor.getInt(cursor.getColumnIndex("id"))
+                    database.execSQL(
+                        "UPDATE passworddata SET id = ? WHERE id = ?",
+                        arrayOf<Any>(newId, currentId)
+                    )
+                    newId++
+                }
+                cursor.close()
+            }
+
             // 旧テーブルのデータを全て一時テーブルに追加
             database.execSQL("""
-                INSERT INTO passworddata_tmp (id,title,account,password,url,group_id,memo,inputdate)
+                INSERT OR IGNORE INTO passworddata_tmp (id,title,account,password,url,group_id,memo,inputdate)
                 SELECT id,title,account,password,url,group_id,memo,inputdate FROM passworddata
                 """.trimIndent()
             )
