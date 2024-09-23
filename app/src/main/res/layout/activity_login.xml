@@ -7,92 +7,9 @@
     android:layout_height="match_parent"
     tools:context="com.highcom.passwordmemo.LoginActivity">
 
-    <RelativeLayout
-        android:id="@+id/loginArea"
-        android:orientation="horizontal"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal">
-
-        <TextView
-            android:id="@+id/versionText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
-            android:textSize="10dp"
-            android:textColor="@android:color/black"
-            android:text="" />
-
-        <TextView
-            android:id="@+id/navigateText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/layoutMasterPassword"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="16dp"
-            android:textSize="15sp"
-            android:textColor="@android:color/black"
-            android:text="@string/new_password" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/layoutMasterPassword"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/loginButton"
-            android:layout_centerHorizontal="true"
-            app:passwordToggleEnabled="true">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editMasterPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:ems="10"
-                android:textSize="12dp"
-               android:inputType="textPassword" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <ImageView
-            android:id="@+id/masterKeyIcon"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginLeft="10dp"
-            android:scaleType="centerCrop"
-            android:rotation="90"
-            android:tint="@color/blue"
-            android:layout_toRightOf="@+id/layoutMasterPassword"
-            android:layout_alignBottom="@+id/layoutMasterPassword"
-            android:src="@drawable/ic_key_icon" />
-
-        <Button
-            android:id="@+id/loginButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="16dp"
-            android:textSize="12dp"
-            android:background="@layout/original_button"
-            android:textColor="@color/blue"
-            android:text="@string/login" />
-
-        <ImageButton
-            android:id="@+id/biometricLoginButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/loginButton"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="16dp"
-            android:scaleType="fitCenter"
-            android:background="@layout/round_button"
-            android:textColor="@color/blue"
-            android:src="@drawable/ic_baseline_fingerprint_24"
-            android:visibility="gone"
-            android:text="@string/biometrics" />
-
-    </RelativeLayout>
+        android:name="com.highcom.passwordmemo.ui.fragment.LoginFragment" />
 </androidx.constraintlayout.widget.ConstraintLayout>

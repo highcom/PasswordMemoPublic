@@ -68,7 +68,7 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         setContentView(R.layout.activity_setting)
         title = getString(R.string.setting)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        loginDataManager = LoginDataManager.Companion.getInstance(this)
+        loginDataManager = LoginDataManager.getInstance(application)
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager!!.displayBackgroundSwitchEnable) {

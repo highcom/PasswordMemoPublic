@@ -22,7 +22,7 @@ class LicenseActivity : AppCompatActivity() {
         setContentView(R.layout.activity_license)
         title = getString(R.string.license)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        loginDataManager = LoginDataManager.Companion.getInstance(this)
+        loginDataManager = LoginDataManager.getInstance(application)
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager!!.displayBackgroundSwitchEnable) {
@@ -34,7 +34,7 @@ class LicenseActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         (findViewById<View>(R.id.licenseView) as LinearLayout).setBackgroundColor(
-            LoginDataManager.Companion.getInstance(this)!!.backgroundColor
+            LoginDataManager.getInstance(application)!!.backgroundColor
         )
     }
 

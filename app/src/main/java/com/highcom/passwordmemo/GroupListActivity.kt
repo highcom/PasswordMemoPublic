@@ -67,7 +67,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_list)
-        loginDataManager = LoginDataManager.Companion.getInstance(this)
+        loginDataManager = LoginDataManager.getInstance(application)
         MobileAds.initialize(this) { }
         MobileAds.setRequestConfiguration(
             RequestConfiguration.Builder().setTestDeviceIds(
@@ -81,7 +81,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         adContainerView?.post { loadBanner() }
         title = getString(R.string.group_title) + getString(R.string.group_title_select)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        loginDataManager = LoginDataManager.Companion.getInstance(this)
+        loginDataManager = LoginDataManager.getInstance(application)
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager?.displayBackgroundSwitchEnable == true) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)

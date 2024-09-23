@@ -141,7 +141,7 @@ class PasswordListActivity : AppCompatActivity(), AdapterListener {
                 true
             }, options
         )
-        loginDataManager = LoginDataManager.getInstance(this)
+        loginDataManager = LoginDataManager.getInstance(application)
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager!!.displayBackgroundSwitchEnable) {

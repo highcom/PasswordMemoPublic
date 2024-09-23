@@ -56,7 +56,7 @@ class ReferencePasswordActivity : AppCompatActivity() {
         adContainerView = findViewById(R.id.adView_frame_reference)
         adContainerView?.post { loadBanner() }
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        loginDataManager = LoginDataManager.getInstance(this)
+        loginDataManager = LoginDataManager.getInstance(application)
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager!!.displayBackgroundSwitchEnable) {
