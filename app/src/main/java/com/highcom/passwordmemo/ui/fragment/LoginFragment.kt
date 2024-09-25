@@ -1,7 +1,6 @@
 package com.highcom.passwordmemo.ui.fragment
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
@@ -23,8 +22,8 @@ import androidx.biometric.BiometricManager
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
-import com.highcom.passwordmemo.PasswordListActivity
 import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.ui.viewmodel.LoginViewModel
@@ -63,6 +62,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loginDataManager = (requireActivity().application as PasswordMemoApplication).loginDataManager
+        requireActivity().title = getString(R.string.app_name)
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager!!.displayBackgroundSwitchEnable) {
@@ -116,10 +116,10 @@ class LoginFragment : Fragment(), View.OnClickListener {
             R.id.loginButton -> {
                 val editPassword =
                     (rootView?.findViewById<View>(R.id.editMasterPassword) as TextInputEditText).text.toString()
-                context?.let { loginViewModel.passwordLogin(it, editPassword) }
+                loginViewModel.passwordLogin(requireContext(), editPassword)
             }
 
-            R.id.biometricLoginButton -> context?.let { loginViewModel.biometricLogin(it) }
+            R.id.biometricLoginButton -> loginViewModel.biometricLogin(requireContext())
             else -> {}
         }
         (rootView?.findViewById<View>(R.id.editMasterPassword) as EditText).editableText.clear()
@@ -133,10 +133,10 @@ class LoginFragment : Fragment(), View.OnClickListener {
         checkBiometricSetting()
         masterKeyIcon?.clearAnimation()
         loginViewModel.resetKeyIconRotate()
-        context?.let { loginViewModel.resetNaviMessage(it) }
+        loginViewModel.resetNaviMessage(requireContext())
 
         // 背景色を設定する
-        (view?.findViewById<View>(R.id.loginView) as ConstraintLayout?)?.setBackgroundColor(
+        (view?.findViewById<View>(R.id.loginFragmentView) as ConstraintLayout?)?.setBackgroundColor(
             loginDataManager!!.backgroundColor
         )
         // 入力内容は一旦クリアする
@@ -152,7 +152,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
         checkBiometricSetting()
         masterKeyIcon?.clearAnimation()
         loginViewModel.resetKeyIconRotate()
-        context?.let { loginViewModel.resetNaviMessage(it) }
+        loginViewModel.resetNaviMessage(requireContext())
     }
 
     /**
@@ -247,8 +247,6 @@ class LoginFragment : Fragment(), View.OnClickListener {
                 InputMethodManager.HIDE_NOT_ALWAYS
             )
         }
-        val intent = Intent(requireActivity(), PasswordListActivity::class.java)
-        intent.putExtra("FIRST_TIME", loginViewModel.firstTime)
-        requireActivity().startActivity(intent)
+        findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToPasswordListFragment(firstTime = loginViewModel.firstTime))
     }
 }

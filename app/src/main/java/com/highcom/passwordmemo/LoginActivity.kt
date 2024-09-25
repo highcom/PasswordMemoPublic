@@ -2,6 +2,7 @@ package com.highcom.passwordmemo
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.findNavController
 import com.google.firebase.analytics.FirebaseAnalytics
 
 /**
@@ -16,6 +17,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setTheme(R.style.AppTheme)
         setContentView(R.layout.activity_login)
+        // Firebaseの設定
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
     }
 }
