@@ -35,13 +35,13 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.highcom.passwordmemo.GroupListActivity
-import com.highcom.passwordmemo.InputPasswordActivity
 import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.PasswordMemoLifecycle
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.ReferencePasswordActivity
 import com.highcom.passwordmemo.SettingActivity
 import com.highcom.passwordmemo.ui.DividerItemDecoration
+import com.highcom.passwordmemo.ui.PasswordEditData
 import com.highcom.passwordmemo.ui.list.PasswordListAdapter
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
@@ -53,6 +53,10 @@ import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Locale
 
+/**
+ * パスワード一覧画面フラグメント
+ *
+ */
 class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     /** パスワード一覧画面のビュー */
     private var rootView: View? = null
@@ -103,7 +107,6 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         return rootView
     }
 
-    @Suppress("DEPRECATION")
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -237,27 +240,19 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                         viewHolder,
                         object : UnderlayButtonClickListener {
                             override fun onClick(holder: RecyclerView.ViewHolder, pos: Int) {
-                                val intent =
-                                    Intent(requireActivity(), InputPasswordActivity::class.java)
                                 // 選択アイテムを編集モードで設定
-                                intent.putExtra("ID", (holder as PasswordListAdapter.ViewHolder).id)
-                                intent.putExtra("EDIT", true)
-                                intent.putExtra(
-                                    "TITLE",
-                                    holder.title?.text.toString()
+                                val vh = holder as PasswordListAdapter.ViewHolder
+                                val passwordEditData = PasswordEditData(
+                                    edit = true,
+                                    id = vh.id ?: 0,
+                                    title = vh.title?.text.toString(),
+                                    account = vh.account ?: "",
+                                    password =  vh.password ?: "",
+                                    url = vh.url ?: "",
+                                    groupId = vh.groupId ?: 1,
+                                    memo = vh.memo ?: ""
                                 )
-                                intent.putExtra(
-                                    "ACCOUNT",
-                                    holder.account
-                                )
-                                intent.putExtra(
-                                    "PASSWORD",
-                                    holder.password
-                                )
-                                intent.putExtra("URL", holder.url)
-                                intent.putExtra("GROUP", holder.groupId)
-                                intent.putExtra("MEMO", holder.memo)
-                                startActivityForResult(intent, EDIT_DATA)
+                                findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToInputPasswordFragment(editData = passwordEditData))
                             }
                         }
                     ))
@@ -268,28 +263,18 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                         viewHolder,
                         object : UnderlayButtonClickListener {
                             override fun onClick(holder: RecyclerView.ViewHolder, pos: Int) {
-                                val intent =
-                                    Intent(requireActivity(), InputPasswordActivity::class.java)
+                                val vh = holder as PasswordListAdapter.ViewHolder
                                 // 選択アイテムを複製モードで設定
-                                intent.putExtra("EDIT", false)
-                                intent.putExtra(
-                                    "TITLE",
-                                    (holder as PasswordListAdapter.ViewHolder).title?.text.toString() + " " + getString(
-                                        R.string.copy_title
-                                    )
+                                val passwordEditData = PasswordEditData(
+                                    edit = false,
+                                    title = vh.title?.text.toString() + " " + getString(R.string.copy_title),
+                                    account = vh.account ?: "",
+                                    password =  vh.password ?: "",
+                                    url = vh.url ?: "",
+                                    groupId = vh.groupId ?: 1,
+                                    memo = vh.memo ?: ""
                                 )
-                                intent.putExtra(
-                                    "ACCOUNT",
-                                    holder.account
-                                )
-                                intent.putExtra(
-                                    "PASSWORD",
-                                    holder.password
-                                )
-                                intent.putExtra("URL", holder.url)
-                                intent.putExtra("GROUP", holder.groupId)
-                                intent.putExtra("MEMO", holder.memo)
-                                startActivityForResult(intent, EDIT_DATA)
+                                findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToInputPasswordFragment(editData = passwordEditData))
                             }
                         }
                     ))
@@ -299,9 +284,8 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         // フローティングボタンからの新規追加処理
         val fab = rootView?.findViewById<FloatingActionButton>(R.id.fab)
         fab?.setOnClickListener {
-            val intent = Intent(requireActivity(), InputPasswordActivity::class.java)
-            intent.putExtra("EDIT", false)
-            startActivityForResult(intent, EDIT_DATA)
+            val passwordEditData = PasswordEditData()
+            findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToInputPasswordFragment(editData = passwordEditData))
         }
 
         // 渡されたデータを取得する
