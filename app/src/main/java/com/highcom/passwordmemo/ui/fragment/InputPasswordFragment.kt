@@ -110,7 +110,7 @@ class InputPasswordFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         adContainerView = rootView?.findViewById(R.id.adView_frame_input)
         adContainerView?.post { loadBanner() }
-        loginDataManager = LoginDataManager.getInstance(requireActivity().application)
+        loginDataManager = (requireActivity().application as PasswordMemoApplication).loginDataManager
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager!!.displayBackgroundSwitchEnable) {
@@ -118,7 +118,7 @@ class InputPasswordFragment : Fragment() {
         }
 
         // グループ選択スピナーの設定
-        selectGroupSpinner = rootView?.findViewById(R.id.selectGroup)
+        selectGroupSpinner = rootView?.findViewById(R.id.select_group)
         selectGroupSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, i: Int, l: Long) {
                 lifecycleScope.launch {
@@ -154,12 +154,12 @@ class InputPasswordFragment : Fragment() {
         id = args.editData.id
         groupId = args.editData.groupId
         editState = args.editData.edit
-        rootView?.findViewById<EditText>(R.id.editTitle)?.setText(args.editData.title)
-        rootView?.findViewById<EditText>(R.id.editAccount)?.setText(args.editData.account)
-        rootView?.findViewById<EditText>(R.id.editPassword)?.setText(args.editData.password)
-        rootView?.findViewById<EditText>(R.id.editUrl)?.setText(args.editData.url)
-        rootView?.findViewById<EditText>(R.id.editMemo)?.setText(args.editData.memo)
-        val generateBtn = rootView?.findViewById<Button>(R.id.generateButton)
+        rootView?.findViewById<EditText>(R.id.edit_title)?.setText(args.editData.title)
+        rootView?.findViewById<EditText>(R.id.edit_account)?.setText(args.editData.account)
+        rootView?.findViewById<EditText>(R.id.edit_password)?.setText(args.editData.password)
+        rootView?.findViewById<EditText>(R.id.edit_url)?.setText(args.editData.url)
+        rootView?.findViewById<EditText>(R.id.edit_memo)?.setText(args.editData.memo)
+        val generateBtn = rootView?.findViewById<Button>(R.id.generate_button)
         generateBtn?.setOnClickListener { generatePasswordDialog() }
 
         // タイトルを編集にする
@@ -227,12 +227,12 @@ class InputPasswordFragment : Fragment() {
                 // 入力データを登録する
                 val passwordEntity = PasswordEntity(
                     id = id,
-                    title = rootView?.findViewById<EditText>(R.id.editTitle)?.text.toString(),
-                    account = rootView?.findViewById<EditText>(R.id.editAccount)?.text.toString(),
-                    password = rootView?.findViewById<EditText>(R.id.editPassword)?.text.toString(),
-                    url = rootView?.findViewById<EditText>(R.id.editUrl)?.text.toString(),
+                    title = rootView?.findViewById<EditText>(R.id.edit_title)?.text.toString(),
+                    account = rootView?.findViewById<EditText>(R.id.edit_account)?.text.toString(),
+                    password = rootView?.findViewById<EditText>(R.id.edit_password)?.text.toString(),
+                    url = rootView?.findViewById<EditText>(R.id.edit_url)?.text.toString(),
                     groupId = selectGroupId ?: 1,
-                    memo = rootView?.findViewById<EditText>(R.id.editMemo)?.text.toString(),
+                    memo = rootView?.findViewById<EditText>(R.id.edit_memo)?.text.toString(),
                     inputDate = nowDate
                 )
                 if (editState) {
@@ -252,7 +252,7 @@ class InputPasswordFragment : Fragment() {
         super.onStart()
 
         // 背景色を設定する
-        rootView?.findViewById<View>(R.id.inputPasswordView)?.setBackgroundColor(loginDataManager!!.backgroundColor)
+        rootView?.findViewById<View>(R.id.input_password_view)?.setBackgroundColor(loginDataManager!!.backgroundColor)
         // テキストサイズを設定する
         setTextSize(loginDataManager!!.textSize)
     }
@@ -264,15 +264,15 @@ class InputPasswordFragment : Fragment() {
     private fun generatePasswordDialog() {
         val generatePasswordView = layoutInflater.inflate(R.layout.alert_generate_password, null)
         // 文字種別ラジオボタンの初期値を設定
-        val passwordRadio = generatePasswordView.findViewById<RadioGroup>(R.id.passwordKindMenu)
-        passwordRadio.check(R.id.radioLettersNumbers)
+        val passwordRadio = generatePasswordView.findViewById<RadioGroup>(R.id.password_kind_menu)
+        passwordRadio.check(R.id.radio_letters_numbers)
         passwordKind = passwordRadio.checkedRadioButtonId
         passwordRadio.setOnCheckedChangeListener { _, checkedId ->
             passwordKind = checkedId
             generatePasswordString()
         }
         // 小文字のみチェクボックスを設定
-        val lowerCaseOnlyCheckBox = generatePasswordView.findViewById<CheckBox>(R.id.lowerCaseOnly)
+        val lowerCaseOnlyCheckBox = generatePasswordView.findViewById<CheckBox>(R.id.lower_case_only)
         lowerCaseOnlyCheckBox.isChecked = false
         isLowerCaseOnly = false
         lowerCaseOnlyCheckBox.setOnClickListener {
@@ -286,7 +286,7 @@ class InputPasswordFragment : Fragment() {
 
         // 文字数ピッカーの初期値を設定
         val passwordPicker =
-            generatePasswordView.findViewById<NumberPicker>(R.id.passwordNumberPicker)
+            generatePasswordView.findViewById<NumberPicker>(R.id.password_number_picker)
         passwordPicker.descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
         passwordPicker.maxValue = 32
         passwordPicker.minValue = 4
@@ -297,7 +297,7 @@ class InputPasswordFragment : Fragment() {
             generatePasswordString()
         }
         // ボタンのカラーフィルターとイベントを設定
-        val generateButton = generatePasswordView.findViewById<ImageButton>(R.id.generateButton)
+        val generateButton = generatePasswordView.findViewById<ImageButton>(R.id.generate_button)
         generateButton.setColorFilter(Color.parseColor("#007AFF"))
         generateButton.setOnClickListener { generatePasswordString() }
 
@@ -311,17 +311,17 @@ class InputPasswordFragment : Fragment() {
         alertDialog.show()
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             if (isLowerCaseOnly) {
-                rootView?.findViewById<EditText>(R.id.editPassword)?.setText(
+                rootView?.findViewById<EditText>(R.id.edit_password)?.setText(
                     generatePassword!!.lowercase(Locale.getDefault())
                 )
             } else {
-                rootView?.findViewById<EditText>(R.id.editPassword)?.setText(generatePassword)
+                rootView?.findViewById<EditText>(R.id.edit_password)?.setText(generatePassword)
             }
             alertDialog.dismiss()
         }
         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
             .setOnClickListener { alertDialog.dismiss() }
-        generatePasswordText = generatePasswordView.findViewById(R.id.generatePasswordText)
+        generatePasswordText = generatePasswordView.findViewById(R.id.generate_password_text)
         generatePasswordString()
     }
 
@@ -331,11 +331,11 @@ class InputPasswordFragment : Fragment() {
      */
     private fun generatePasswordString() {
         generatePassword = when (passwordKind) {
-            R.id.radioNumbers -> {
+            R.id.radio_numbers -> {
                 // 数字のみ
                 RandomStringUtils.randomNumeric(passwordCount)
             }
-            R.id.radioLettersNumbers -> {
+            R.id.radio_letters_numbers -> {
                 // 数字＋文字
                 RandomStringUtils.randomAlphanumeric(passwordCount)
             }
@@ -366,11 +366,10 @@ class InputPasswordFragment : Fragment() {
         super.onDestroyView()
         if (mAdView != null) mAdView!!.destroy()
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
-        if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.isBackground) {
+        if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.isBackground) {
+            // TODO:これでログイン画面に戻るのか？
             requireActivity().finishAffinity()
         }
-        // Fragmentを離れるときに戻るボタンを無効化
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
     }
 
     /**
@@ -379,43 +378,43 @@ class InputPasswordFragment : Fragment() {
      * @param size 指定テキストサイズ
      */
     private fun setTextSize(size: Float) {
-        rootView?.findViewById<TextView>(R.id.titleView) ?.setTextSize(
+        rootView?.findViewById<TextView>(R.id.title_view)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size - 3
         )
-        rootView?.findViewById<EditText>(R.id.editTitle)?.setTextSize(
+        rootView?.findViewById<EditText>(R.id.edit_title)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size
         )
-        rootView?.findViewById<TextView>(R.id.accountView)?.setTextSize(
+        rootView?.findViewById<TextView>(R.id.account_view)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size - 3
         )
-        rootView?.findViewById<EditText>(R.id.editAccount)?.setTextSize(
+        rootView?.findViewById<EditText>(R.id.edit_account)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size
         )
-        rootView?.findViewById<TextView>(R.id.passwordView)?.setTextSize(
+        rootView?.findViewById<TextView>(R.id.password_view)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size - 3
         )
-        rootView?.findViewById<EditText>(R.id.editPassword)?.setTextSize(
+        rootView?.findViewById<EditText>(R.id.edit_password)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size
         )
-        rootView?.findViewById<Button>(R.id.generateButton)?.setTextSize(
+        rootView?.findViewById<Button>(R.id.generate_button)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size - 3
         )
-        rootView?.findViewById<TextView>(R.id.urlView)?.setTextSize(
+        rootView?.findViewById<TextView>(R.id.url_view)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size - 3
         )
-        rootView?.findViewById<EditText>(R.id.editUrl)?.setTextSize(
+        rootView?.findViewById<EditText>(R.id.edit_url)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size
         )
-        rootView?.findViewById<TextView>(R.id.groupView)?.setTextSize(
+        rootView?.findViewById<TextView>(R.id.group_view)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size - 3
         )
@@ -432,7 +431,7 @@ class InputPasswordFragment : Fragment() {
                 }
             }
         }
-        (rootView?.findViewById<View>(R.id.editMemo) as EditText).setTextSize(
+        rootView?.findViewById<EditText>(R.id.edit_memo)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size
         )

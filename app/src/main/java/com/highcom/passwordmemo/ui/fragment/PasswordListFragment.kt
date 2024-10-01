@@ -38,7 +38,6 @@ import com.highcom.passwordmemo.GroupListActivity
 import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.PasswordMemoLifecycle
 import com.highcom.passwordmemo.R
-import com.highcom.passwordmemo.ReferencePasswordActivity
 import com.highcom.passwordmemo.SettingActivity
 import com.highcom.passwordmemo.ui.DividerItemDecoration
 import com.highcom.passwordmemo.ui.PasswordEditData
@@ -179,7 +178,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
             this
         )
         adapter?.textSize = loginDataManager!!.textSize
-        recyclerView = rootView?.findViewById(R.id.passwordListView)
+        recyclerView = rootView?.findViewById(R.id.password_list_view)
         recyclerView!!.layoutManager = LinearLayoutManager(context)
         recyclerView!!.adapter = adapter
 
@@ -374,6 +373,8 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
             android.R.id.home -> {
                 // 編集状態は解除する
                 adapter?.editEnable = false
+                // Fragmentを離れるときに戻るボタンを無効化
+                (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
                 findNavController().navigate(R.id.action_passwordListFragment_to_loginFragment)
             }
             // 編集モード
@@ -458,7 +459,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     override fun onStart() {
         super.onStart()
         // 背景色を設定する
-        rootView?.findViewById<ConstraintLayout>(R.id.passwordListFragmentView)?.setBackgroundColor(
+        rootView?.findViewById<ConstraintLayout>(R.id.password_list_fragment_view)?.setBackgroundColor(
             loginDataManager!!.backgroundColor
         )
         selectGroupName = getString(R.string.list_title)
@@ -551,8 +552,6 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.isBackground) {
             requireActivity().finishAffinity()
         }
-        // Fragmentを離れるときに戻るボタンを無効化
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
     }
 
     /**
@@ -560,24 +559,24 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
      *
      * @param view タップされた項目のビュー
      */
-    @Suppress("DEPRECATION")
     override fun onAdapterClicked(view: View) {
         // 編集状態の場合は入力画面に遷移しない
         if (adapter?.editEnable == true) {
             return
         }
-        // 入力画面を生成
-        val intent = Intent(requireContext(), ReferencePasswordActivity::class.java)
         // 選択アイテムを設定
         val holder = view.tag as PasswordListAdapter.ViewHolder
-        intent.putExtra("ID", holder.id)
-        intent.putExtra("TITLE", holder.title?.text.toString())
-        intent.putExtra("ACCOUNT", holder.account)
-        intent.putExtra("PASSWORD", holder.password)
-        intent.putExtra("URL", holder.url)
-        intent.putExtra("GROUP", holder.groupId)
-        intent.putExtra("MEMO", holder.memo)
-        startActivityForResult(intent, EDIT_DATA)
+        // 入力画面に遷移
+        val passwordEditData = PasswordEditData(
+            id = holder.id ?: -1,
+            title = holder.title?.text.toString(),
+            account = holder.account ?: "",
+            password =  holder.password ?: "",
+            url = holder.url ?: "",
+            groupId = holder.groupId ?: 1,
+            memo = holder.memo ?: ""
+        )
+        findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToReferencePasswordFragment(editData = passwordEditData))
     }
 
     /**

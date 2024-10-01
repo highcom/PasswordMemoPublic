@@ -45,12 +45,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".InputPasswordActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".ReferencePasswordActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
             android:name=".SettingActivity"
             android:configChanges="orientation|screenSize" />
         <activity
