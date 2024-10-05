@@ -1,22 +1,29 @@
-package com.highcom.passwordmemo
+package com.highcom.passwordmemo.ui.fragment
 
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.View
+import com.highcom.passwordmemo.R
 import android.annotation.SuppressLint
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.DialogInterface
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.os.Bundle
 import android.util.DisplayMetrics
+import android.view.LayoutInflater
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
-import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
-import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -26,10 +33,11 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.highcom.passwordmemo.PasswordMemoApplication
+import com.highcom.passwordmemo.PasswordMemoLifecycle
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.ui.DividerItemDecoration
 import com.highcom.passwordmemo.ui.list.GroupListAdapter
-import com.highcom.passwordmemo.ui.list.GroupListAdapter.GroupAdapterListener
 import com.highcom.passwordmemo.ui.list.GroupListAdapter.GroupViewHolder
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper.SimpleCallbackListener
@@ -40,10 +48,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 /**
- * グループ一覧画面アクティビティ
+ * グループ一覧画面フラグメント
  *
  */
-class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
+class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
+    /** グループ一覧画面のビュー */
+    private var rootView: View? = null
     /** ログインデータ管理 */
     private var loginDataManager: LoginDataManager? = null
     /** 広告用コンテナ */
@@ -60,15 +70,29 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
     private var simpleCallbackHelper: SimpleCallbackHelper? = null
     /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels {
-        GroupListViewModel.Factory((application as PasswordMemoApplication).repository)
+        GroupListViewModel.Factory((requireActivity().application as PasswordMemoApplication).repository)
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Fragmentのメニューを有効にする
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        rootView = inflater.inflate(R.layout.fragment_group_list, container, false)
+        return rootView
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_group_list)
-        loginDataManager = LoginDataManager.getInstance(application)
-        MobileAds.initialize(this) { }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        MobileAds.initialize(requireContext()) { }
         MobileAds.setRequestConfiguration(
             RequestConfiguration.Builder().setTestDeviceIds(
                 /* testDeviceIds = */ mutableListOf(
@@ -77,22 +101,23 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
                 )
             ).build()
         )
-        adContainerView = findViewById(R.id.adView_groupFrame)
+        adContainerView = rootView?.findViewById(R.id.adView_groupFrame)
         adContainerView?.post { loadBanner() }
-        title = getString(R.string.group_title) + getString(R.string.group_title_select)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        loginDataManager = LoginDataManager.getInstance(application)
+        requireActivity().title = getString(R.string.group_title) + getString(R.string.group_title_select)
+        // ActionBarに戻るボタンを設定
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        loginDataManager = (requireActivity().application as PasswordMemoApplication).loginDataManager
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager?.displayBackgroundSwitchEnable == true) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+            requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
         adapter = GroupListAdapter(
-            this,
+            requireContext(),
             this
         )
         adapter?.textSize = loginDataManager!!.textSize
-        recyclerView = findViewById<View>(R.id.groupListView) as RecyclerView
-        recyclerView!!.layoutManager = LinearLayoutManager(this)
+        recyclerView = rootView?.findViewById<View>(R.id.group_list_view) as RecyclerView
+        recyclerView!!.layoutManager = LinearLayoutManager(requireContext())
         recyclerView!!.adapter = adapter
 
         lifecycleScope.launch {
@@ -121,9 +146,9 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
 
         // セル間に区切り線を実装する
         val itemDecoration: ItemDecoration =
-            DividerItemDecoration(this, DividerItemDecoration.Companion.VERTICAL_LIST)
+            DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL_LIST)
         recyclerView!!.addItemDecoration(itemDecoration)
-        groupFab = findViewById(R.id.groupFab)
+        groupFab = rootView?.findViewById(R.id.group_fab)
         groupFab?.setOnClickListener {
             groupListViewModel.insert(GroupEntity(0, (adapter?.groupList?.size ?: 0) + 1, ""))
             lifecycleScope.launch {
@@ -143,7 +168,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         val scale = resources.displayMetrics.density
         // ドラックアンドドロップの操作を実装する
         simpleCallbackHelper =
-            object : SimpleCallbackHelper(applicationContext, recyclerView, scale, GroupListCallbackListener()) {
+            object : SimpleCallbackHelper(requireContext(), recyclerView, scale, GroupListCallbackListener()) {
                 @SuppressLint("ResourceType")
                 override fun instantiateUnderlayButton(
                     viewHolder: RecyclerView.ViewHolder,
@@ -159,7 +184,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
                         viewHolder,
                         object : UnderlayButtonClickListener {
                             override fun onClick(holder: RecyclerView.ViewHolder, pos: Int) {
-                                AlertDialog.Builder(this@GroupListActivity)
+                                AlertDialog.Builder(requireContext())
                                     .setTitle(
                                         getString(R.string.delete_title_head) + (holder as GroupViewHolder).groupName?.text.toString() + getString(
                                             R.string.delete_title
@@ -193,7 +218,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
      */
     private fun loadBanner() {
         // Create an ad request.
-        mAdView = AdView(this)
+        mAdView = AdView(requireContext())
         mAdView!!.adUnitId = getString(R.string.admob_unit_id_4)
         adContainerView!!.removeAllViews()
         adContainerView!!.addView(mAdView)
@@ -210,7 +235,7 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
     private val adSize: AdSize
         get() {
             // Determine the screen width (less decorations) to use for the ad width.
-            val display = windowManager.defaultDisplay
+            val display = requireActivity().windowManager.defaultDisplay
             val outMetrics = DisplayMetrics()
             display.getMetrics(outMetrics)
             val density = outMetrics.density
@@ -221,14 +246,14 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
                 adWidthPixels = outMetrics.widthPixels.toFloat()
             }
             val adWidth = (adWidthPixels / density).toInt()
-            return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, adWidth)
+            return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(requireContext(), adWidth)
         }
 
     @SuppressLint("ResourceType")
     override fun onStart() {
         super.onStart()
         // 背景色を設定する
-        (findViewById<View>(R.id.groupListActivityView) as ConstraintLayout).setBackgroundColor(
+        rootView?.findViewById<ConstraintLayout>(R.id.group_list_fragment_view)?.setBackgroundColor(
             loginDataManager!!.backgroundColor
         )
     }
@@ -245,26 +270,32 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         if (needRefresh) adapter!!.notifyDataSetChanged()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_group_mode, menu)
-        return true
+    @Deprecated("Deprecated in Java", ReplaceWith(
+        "inflater.inflate(R.menu.menu_group_mode, menu)",
+        "com.highcom.passwordmemo.R"
+    )
+    )
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_group_mode, menu)
     }
 
+    @Suppress("DEPRECATION")
+    @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
                 recyclerView!!.adapter = adapter
-                finish()
+                findNavController().navigate(GroupListFragmentDirections.actionGroupListFragmentToPasswordListFragment())
             }
 
             R.id.select_group_mode -> {
                 if (adapter?.editEnable == true) {
                     adapter?.editEnable = false
-                    title = getString(R.string.group_title) + getString(R.string.group_title_select)
+                    requireActivity().title = getString(R.string.group_title) + getString(R.string.group_title_select)
                     groupFab!!.visibility = View.GONE
                 } else {
                     adapter?.editEnable = true
-                    title = getString(R.string.group_title) + getString(R.string.group_title_edit)
+                    requireActivity().title = getString(R.string.group_title) + getString(R.string.group_title_edit)
                     groupFab!!.visibility = View.VISIBLE
                 }
                 recyclerView!!.adapter = adapter
@@ -286,15 +317,16 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
         }
         super.onStop()
     }
-    public override fun onDestroy() {
+
+    override fun onDestroyView() {
+        super.onDestroyView()
         if (mAdView != null) mAdView!!.destroy()
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
-        if (loginDataManager?.displayBackgroundSwitchEnable == true && PasswordMemoLifecycle.Companion.isBackground) {
-            finishAffinity()
+        if (loginDataManager?.displayBackgroundSwitchEnable == true && PasswordMemoLifecycle.isBackground) {
+            // TODO:これでログイン画面に戻るのか？
+            requireActivity().finishAffinity()
         }
-        super.onDestroy()
     }
-
     override fun onGroupNameClicked(view: View, groupId: Long?) {
         if (adapter?.editEnable == true) {
             view.post {
@@ -302,20 +334,22 @@ class GroupListActivity : AppCompatActivity(), GroupAdapterListener {
                 view.isFocusable = true
                 view.isFocusableInTouchMode = true
                 view.requestFocus()
+                // Navigationでバックされた後にイベントが発生するためactivityがnullでない場合のみ実施
                 val inputMethodManager =
-                    getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                inputMethodManager.showSoftInput(view, 0)
+                    activity?.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager?
+                inputMethodManager?.showSoftInput(view, 0)
             }
         } else {
             loginDataManager?.setSelectGroup(groupId!!)
-            finish()
+            findNavController().navigate(GroupListFragmentDirections.actionGroupListFragmentToPasswordListFragment())
         }
     }
 
     override fun onGroupNameOutOfFocused(view: View, groupEntity: GroupEntity) {
         // 内容編集中にフォーカスが外れた場合は、キーボードを閉じる
-        val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(
+        // Navigationでバックされた後にイベントが発生するためactivityがnullでない場合のみ実施
+        val inputMethodManager = activity?.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager?
+        inputMethodManager?.hideSoftInputFromWindow(
             view.windowToken,
             InputMethodManager.HIDE_NOT_ALWAYS
         )

@@ -30,7 +30,6 @@ import com.highcom.passwordmemo.util.TextSizeUtil
 import com.highcom.passwordmemo.util.TextSizeUtil.TextSizeListener
 import com.highcom.passwordmemo.util.file.BackupDbFile
 import com.highcom.passwordmemo.util.file.InputExternalFile
-import com.highcom.passwordmemo.util.file.InputExternalFile.InputExternalFileListener
 import com.highcom.passwordmemo.util.file.OutputExternalFile
 import com.highcom.passwordmemo.util.file.RestoreDbFile
 import com.highcom.passwordmemo.util.file.RestoreDbFile.RestoreDbFileListener
@@ -46,7 +45,7 @@ import java.util.Date
  *
  */
 class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeListener,
-    InputOutputFileDialogListener, RestoreDbFileListener, InputExternalFileListener {
+    InputOutputFileDialogListener, RestoreDbFileListener {
     /** ログインデータ管理 */
     private var loginDataManager: LoginDataManager? = null
     /** 処理ハンドラ */
@@ -339,7 +338,7 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
                 }
                 // CSV入力
                 INPUT_CSV -> {
-                    val inputExternalFile = InputExternalFile(this, settingViewModel, this)
+                    val inputExternalFile = InputExternalFile(this, settingViewModel)
                     inputExternalFile.inputSelectFolder(uri)
                 }
                 // CSV出力
@@ -565,14 +564,6 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
         startActivity(intent)
     }
 
-    /**
-     * CSV入力完了時処理
-     *
-     */
-    override fun importComplete() {
-        setResult(NEED_UPDATE)
-    }
-
     public override fun onDestroy() {
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
         if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.isBackground) {
@@ -582,8 +573,6 @@ class SettingActivity : AppCompatActivity(), BackgroundColorListener, TextSizeLi
     }
 
     companion object {
-        /** 更新が必要 */
-        const val NEED_UPDATE = 1
         /** DB復元操作 */
         private const val RESTORE_DB = 1001
         /** DBバックアップ操作 */

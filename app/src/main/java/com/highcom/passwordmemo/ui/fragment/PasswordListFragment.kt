@@ -34,7 +34,6 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.highcom.passwordmemo.GroupListActivity
 import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.PasswordMemoLifecycle
 import com.highcom.passwordmemo.R
@@ -375,7 +374,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                 adapter?.editEnable = false
                 // Fragmentを離れるときに戻るボタンを無効化
                 (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
-                findNavController().navigate(R.id.action_passwordListFragment_to_loginFragment)
+                findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToLoginFragment())
             }
             // 編集モード
             R.id.edit_mode -> {
@@ -422,8 +421,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
             // グループ選択
             R.id.select_group -> {
                 // 設定画面へ遷移
-                val intentGroup = Intent(requireContext(), GroupListActivity::class.java)
-                startActivityForResult(intentGroup, START_GROUP)
+                findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToGroupListFragment())
             }
             // 設定メニュー
             R.id.setting_menu -> {
@@ -580,42 +578,6 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     }
 
     /**
-     * 各画面から戻ってきた際の更新処理
-     *
-     * @param requestCode 要求コード
-     * @param resultCode 結果コード
-     * @param data 戻り値データ
-     */
-    @Suppress("DEPRECATION")
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == EDIT_DATA || requestCode == START_GROUP || requestCode == START_SETTING && resultCode == SettingActivity.NEED_UPDATE) {
-            if (requestCode == START_GROUP) {
-                // 選択したグループを設定
-                passwordListViewModel.setSelectGroup(loginDataManager?.selectGroup ?: 1L)
-                lifecycleScope.launch {
-                    groupListViewModel.groupList.collect {
-                        for (group in it) {
-                            if (group.groupId == loginDataManager!!.selectGroup) {
-                                selectGroupName = group.name
-                                requireActivity().title = when (loginDataManager!!.sortKey) {
-                                    PasswordListAdapter.SORT_ID -> getString(R.string.sort_name_default) + "：" + selectGroupName
-                                    PasswordListAdapter.SORT_TITLE -> getString(R.string.sort_name_title) + "：" + selectGroupName
-                                    PasswordListAdapter.SORT_INPUTDATE -> getString(R.string.sort_name_update) + "：" + selectGroupName
-                                    else -> getString(R.string.sort_name_default) + "：" + selectGroupName
-                                }
-                                break
-                            }
-                        }
-                    }
-                }
-            }
-            reflesh()
-        }
-    }
-
-    /**
      * パスワード一覧応答通知リスナークラス
      *
      */
@@ -670,11 +632,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     }
 
     companion object {
-        /** データ編集要求コード */
-        private const val EDIT_DATA = 1001
         /** 設定画面遷移要求コード */
         private const val START_SETTING = 1002
-        /** グループ一覧画面遷移要求コード */
-        private const val START_GROUP = 1003
     }
 }

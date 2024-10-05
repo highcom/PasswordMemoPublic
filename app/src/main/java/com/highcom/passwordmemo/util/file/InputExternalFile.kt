@@ -29,11 +29,9 @@ import java.util.concurrent.Executors
  *
  * @property activity ダイアログ表示用アクティビティ
  * @property settingViewModel ビューモデル
- * @property listener 完了通知用リスナー
  */
 class InputExternalFile(private val activity: Activity,
-                        private val settingViewModel: SettingViewModel,
-                        private val listener: InputExternalFileListener) {
+                        private val settingViewModel: SettingViewModel) {
     /** パスワード一覧データ */
     private var passwordList: MutableList<PasswordEntity>? = null
     /** グループ一覧データ */
@@ -46,18 +44,6 @@ class InputExternalFile(private val activity: Activity,
     private var progressAlertDialog: AlertDialog? = null
     /** 取込処理中のプログレスバー */
     private var progressBar: ProgressBar? = null
-
-    /**
-     * ファイル取込完了通知用リスナークラス
-     *
-     */
-    interface InputExternalFileListener {
-        /**
-         * 取込完了通知処理
-         *
-         */
-        fun importComplete()
-    }
 
     /**
      * ファイル取込処理用バックグラウンドタスク
@@ -93,7 +79,6 @@ class InputExternalFile(private val activity: Activity,
         @UiThread
         override fun run() {
             progressAlertDialog!!.dismiss()
-            listener.importComplete()
             AlertDialog.Builder(activity)
                 .setTitle(activity.getString(R.string.input_csv))
                 .setMessage(
@@ -165,22 +150,22 @@ class InputExternalFile(private val activity: Activity,
             while (reader.readLine().also { line = it ?: "" } != null) {
                 val result = line.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                 // カラム数が合っていなかった場合終了
-                if (result.size != 6 && result.size != 7) return false
+                if (result.size != COLUMN_COUNT_6 && result.size != COLUMN_COUNT_7) return false
                 // 入力最大レコード数を30000件とする
                 if (id > MAX_RECORD) return false
                 // ヘッダが正しく設定されているか
                 if (!isHeaderCorrect && result[0] == "TITLE" && result[1] == "ACCOUNT" && result[2] == "PASSWORD" && result[3] == "URL" && result[4] == "MEMO" && result[5] == "INPUTDATE") {
                     // バージョン2系の場合
                     isHeaderCorrect = true
-                    columnCount = 6
+                    columnCount = COLUMN_COUNT_6
                     continue
                 } else if (!isHeaderCorrect && result[0] == "TITLE" && result[1] == "ACCOUNT" && result[2] == "PASSWORD" && result[3] == "URL" && result[4] == "GROUP" && result[5] == "MEMO" && result[6] == "INPUTDATE") {
                     // バージョン3系の場合
                     isHeaderCorrect = true
-                    columnCount = 7
+                    columnCount = COLUMN_COUNT_7
                     continue
                 }
-                if (isHeaderCorrect && columnCount == 6) {
+                if (isHeaderCorrect && columnCount == COLUMN_COUNT_6) {
                     val passwordEntity = PasswordEntity(
                         id = id,
                         title = result[0],
@@ -192,7 +177,7 @@ class InputExternalFile(private val activity: Activity,
                         inputDate = result[5]
                     )
                     passwordList?.add(passwordEntity)
-                } else if (isHeaderCorrect && columnCount == 7) {
+                } else if (isHeaderCorrect && columnCount == COLUMN_COUNT_7) {
                     var groupId = 0L
                     for (entity in groupList!!) {
                         if (entity.name == result[4]) {
@@ -336,5 +321,9 @@ class InputExternalFile(private val activity: Activity,
         private const val HEADER_RECORD = 1L
         /** 取込最大レコード数 */
         private const val MAX_RECORD = 10000
+        /** カラム数が6 */
+        private const val COLUMN_COUNT_6 = 6
+        /** カラム数が7 */
+        private const val COLUMN_COUNT_7 = 7
     }
 }
