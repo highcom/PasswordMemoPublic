@@ -2,7 +2,8 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/settingView"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/setting_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fastScrollEnabled="true">
@@ -14,7 +15,7 @@
         android:layout_height="match_parent">
 
         <Switch
-            android:id="@+id/deleteSwitch"
+            android:id="@+id/delete_switch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -26,30 +27,31 @@
             android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
         <TextView
-            android:id="@+id/deleteTextView"
+            android:id="@+id/delete_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/data_deletion_enable_message"
             android:textSize="12dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/deleteSwitch" />
+            app:layout_constraintTop_toBottomOf="@+id/delete_switch" />
 
         <View
-            android:id="@+id/deleteTextView_line"
+            android:id="@+id/delete_text_view_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
             android:layout_marginRight="110dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/deleteTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/delete_text_view" />
 
         <Switch
-            android:id="@+id/biometricLoginSwitch"
+            android:id="@+id/biometric_login_switch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -61,30 +63,31 @@
             android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/deleteTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/delete_text_view"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
         <TextView
-            android:id="@+id/textBiometricLogin"
+            android:id="@+id/text_biometric_login"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/login_biometrics_enable_message"
             android:textSize="12dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/biometricLoginSwitch" />
+            app:layout_constraintTop_toBottomOf="@+id/biometric_login_switch" />
 
         <View
-            android:id="@+id/textBiometricLogin_line"
+            android:id="@+id/text_biometric_login_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
             android:layout_marginRight="110dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textBiometricLogin" />
+            app:layout_constraintTop_toBottomOf="@+id/text_biometric_login" />
 
         <Switch
-            android:id="@+id/displayBackgroundSwitch"
+            android:id="@+id/display_background_switch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -96,30 +99,31 @@
             android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textBiometricLogin" />
+            app:layout_constraintTop_toBottomOf="@+id/text_biometric_login"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
         <TextView
-            android:id="@+id/textDisplayBackground"
+            android:id="@+id/text_display_background"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/display_background_enable_message"
             android:textSize="12dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/displayBackgroundSwitch" />
+            app:layout_constraintTop_toBottomOf="@+id/display_background_switch" />
 
         <View
-            android:id="@+id/textDisplayBackground_line"
+            android:id="@+id/text_display_background_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
             android:layout_marginRight="110dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textDisplayBackground" />
+            app:layout_constraintTop_toBottomOf="@+id/text_display_background" />
 
         <Switch
-            android:id="@+id/memoVisibleSwitch"
+            android:id="@+id/memo_visible_switch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -131,30 +135,31 @@
             android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textDisplayBackground" />
+            app:layout_constraintTop_toBottomOf="@+id/text_display_background"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
         <TextView
-            android:id="@+id/textTextVisible"
+            android:id="@+id/text_text_visible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/memo_visible_enable_message"
             android:textSize="12dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/memoVisibleSwitch" />
+            app:layout_constraintTop_toBottomOf="@+id/memo_visible_switch" />
 
         <View
-            android:id="@+id/textTextVisible_line"
+            android:id="@+id/text_text_visible_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
             android:layout_marginRight="110dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textTextVisible" />
+            app:layout_constraintTop_toBottomOf="@+id/text_text_visible" />
 
         <Switch
-            android:id="@+id/passwordVisibleSwitch"
+            android:id="@+id/password_visible_switch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -166,30 +171,31 @@
             android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textTextVisible" />
+            app:layout_constraintTop_toBottomOf="@+id/text_text_visible"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
         <TextView
-            android:id="@+id/textPasswordVisible"
+            android:id="@+id/text_password_visible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/password_visible_enable_message"
             android:textSize="12dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/passwordVisibleSwitch" />
+            app:layout_constraintTop_toBottomOf="@+id/password_visible_switch" />
 
         <View
-            android:id="@+id/textPasswordVisible_line"
+            android:id="@+id/text_password_visible_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
             android:layout_marginRight="110dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textPasswordVisible" />
+            app:layout_constraintTop_toBottomOf="@+id/text_password_visible" />
 
         <TextView
-            android:id="@+id/textSizeView"
+            android:id="@+id/text_size_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -199,10 +205,10 @@
             android:layout_weight="1"
             android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textSizeSpinner" />
+            app:layout_constraintTop_toTopOf="@+id/text_size_spinner" />
 
         <TextView
-            android:id="@+id/textSizeDetailView"
+            android:id="@+id/text_size_detail_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -210,20 +216,20 @@
             android:textSize="12dp"
             android:layout_weight="1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textSizeView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_size_view" />
 
         <View
-            android:id="@+id/textSizeDetailView_line"
+            android:id="@+id/text_size_detail_view_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
             android:layout_marginRight="110dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textSizeDetailView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_size_detail_view" />
 
         <Spinner
-            android:id="@+id/textSizeSpinner"
+            android:id="@+id/text_size_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -232,10 +238,10 @@
             android:layout_gravity="center_vertical"
             android:gravity="right"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textPasswordVisible" />
+            app:layout_constraintTop_toBottomOf="@+id/text_password_visible" />
 
         <TextView
-            android:id="@+id/copyClipboardView"
+            android:id="@+id/copy_clipboard_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -245,10 +251,10 @@
             android:layout_weight="1"
             android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/copyClipboardSpinner" />
+            app:layout_constraintTop_toTopOf="@+id/copy_clipboard_spinner" />
 
         <TextView
-            android:id="@+id/copyClipboardDetailView"
+            android:id="@+id/copy_clipboard_detail_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -256,20 +262,20 @@
             android:textSize="12dp"
             android:layout_weight="1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/copyClipboardView" />
+            app:layout_constraintTop_toBottomOf="@+id/copy_clipboard_view" />
 
         <View
-            android:id="@+id/copyClipboardDetailView_line"
+            android:id="@+id/copy_clipboard_detail_view_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
             android:layout_marginRight="110dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/copyClipboardDetailView" />
+            app:layout_constraintTop_toBottomOf="@+id/copy_clipboard_detail_view" />
 
         <Spinner
-            android:id="@+id/copyClipboardSpinner"
+            android:id="@+id/copy_clipboard_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -278,10 +284,10 @@
             android:layout_gravity="center_vertical"
             android:gravity="right"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textSizeDetailView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_size_detail_view" />
 
         <TextView
-            android:id="@+id/textDbBackupView"
+            android:id="@+id/text_db_backup_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -290,30 +296,30 @@
             android:textSize="15dp"
             android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/dbBackupButton" />
+            app:layout_constraintTop_toTopOf="@+id/db_backup_button" />
 
         <TextView
-            android:id="@+id/textDbBackupDetailView"
+            android:id="@+id/text_db_backup_detail_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/db_input_output_message"
             android:textSize="12dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textDbBackupView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_db_backup_view" />
 
         <View
-            android:id="@+id/textDbOutputDetailView_line"
+            android:id="@+id/text_db_output_detail_view_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
             android:layout_marginRight="110dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textDbBackupDetailView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_db_backup_detail_view" />
 
         <Button
-            android:id="@+id/dbBackupButton"
+            android:id="@+id/db_backup_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -322,10 +328,10 @@
             android:text="@string/select_input_output"
             android:textColor="@color/blue"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/copyClipboardDetailView" />
+            app:layout_constraintTop_toBottomOf="@+id/copy_clipboard_detail_view" />
 
         <TextView
-            android:id="@+id/textCsvOutputView"
+            android:id="@+id/text_csv_output_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -334,30 +340,30 @@
             android:textSize="15dp"
             android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/csvOutputButton" />
+            app:layout_constraintTop_toTopOf="@+id/csv_output_button" />
 
         <TextView
-            android:id="@+id/textCsvOutputDetailView"
+            android:id="@+id/text_csv_output_detail_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/csv_input_output_message"
             android:textSize="12dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textCsvOutputView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_csv_output_view" />
 
         <View
-            android:id="@+id/textCsvOutputDetailView_line"
+            android:id="@+id/text_csv_output_detail_view_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
             android:layout_marginRight="110dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textCsvOutputDetailView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_csv_output_detail_view" />
 
         <Button
-            android:id="@+id/csvOutputButton"
+            android:id="@+id/csv_output_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -366,10 +372,10 @@
             android:text="@string/select_input_output"
             android:textColor="@color/blue"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textDbBackupDetailView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_db_backup_detail_view" />
 
         <TextView
-            android:id="@+id/textColorSelectView"
+            android:id="@+id/text_color_select_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -378,30 +384,30 @@
             android:textSize="15dp"
             android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/colorSelectButton" />
+            app:layout_constraintTop_toTopOf="@+id/color_select_button" />
 
         <TextView
-            android:id="@+id/textColorSelectDetailView"
+            android:id="@+id/text_color_select_detail_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/select_color_message"
             android:textSize="12dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textColorSelectView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_color_select_view" />
 
         <View
-            android:id="@+id/textColorSelectDetailView_line"
+            android:id="@+id/text_color_select_detail_view_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
             android:layout_marginRight="110dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textColorSelectDetailView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_color_select_detail_view" />
 
         <Button
-            android:id="@+id/colorSelectButton"
+            android:id="@+id/color_select_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -410,10 +416,10 @@
             android:text="@string/setting"
             android:textColor="@color/blue"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/csvOutputButton" />
+            app:layout_constraintTop_toBottomOf="@+id/csv_output_button" />
 
         <TextView
-            android:id="@+id/textMasterPasswordView"
+            android:id="@+id/text_master_password_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -422,30 +428,30 @@
             android:textSize="15dp"
             android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/masterPasswordSetButton" />
+            app:layout_constraintTop_toTopOf="@+id/master_password_set_button" />
 
         <TextView
-            android:id="@+id/textMasterPasswordDetailView"
+            android:id="@+id/text_master_password_detail_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/change_master_password_message"
             android:textSize="12dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textMasterPasswordView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_master_password_view" />
 
         <View
-            android:id="@+id/textMasterPasswordDetailView_line"
+            android:id="@+id/text_master_password_detail_view_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
             android:layout_marginRight="110dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textMasterPasswordDetailView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_master_password_detail_view" />
 
         <Button
-            android:id="@+id/masterPasswordSetButton"
+            android:id="@+id/master_password_set_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -454,7 +460,7 @@
             android:text="@string/setting"
             android:textColor="@color/blue"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/colorSelectButton" />
+            app:layout_constraintTop_toBottomOf="@+id/color_select_button" />
 
         <View
             android:id="@+id/setting_separate_line"
@@ -464,10 +470,10 @@
             android:layout_marginVertical="20dp"
             android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/masterPasswordSetButton" />
+            app:layout_constraintTop_toBottomOf="@+id/master_password_set_button" />
 
         <TextView
-            android:id="@+id/textOperationInstructionView"
+            android:id="@+id/text_operation_instruction_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -476,30 +482,30 @@
             android:textSize="15dp"
             android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/operationInstructionButton" />
+            app:layout_constraintTop_toTopOf="@+id/operation_instruction_button" />
 
         <TextView
-            android:id="@+id/textOperationInstructionDetailView"
+            android:id="@+id/text_operation_instruction_detail_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/operation_instruction_message"
             android:textSize="12dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textOperationInstructionView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_operation_instruction_view" />
 
         <View
-            android:id="@+id/textOperationInstructionDetailView_line"
+            android:id="@+id/text_operation_instruction_detail_view_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
             android:layout_marginRight="110dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textOperationInstructionDetailView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_operation_instruction_detail_view" />
 
         <Button
-            android:id="@+id/operationInstructionButton"
+            android:id="@+id/operation_instruction_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginVertical="20dp"
@@ -512,7 +518,7 @@
             app:layout_constraintTop_toBottomOf="@+id/setting_separate_line" />
 
         <TextView
-            android:id="@+id/textRateView"
+            android:id="@+id/text_rate_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -521,30 +527,30 @@
             android:textSize="15dp"
             android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/RateButton" />
+            app:layout_constraintTop_toTopOf="@+id/rate_button" />
 
         <TextView
-            android:id="@+id/textRateDetailView"
+            android:id="@+id/text_rate_detail_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/rate_message"
             android:textSize="12dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textRateView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_rate_view" />
 
         <View
-            android:id="@+id/textRateDetailView_line"
+            android:id="@+id/text_rate_detail_view_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
             android:layout_marginRight="110dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textRateDetailView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_rate_detail_view" />
 
         <Button
-            android:id="@+id/RateButton"
+            android:id="@+id/rate_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -553,7 +559,7 @@
             android:text="@string/move"
             android:textColor="@color/blue"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/operationInstructionButton" />
+            app:layout_constraintTop_toBottomOf="@+id/operation_instruction_button" />
 
         <View
             android:id="@+id/setting_separate_line_2"
@@ -563,10 +569,10 @@
             android:layout_marginVertical="20dp"
             android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/RateButton" />
+            app:layout_constraintTop_toBottomOf="@+id/rate_button" />
 
         <TextView
-            android:id="@+id/textLicenseView"
+            android:id="@+id/text_license_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -575,30 +581,30 @@
             android:textSize="15dp"
             android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/licenseButton" />
+            app:layout_constraintTop_toTopOf="@+id/license_button" />
 
         <TextView
-            android:id="@+id/textLicenseDetailView"
+            android:id="@+id/text_license_detail_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/license_message"
             android:textSize="12dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textLicenseView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_license_view" />
 
         <View
-            android:id="@+id/textLicenseDetailView_line"
+            android:id="@+id/text_license_detail_view_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
             android:layout_marginRight="110dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textLicenseDetailView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_license_detail_view" />
 
         <Button
-            android:id="@+id/licenseButton"
+            android:id="@+id/license_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginVertical="20dp"
@@ -611,7 +617,7 @@
             app:layout_constraintTop_toBottomOf="@+id/setting_separate_line_2" />
 
         <TextView
-            android:id="@+id/textPrivacyPolicyView"
+            android:id="@+id/text_privacy_policy_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -620,30 +626,30 @@
             android:textSize="15dp"
             android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/PrivacyPolicyButton" />
+            app:layout_constraintTop_toTopOf="@+id/privacy_policy_button" />
 
         <TextView
-            android:id="@+id/textPrivacyPolicyDetailView"
+            android:id="@+id/text_privacy_policy_detail_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/privacy_policy_message"
             android:textSize="12dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textPrivacyPolicyView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_privacy_policy_view" />
 
         <View
-            android:id="@+id/textPrivacyPolicyDetailView_line"
+            android:id="@+id/text_privacy_policy_detail_view_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
             android:layout_marginRight="110dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textPrivacyPolicyDetailView" />
+            app:layout_constraintTop_toBottomOf="@+id/text_privacy_policy_detail_view" />
 
         <Button
-            android:id="@+id/PrivacyPolicyButton"
+            android:id="@+id/privacy_policy_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -652,7 +658,7 @@
             android:text="@string/view"
             android:textColor="@color/blue"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/licenseButton" />
+            app:layout_constraintTop_toBottomOf="@+id/license_button" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

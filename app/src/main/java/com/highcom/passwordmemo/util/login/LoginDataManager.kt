@@ -1,6 +1,6 @@
 package com.highcom.passwordmemo.util.login
 
-import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
@@ -15,9 +15,9 @@ import com.highcom.passwordmemo.util.TextSizeUtil
  * @constructor
  * ログインデータ管理コンストラクタ
  *
- * @param activity プリファレンス利用のためのアクティビティ
+ * @param application プリファレンス利用のためのアクティビティ
  */
-class LoginDataManager private constructor(activity: Activity) {
+class LoginDataManager private constructor(application: Application) {
     /** ログインデータ保存用のSharedPreferences */
     private val sharedPref: SharedPreferences
     /** ログイン用マスターパスワードユーティリティ */
@@ -57,9 +57,9 @@ class LoginDataManager private constructor(activity: Activity) {
         private set
 
     init {
-        sharedPref = activity.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
-        passUtil = MasterPasswordUtil(sharedPref, activity)
-        checkBackgroundColor(activity.applicationContext)
+        sharedPref = application.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
+        passUtil = MasterPasswordUtil(sharedPref, application)
+        checkBackgroundColor(application.applicationContext)
         updateSetting()
     }
 
@@ -246,9 +246,9 @@ class LoginDataManager private constructor(activity: Activity) {
          * @param activity アクティビティ
          * @return ログイン管理インスタンス
          */
-        fun getInstance(activity: Activity): LoginDataManager? {
+        fun getInstance(application: Application): LoginDataManager? {
             if (manager == null) {
-                manager = LoginDataManager(activity)
+                manager = LoginDataManager(application)
             }
             return manager
         }

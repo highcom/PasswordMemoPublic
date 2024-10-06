@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/loginView"
+    android:id="@+id/loginFragmentView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.highcom.passwordmemo.LoginActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.fragment.LoginFragment">
 
     <RelativeLayout
         android:id="@+id/loginArea"
@@ -52,7 +52,7 @@
                 android:layout_centerHorizontal="true"
                 android:ems="10"
                 android:textSize="12dp"
-               android:inputType="textPassword" />
+                android:inputType="textPassword" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -63,10 +63,10 @@
             android:layout_marginLeft="10dp"
             android:scaleType="centerCrop"
             android:rotation="90"
-            android:tint="@color/blue"
             android:layout_toRightOf="@+id/layoutMasterPassword"
             android:layout_alignBottom="@+id/layoutMasterPassword"
-            android:src="@drawable/ic_key_icon" />
+            android:src="@drawable/ic_key_icon"
+            app:tint="@color/blue" />
 
         <Button
             android:id="@+id/loginButton"

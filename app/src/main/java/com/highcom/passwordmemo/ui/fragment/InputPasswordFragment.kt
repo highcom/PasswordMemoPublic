@@ -1,4 +1,4 @@
-package com.highcom.passwordmemo
+package com.highcom.passwordmemo.ui.fragment
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -6,7 +6,10 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.TypedValue
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -21,12 +24,17 @@ import android.widget.NumberPicker
 import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.highcom.passwordmemo.PasswordMemoApplication
+import com.highcom.passwordmemo.PasswordMemoLifecycle
+import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
@@ -39,10 +47,12 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * パスワード入力画面アクティビティ
+ * パスワード入力画面フラグメント
  *
  */
-class InputPasswordActivity : AppCompatActivity() {
+class InputPasswordFragment : Fragment() {
+    /** パスワード入力画面のビュー */
+    private var rootView: View? = null
     /** パスワードデータID */
     private var id: Long = 0
     /** 広告コンテナ */
@@ -73,28 +83,42 @@ class InputPasswordActivity : AppCompatActivity() {
     private var selectGroupId: Long? = null
     /** パスワード一覧ビューモデル */
     private val passwordListViewModel: PasswordListViewModel by viewModels {
-        PasswordListViewModel.Factory((application as PasswordMemoApplication).repository)
+        PasswordListViewModel.Factory((requireActivity().application as PasswordMemoApplication).repository)
     }
     /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels {
-        GroupListViewModel.Factory((application as PasswordMemoApplication).repository)
+        GroupListViewModel.Factory((requireActivity().application as PasswordMemoApplication).repository)
     }
 
-    @SuppressLint("ResourceType")
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_input_password)
-        adContainerView = findViewById(R.id.adView_frame_input)
+        // Fragmentのメニューを有効にする
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        rootView = inflater.inflate(R.layout.fragment_input_password, container, false)
+        return rootView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        adContainerView = rootView?.findViewById(R.id.adView_frame_input)
         adContainerView?.post { loadBanner() }
-        loginDataManager = LoginDataManager.Companion.getInstance(this)
+        loginDataManager = (requireActivity().application as PasswordMemoApplication).loginDataManager
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager!!.displayBackgroundSwitchEnable) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+            requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
 
         // グループ選択スピナーの設定
-        selectGroupSpinner = findViewById(R.id.selectGroup)
+        selectGroupSpinner = rootView?.findViewById(R.id.select_group)
         selectGroupSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, i: Int, l: Long) {
                 lifecycleScope.launch {
@@ -114,7 +138,7 @@ class InputPasswordActivity : AppCompatActivity() {
                     selectGroupNames?.add(group.name)
                 }
                 val selectGroupAdapter =
-                    SetTextSizeAdapter(this@InputPasswordActivity, selectGroupNames, loginDataManager!!.textSize.toInt())
+                    SetTextSizeAdapter(requireContext(), selectGroupNames, loginDataManager!!.textSize.toInt())
                 selectGroupSpinner?.adapter = selectGroupAdapter
                 for (i in list.indices) {
                     if (groupId == list[i].groupId) {
@@ -126,25 +150,26 @@ class InputPasswordActivity : AppCompatActivity() {
         }
 
         // 渡されたデータを取得する
-        val intent = intent
-        id = intent.getLongExtra("ID", 0)
-        groupId = intent.getLongExtra("GROUP", 1)
-        editState = intent.getBooleanExtra("EDIT", false)
-        (findViewById<View>(R.id.editTitle) as EditText).setText(intent.getStringExtra("TITLE"))
-        (findViewById<View>(R.id.editAccount) as EditText).setText(intent.getStringExtra("ACCOUNT"))
-        (findViewById<View>(R.id.editPassword) as EditText).setText(intent.getStringExtra("PASSWORD"))
-        (findViewById<View>(R.id.editUrl) as EditText).setText(intent.getStringExtra("URL"))
-        (findViewById<View>(R.id.editMemo) as EditText).setText(intent.getStringExtra("MEMO"))
-        val generateBtn = findViewById<Button>(R.id.generateButton)
-        generateBtn.setOnClickListener { generatePasswordDialog() }
+        val args: InputPasswordFragmentArgs by navArgs()
+        id = args.editData.id
+        groupId = args.editData.groupId
+        editState = args.editData.edit
+        rootView?.findViewById<EditText>(R.id.edit_title)?.setText(args.editData.title)
+        rootView?.findViewById<EditText>(R.id.edit_account)?.setText(args.editData.account)
+        rootView?.findViewById<EditText>(R.id.edit_password)?.setText(args.editData.password)
+        rootView?.findViewById<EditText>(R.id.edit_url)?.setText(args.editData.url)
+        rootView?.findViewById<EditText>(R.id.edit_memo)?.setText(args.editData.memo)
+        val generateBtn = rootView?.findViewById<Button>(R.id.generate_button)
+        generateBtn?.setOnClickListener { generatePasswordDialog() }
 
         // タイトルを編集にする
-        title = if (editState) {
+        requireActivity().title = if (editState) {
             getString(R.string.edit)
         } else {
             getString(R.string.create_new)
         }
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        // ActionBarに戻るボタンを設定
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     /**
@@ -153,7 +178,7 @@ class InputPasswordActivity : AppCompatActivity() {
      */
     private fun loadBanner() {
         // Create an ad request.
-        mAdView = AdView(this)
+        mAdView = AdView(requireContext())
         mAdView!!.adUnitId = getString(R.string.admob_unit_id_3)
         adContainerView!!.removeAllViews()
         adContainerView!!.addView(mAdView)
@@ -170,7 +195,7 @@ class InputPasswordActivity : AppCompatActivity() {
     private val adSize: AdSize
         get() {
             // Determine the screen width (less decorations) to use for the ad width.
-            val display = windowManager.defaultDisplay
+            val display = requireActivity().windowManager.defaultDisplay
             val outMetrics = DisplayMetrics()
             display.getMetrics(outMetrics)
             val density = outMetrics.density
@@ -181,27 +206,33 @@ class InputPasswordActivity : AppCompatActivity() {
                 adWidthPixels = outMetrics.widthPixels.toFloat()
             }
             val adWidth = (adWidthPixels / density).toInt()
-            return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, adWidth)
+            return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(requireContext(), adWidth)
         }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_done, menu)
-        return true
+    @Deprecated("Deprecated in Java", ReplaceWith(
+        "inflater.inflate(R.menu.menu_done, menu)",
+        "com.highcom.passwordmemo.R"
+    )
+    )
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_done, menu)
     }
 
+    @Suppress("DEPRECATION")
+    @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> finish()
+            android.R.id.home -> findNavController().navigate(R.id.action_inputPasswordFragment_to_passwordListFragment)
             R.id.action_done -> {
                 // 入力データを登録する
                 val passwordEntity = PasswordEntity(
                     id = id,
-                    title = findViewById<EditText>(R.id.editTitle).text.toString(),
-                    account = findViewById<EditText>(R.id.editAccount).text.toString(),
-                    password = findViewById<EditText>(R.id.editPassword).text.toString(),
-                    url = findViewById<EditText>(R.id.editUrl).text.toString(),
+                    title = rootView?.findViewById<EditText>(R.id.edit_title)?.text.toString(),
+                    account = rootView?.findViewById<EditText>(R.id.edit_account)?.text.toString(),
+                    password = rootView?.findViewById<EditText>(R.id.edit_password)?.text.toString(),
+                    url = rootView?.findViewById<EditText>(R.id.edit_url)?.text.toString(),
                     groupId = selectGroupId ?: 1,
-                    memo = findViewById<EditText>(R.id.editMemo).text.toString(),
+                    memo = rootView?.findViewById<EditText>(R.id.edit_memo)?.text.toString(),
                     inputDate = nowDate
                 )
                 if (editState) {
@@ -210,7 +241,7 @@ class InputPasswordActivity : AppCompatActivity() {
                     passwordListViewModel.insert(passwordEntity)
                 }
                 // 詳細画面を終了
-                finish()
+                findNavController().navigate(R.id.action_inputPasswordFragment_to_passwordListFragment)
             }
         }
         return super.onOptionsItemSelected(item)
@@ -221,7 +252,7 @@ class InputPasswordActivity : AppCompatActivity() {
         super.onStart()
 
         // 背景色を設定する
-        findViewById<View>(R.id.inputPasswordView).setBackgroundColor(loginDataManager!!.backgroundColor)
+        rootView?.findViewById<View>(R.id.input_password_view)?.setBackgroundColor(loginDataManager!!.backgroundColor)
         // テキストサイズを設定する
         setTextSize(loginDataManager!!.textSize)
     }
@@ -233,15 +264,15 @@ class InputPasswordActivity : AppCompatActivity() {
     private fun generatePasswordDialog() {
         val generatePasswordView = layoutInflater.inflate(R.layout.alert_generate_password, null)
         // 文字種別ラジオボタンの初期値を設定
-        val passwordRadio = generatePasswordView.findViewById<RadioGroup>(R.id.passwordKindMenu)
-        passwordRadio.check(R.id.radioLettersNumbers)
+        val passwordRadio = generatePasswordView.findViewById<RadioGroup>(R.id.password_kind_menu)
+        passwordRadio.check(R.id.radio_letters_numbers)
         passwordKind = passwordRadio.checkedRadioButtonId
         passwordRadio.setOnCheckedChangeListener { _, checkedId ->
             passwordKind = checkedId
             generatePasswordString()
         }
         // 小文字のみチェクボックスを設定
-        val lowerCaseOnlyCheckBox = generatePasswordView.findViewById<CheckBox>(R.id.lowerCaseOnly)
+        val lowerCaseOnlyCheckBox = generatePasswordView.findViewById<CheckBox>(R.id.lower_case_only)
         lowerCaseOnlyCheckBox.isChecked = false
         isLowerCaseOnly = false
         lowerCaseOnlyCheckBox.setOnClickListener {
@@ -255,7 +286,7 @@ class InputPasswordActivity : AppCompatActivity() {
 
         // 文字数ピッカーの初期値を設定
         val passwordPicker =
-            generatePasswordView.findViewById<NumberPicker>(R.id.passwordNumberPicker)
+            generatePasswordView.findViewById<NumberPicker>(R.id.password_number_picker)
         passwordPicker.descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
         passwordPicker.maxValue = 32
         passwordPicker.minValue = 4
@@ -266,12 +297,12 @@ class InputPasswordActivity : AppCompatActivity() {
             generatePasswordString()
         }
         // ボタンのカラーフィルターとイベントを設定
-        val generateButton = generatePasswordView.findViewById<ImageButton>(R.id.generateButton)
+        val generateButton = generatePasswordView.findViewById<ImageButton>(R.id.generate_button)
         generateButton.setColorFilter(Color.parseColor("#007AFF"))
         generateButton.setOnClickListener { generatePasswordString() }
 
         // ダイアログの生成
-        val alertDialog = AlertDialog.Builder(this)
+        val alertDialog = AlertDialog.Builder(requireContext())
             .setTitle(R.string.generate_password_title)
             .setView(generatePasswordView)
             .setPositiveButton(R.string.apply, null)
@@ -280,17 +311,17 @@ class InputPasswordActivity : AppCompatActivity() {
         alertDialog.show()
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             if (isLowerCaseOnly) {
-                (findViewById<View>(R.id.editPassword) as EditText).setText(
+                rootView?.findViewById<EditText>(R.id.edit_password)?.setText(
                     generatePassword!!.lowercase(Locale.getDefault())
                 )
             } else {
-                (findViewById<View>(R.id.editPassword) as EditText).setText(generatePassword)
+                rootView?.findViewById<EditText>(R.id.edit_password)?.setText(generatePassword)
             }
             alertDialog.dismiss()
         }
         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
             .setOnClickListener { alertDialog.dismiss() }
-        generatePasswordText = generatePasswordView.findViewById(R.id.generatePasswordText)
+        generatePasswordText = generatePasswordView.findViewById(R.id.generate_password_text)
         generatePasswordString()
     }
 
@@ -300,11 +331,11 @@ class InputPasswordActivity : AppCompatActivity() {
      */
     private fun generatePasswordString() {
         generatePassword = when (passwordKind) {
-            R.id.radioNumbers -> {
+            R.id.radio_numbers -> {
                 // 数字のみ
                 RandomStringUtils.randomNumeric(passwordCount)
             }
-            R.id.radioLettersNumbers -> {
+            R.id.radio_letters_numbers -> {
                 // 数字＋文字
                 RandomStringUtils.randomAlphanumeric(passwordCount)
             }
@@ -331,13 +362,9 @@ class InputPasswordActivity : AppCompatActivity() {
             return sdf.format(date)
         }
 
-    public override fun onDestroy() {
+    override fun onDestroyView() {
+        super.onDestroyView()
         if (mAdView != null) mAdView!!.destroy()
-        //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
-        if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.isBackground) {
-            finishAffinity()
-        }
-        super.onDestroy()
     }
 
     /**
@@ -346,50 +373,50 @@ class InputPasswordActivity : AppCompatActivity() {
      * @param size 指定テキストサイズ
      */
     private fun setTextSize(size: Float) {
-        (findViewById<View>(R.id.titleView) as TextView).setTextSize(
+        rootView?.findViewById<TextView>(R.id.title_view)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size - 3
         )
-        (findViewById<View>(R.id.editTitle) as EditText).setTextSize(
+        rootView?.findViewById<EditText>(R.id.edit_title)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size
         )
-        (findViewById<View>(R.id.accountView) as TextView).setTextSize(
+        rootView?.findViewById<TextView>(R.id.account_view)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size - 3
         )
-        (findViewById<View>(R.id.editAccount) as EditText).setTextSize(
+        rootView?.findViewById<EditText>(R.id.edit_account)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size
         )
-        (findViewById<View>(R.id.passwordView) as TextView).setTextSize(
+        rootView?.findViewById<TextView>(R.id.password_view)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size - 3
         )
-        (findViewById<View>(R.id.editPassword) as EditText).setTextSize(
+        rootView?.findViewById<EditText>(R.id.edit_password)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size
         )
-        (findViewById<View>(R.id.generateButton) as Button).setTextSize(
+        rootView?.findViewById<Button>(R.id.generate_button)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size - 3
         )
-        (findViewById<View>(R.id.urlView) as TextView).setTextSize(
+        rootView?.findViewById<TextView>(R.id.url_view)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size - 3
         )
-        (findViewById<View>(R.id.editUrl) as EditText).setTextSize(
+        rootView?.findViewById<EditText>(R.id.edit_url)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size
         )
-        (findViewById<View>(R.id.groupView) as TextView).setTextSize(
+        rootView?.findViewById<TextView>(R.id.group_view)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size - 3
         )
         lifecycleScope.launch {
             groupListViewModel.groupList.collect { list ->
                 val selectGroupAdapter =
-                    SetTextSizeAdapter(this@InputPasswordActivity, selectGroupNames, loginDataManager!!.textSize.toInt())
+                    SetTextSizeAdapter(requireContext(), selectGroupNames, loginDataManager!!.textSize.toInt())
                 selectGroupSpinner!!.adapter = selectGroupAdapter
                 for (i in list.indices) {
                     if (groupId == list[i].groupId) {
@@ -399,7 +426,7 @@ class InputPasswordActivity : AppCompatActivity() {
                 }
             }
         }
-        (findViewById<View>(R.id.editMemo) as EditText).setTextSize(
+        rootView?.findViewById<EditText>(R.id.edit_memo)?.setTextSize(
             TypedValue.COMPLEX_UNIT_DIP,
             size
         )
