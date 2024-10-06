@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.DisplayMetrics
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
@@ -27,14 +26,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.highcom.passwordmemo.PasswordMemoApplication
-import com.highcom.passwordmemo.PasswordMemoLifecycle
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.ui.DividerItemDecoration
 import com.highcom.passwordmemo.ui.PasswordEditData
@@ -42,6 +35,7 @@ import com.highcom.passwordmemo.ui.list.PasswordListAdapter
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
+import com.highcom.passwordmemo.util.AdBanner
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import jp.co.recruit_mp.android.rmp_appirater.RmpAppirater
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -62,10 +56,10 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     private var loginDataManager: LoginDataManager? = null
     /** スワイプボタン表示用通知ヘルパー */
     private var simpleCallbackHelper: SimpleCallbackHelper? = null
+    /** バナー広告処理 */
+    private var adBanner: AdBanner? = null
     /** 広告コンテナ */
     private var adContainerView: FrameLayout? = null
-    /** 広告ビュー */
-    private var mAdView: AdView? = null
     /** パスワード一覧表示用リサイクラービュー */
     var recyclerView: RecyclerView? = null
     /** パスワード一覧用アダプタ */
@@ -106,17 +100,9 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        MobileAds.initialize(requireContext()) { }
-        MobileAds.setRequestConfiguration(
-            RequestConfiguration.Builder().setTestDeviceIds(
-                listOf(
-                    getString(R.string.admob_test_device),
-                    getString(R.string.admob_test_device_xaomi)
-                )
-            ).build()
-        )
         adContainerView = rootView?.findViewById(R.id.adView_frame)
-        adContainerView?.post { loadBanner() }
+        adBanner = AdBanner(this, adContainerView)
+        adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_1)) }
         // ActionBarに戻るボタンを設定
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -290,43 +276,6 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
             operationInstructionDialog()
         }
     }
-
-    /**
-     * バナー広告ロード処理
-     *
-     */
-    private fun loadBanner() {
-        // Create an ad request.
-        mAdView = AdView(requireContext())
-        mAdView!!.adUnitId = getString(R.string.admob_unit_id_1)
-        adContainerView!!.removeAllViews()
-        adContainerView!!.addView(mAdView)
-        val adSize = adSize
-        mAdView!!.setAdSize(adSize)
-        val adRequest = AdRequest.Builder().build()
-
-        // Start loading the ad in the background.
-        mAdView!!.loadAd(adRequest)
-    }
-
-    /** 広告サイズ設定 */
-    @Suppress("DEPRECATION")
-    private val adSize: AdSize
-        get() {
-            // Determine the screen width (less decorations) to use for the ad width.
-            val display = requireActivity().windowManager.defaultDisplay
-            val outMetrics = DisplayMetrics()
-            display.getMetrics(outMetrics)
-            val density = outMetrics.density
-            var adWidthPixels = adContainerView!!.width.toFloat()
-
-            // If the ad hasn't been laid out, default to the full screen width.
-            if (adWidthPixels == 0f) {
-                adWidthPixels = outMetrics.widthPixels.toFloat()
-            }
-            val adWidth = (adWidthPixels / density).toInt()
-            return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(requireContext(), adWidth)
-        }
 
     @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -540,7 +489,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (mAdView != null) mAdView!!.destroy()
+        adBanner?.destroy()
     }
 
     /**
@@ -620,10 +569,5 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
             fromPos = -1
             toPos = -1
         }
-    }
-
-    companion object {
-        /** 設定画面遷移要求コード */
-        private const val START_SETTING = 1002
     }
 }

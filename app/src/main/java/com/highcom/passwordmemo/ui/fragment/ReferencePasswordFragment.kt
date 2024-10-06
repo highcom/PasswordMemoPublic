@@ -8,7 +8,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
-import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.Menu
@@ -26,15 +25,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
 import com.google.android.material.snackbar.Snackbar
 import com.highcom.passwordmemo.PasswordMemoApplication
-import com.highcom.passwordmemo.PasswordMemoLifecycle
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.ui.PasswordEditData
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
+import com.highcom.passwordmemo.util.AdBanner
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import kotlinx.coroutines.launch
 
@@ -51,10 +47,10 @@ class ReferencePasswordFragment : Fragment() {
     private var id: Long = 0
     /** グループID */
     private var groupId: Long = 0
+    /** バナー広告処理 */
+    private var adBanner: AdBanner? = null
     /** 広告コンテナ */
     private var adContainerView: FrameLayout? = null
-    /** 広告ビュー */
-    private var mAdView: AdView? = null
     /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels {
         GroupListViewModel.Factory((requireActivity().application as PasswordMemoApplication).repository)
@@ -79,7 +75,8 @@ class ReferencePasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         adContainerView = rootView?.findViewById(R.id.adView_frame_reference)
-        adContainerView?.post { loadBanner() }
+        adBanner = AdBanner(this, adContainerView)
+        adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_2)) }
         loginDataManager = (requireActivity().application as PasswordMemoApplication).loginDataManager
 
         // ActionBarに戻るボタンを設定
@@ -162,43 +159,6 @@ class ReferencePasswordFragment : Fragment() {
             startActivity(chooser)
         })
     }
-
-    /**
-     * バナー広告ロード処理
-     *
-     */
-    private fun loadBanner() {
-        // Create an ad request.
-        mAdView = AdView(requireContext())
-        mAdView!!.adUnitId = getString(R.string.admob_unit_id_2)
-        adContainerView!!.removeAllViews()
-        adContainerView!!.addView(mAdView)
-        val adSize = adSize
-        mAdView!!.setAdSize(adSize)
-        val adRequest = AdRequest.Builder().build()
-
-        // Start loading the ad in the background.
-        mAdView!!.loadAd(adRequest)
-    }
-
-    /** 広告サイズ設定 */
-    @Suppress("DEPRECATION")
-    private val adSize: AdSize
-        get() {
-            // Determine the screen width (less decorations) to use for the ad width.
-            val display = requireActivity().windowManager.defaultDisplay
-            val outMetrics = DisplayMetrics()
-            display.getMetrics(outMetrics)
-            val density = outMetrics.density
-            var adWidthPixels = adContainerView!!.width.toFloat()
-
-            // If the ad hasn't been laid out, default to the full screen width.
-            if (adWidthPixels == 0f) {
-                adWidthPixels = outMetrics.widthPixels.toFloat()
-            }
-            val adWidth = (adWidthPixels / density).toInt()
-            return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(requireContext(), adWidth)
-        }
 
     @Deprecated("Deprecated in Java", ReplaceWith(
         "inflater.inflate(R.menu.menu_reference, menu)",
@@ -307,7 +267,7 @@ class ReferencePasswordFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (mAdView != null) mAdView!!.destroy()
+        adBanner?.destroy()
     }
 
     /**

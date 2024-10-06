@@ -9,7 +9,6 @@ import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.DialogInterface
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -27,14 +26,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.highcom.passwordmemo.PasswordMemoApplication
-import com.highcom.passwordmemo.PasswordMemoLifecycle
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.ui.DividerItemDecoration
 import com.highcom.passwordmemo.ui.list.GroupListAdapter
@@ -42,6 +35,7 @@ import com.highcom.passwordmemo.ui.list.GroupListAdapter.GroupViewHolder
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper.SimpleCallbackListener
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
+import com.highcom.passwordmemo.util.AdBanner
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -56,10 +50,10 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
     private var rootView: View? = null
     /** ログインデータ管理 */
     private var loginDataManager: LoginDataManager? = null
+    /** バナー広告処理 */
+    private var adBanner: AdBanner? = null
     /** 広告用コンテナ */
     private var adContainerView: FrameLayout? = null
-    /** 広告ビュー */
-    private var mAdView: AdView? = null
     /** グループ一覧用リサイクラービュー */
     var recyclerView: RecyclerView? = null
     /** グループ追加フローティングボタン */
@@ -92,17 +86,9 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        MobileAds.initialize(requireContext()) { }
-        MobileAds.setRequestConfiguration(
-            RequestConfiguration.Builder().setTestDeviceIds(
-                /* testDeviceIds = */ mutableListOf(
-                    "874848BA4D9A6B9B0A256F7862A47A31",
-                    "A02A04D245766C519D07D09F0E258E1E"
-                )
-            ).build()
-        )
         adContainerView = rootView?.findViewById(R.id.adView_groupFrame)
-        adContainerView?.post { loadBanner() }
+        adBanner = AdBanner(this, adContainerView)
+        adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_4)) }
         requireActivity().title = getString(R.string.group_title) + getString(R.string.group_title_select)
         // ActionBarに戻るボタンを設定
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -212,43 +198,6 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
             }
     }
 
-    /**
-     * バナー広告ロード処理
-     *
-     */
-    private fun loadBanner() {
-        // Create an ad request.
-        mAdView = AdView(requireContext())
-        mAdView!!.adUnitId = getString(R.string.admob_unit_id_4)
-        adContainerView!!.removeAllViews()
-        adContainerView!!.addView(mAdView)
-        val adSize = adSize
-        mAdView!!.setAdSize(adSize)
-        val adRequest = AdRequest.Builder().build()
-
-        // Start loading the ad in the background.
-        mAdView!!.loadAd(adRequest)
-    }
-
-    /** 広告サイズ設定 */
-    @Suppress("DEPRECATION")
-    private val adSize: AdSize
-        get() {
-            // Determine the screen width (less decorations) to use for the ad width.
-            val display = requireActivity().windowManager.defaultDisplay
-            val outMetrics = DisplayMetrics()
-            display.getMetrics(outMetrics)
-            val density = outMetrics.density
-            var adWidthPixels = adContainerView!!.width.toFloat()
-
-            // If the ad hasn't been laid out, default to the full screen width.
-            if (adWidthPixels == 0f) {
-                adWidthPixels = outMetrics.widthPixels.toFloat()
-            }
-            val adWidth = (adWidthPixels / density).toInt()
-            return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(requireContext(), adWidth)
-        }
-
     @SuppressLint("ResourceType")
     override fun onStart() {
         super.onStart()
@@ -320,7 +269,7 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (mAdView != null) mAdView!!.destroy()
+        adBanner?.destroy()
     }
 
     override fun onGroupNameClicked(view: View, groupId: Long?) {

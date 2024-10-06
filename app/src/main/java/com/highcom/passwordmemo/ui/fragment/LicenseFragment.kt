@@ -13,7 +13,6 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import com.highcom.passwordmemo.PasswordMemoApplication
-import com.highcom.passwordmemo.PasswordMemoLifecycle
 import com.highcom.passwordmemo.util.login.LoginDataManager
 
 /**

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
-import android.util.DisplayMetrics
 import android.util.TypedValue
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -29,16 +28,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
 import com.highcom.passwordmemo.PasswordMemoApplication
-import com.highcom.passwordmemo.PasswordMemoLifecycle
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
+import com.highcom.passwordmemo.util.AdBanner
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import kotlinx.coroutines.launch
 import org.apache.commons.lang3.RandomStringUtils
@@ -55,10 +51,10 @@ class InputPasswordFragment : Fragment() {
     private var rootView: View? = null
     /** パスワードデータID */
     private var id: Long = 0
+    /** バナー広告処理 */
+    private var adBanner: AdBanner? = null
     /** 広告コンテナ */
     private var adContainerView: FrameLayout? = null
-    /** 広告ビュー */
-    private var mAdView: AdView? = null
     /** 編集モードかどうか */
     private var editState = false
     /** ログインデータ管理 */
@@ -109,7 +105,8 @@ class InputPasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         adContainerView = rootView?.findViewById(R.id.adView_frame_input)
-        adContainerView?.post { loadBanner() }
+        adBanner = AdBanner(this, adContainerView)
+        adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_3)) }
         loginDataManager = (requireActivity().application as PasswordMemoApplication).loginDataManager
 
         // バックグラウンドでは画面の中身が見えないようにする
@@ -171,43 +168,6 @@ class InputPasswordFragment : Fragment() {
         // ActionBarに戻るボタンを設定
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
-
-    /**
-     * バナー広告ロード処理
-     *
-     */
-    private fun loadBanner() {
-        // Create an ad request.
-        mAdView = AdView(requireContext())
-        mAdView!!.adUnitId = getString(R.string.admob_unit_id_3)
-        adContainerView!!.removeAllViews()
-        adContainerView!!.addView(mAdView)
-        val adSize = adSize
-        mAdView!!.setAdSize(adSize)
-        val adRequest = AdRequest.Builder().build()
-
-        // Start loading the ad in the background.
-        mAdView!!.loadAd(adRequest)
-    }
-
-    /** 広告サイズ設定 */
-    @Suppress("DEPRECATION")
-    private val adSize: AdSize
-        get() {
-            // Determine the screen width (less decorations) to use for the ad width.
-            val display = requireActivity().windowManager.defaultDisplay
-            val outMetrics = DisplayMetrics()
-            display.getMetrics(outMetrics)
-            val density = outMetrics.density
-            var adWidthPixels = adContainerView!!.width.toFloat()
-
-            // If the ad hasn't been laid out, default to the full screen width.
-            if (adWidthPixels == 0f) {
-                adWidthPixels = outMetrics.widthPixels.toFloat()
-            }
-            val adWidth = (adWidthPixels / density).toInt()
-            return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(requireContext(), adWidth)
-        }
 
     @Deprecated("Deprecated in Java", ReplaceWith(
         "inflater.inflate(R.menu.menu_done, menu)",
@@ -364,7 +324,7 @@ class InputPasswordFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (mAdView != null) mAdView!!.destroy()
+        adBanner?.destroy()
     }
 
     /**
