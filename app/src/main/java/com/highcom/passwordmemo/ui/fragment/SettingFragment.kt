@@ -26,9 +26,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
-import com.highcom.passwordmemo.LoginActivity
+import com.highcom.passwordmemo.PasswordMemoActivity
 import com.highcom.passwordmemo.PasswordMemoApplication
-import com.highcom.passwordmemo.PasswordMemoLifecycle
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
 import com.highcom.passwordmemo.ui.viewmodel.SettingViewModel
@@ -231,7 +230,7 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
      *
      */
     private fun executeRestart() {
-        val intent = Intent(requireContext(), LoginActivity::class.java)
+        val intent = Intent(requireContext(), PasswordMemoActivity::class.java)
         // 起動しているActivityをすべて削除し、新しいタスクでMainActivityを起動する
         intent.flags =
             Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -581,20 +580,11 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
     override fun restoreComplete() {
         // データベースとリポジトリを初期化する
         (requireActivity().application as PasswordMemoApplication).initializeDatabaseAndRepository()
-        // 起動しているActivityをすべて削除し、新しいタスクでLoginActivityを起動する
-        val intent = Intent(requireContext(), LoginActivity::class.java)
+        // 起動しているActivityをすべて削除し、新しいタスクでActivityを起動する
+        val intent = Intent(requireContext(), PasswordMemoActivity::class.java)
         intent.flags =
             Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
-        if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.isBackground) {
-            // TODO:これでログイン画面に戻るのか？
-            requireActivity().finishAffinity()
-        }
     }
 
     companion object {

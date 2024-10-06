@@ -321,12 +321,8 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
     override fun onDestroyView() {
         super.onDestroyView()
         if (mAdView != null) mAdView!!.destroy()
-        //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
-        if (loginDataManager?.displayBackgroundSwitchEnable == true && PasswordMemoLifecycle.isBackground) {
-            // TODO:これでログイン画面に戻るのか？
-            requireActivity().finishAffinity()
-        }
     }
+
     override fun onGroupNameClicked(view: View, groupId: Long?) {
         if (adapter?.editEnable == true) {
             view.post {

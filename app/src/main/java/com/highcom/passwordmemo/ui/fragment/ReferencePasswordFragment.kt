@@ -95,7 +95,6 @@ class ReferencePasswordFragment : Fragment() {
         id = args.editData.id
         groupId = args.editData.groupId
         requireActivity().title = args.editData.title
-        // TODO:edit_ref_accountとかに直す
         rootView?.findViewById<EditText>(R.id.edit_ref_account)?.setText(args.editData.account)
         rootView?.findViewById<EditText>(R.id.edit_ref_password)?.setText(args.editData.password)
         rootView?.findViewById<EditText>(R.id.edit_ref_url)?.setText(args.editData.url)
@@ -229,8 +228,6 @@ class ReferencePasswordFragment : Fragment() {
                     memo = rootView?.findViewById<EditText>(R.id.edit_ref_memo)?.text.toString()
                 )
                 findNavController().navigate(ReferencePasswordFragmentDirections.actionReferencePasswordFragmentToInputPasswordFragment(editData = passwordEditData))
-                // TODO:以前はfinishしているがNavigationでは問題ないか確認
-//                finish()
             }
             // 編集
             R.id.action_edit -> {
@@ -246,8 +243,6 @@ class ReferencePasswordFragment : Fragment() {
                     memo = rootView?.findViewById<EditText>(R.id.edit_ref_memo)?.text.toString()
                 )
                 findNavController().navigate(ReferencePasswordFragmentDirections.actionReferencePasswordFragmentToInputPasswordFragment(editData = passwordEditData))
-                // TODO:以前はfinishしているがNavigationでは問題ないか確認
-//                finish()
             }
 
             else -> findNavController().navigate(R.id.action_referencePasswordFragment_to_passwordListFragment)
@@ -313,11 +308,6 @@ class ReferencePasswordFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         if (mAdView != null) mAdView!!.destroy()
-        //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
-        if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.isBackground) {
-            // TODO:これでログイン画面に戻るのか？
-            requireActivity().finishAffinity()
-        }
     }
 
     /**

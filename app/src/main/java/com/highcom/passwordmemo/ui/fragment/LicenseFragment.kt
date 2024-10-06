@@ -64,20 +64,12 @@ class LicenseFragment : Fragment() {
         )
     }
 
+    @Suppress("DEPRECATION")
     @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> findNavController().navigate(LicenseFragmentDirections.actionLicenseFragmentToSettingFragment())
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
-        if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.isBackground) {
-            // TODO:これでログイン画面に戻るのか？
-            requireActivity().finishAffinity()
-        }
     }
 }

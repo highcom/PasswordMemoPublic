@@ -365,11 +365,6 @@ class InputPasswordFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         if (mAdView != null) mAdView!!.destroy()
-        //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
-        if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.isBackground) {
-            // TODO:これでログイン画面に戻るのか？
-            requireActivity().finishAffinity()
-        }
     }
 
     /**

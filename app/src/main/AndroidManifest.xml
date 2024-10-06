@@ -33,7 +33,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".LoginActivity"
+            android:name=".PasswordMemoActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true"
             android:theme="@style/SplashTheme">
