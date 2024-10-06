@@ -2,7 +2,6 @@ package com.highcom.passwordmemo.ui.fragment
 
 import android.annotation.SuppressLint
 import android.content.DialogInterface
-import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
@@ -37,7 +36,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.PasswordMemoLifecycle
 import com.highcom.passwordmemo.R
-import com.highcom.passwordmemo.SettingActivity
 import com.highcom.passwordmemo.ui.DividerItemDecoration
 import com.highcom.passwordmemo.ui.PasswordEditData
 import com.highcom.passwordmemo.ui.list.PasswordListAdapter
@@ -364,8 +362,8 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         })
     }
 
-    @Deprecated("Deprecated in Java")
     @Suppress("DEPRECATION")
+    @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             // 戻るボタン
@@ -420,14 +418,13 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
             }
             // グループ選択
             R.id.select_group -> {
-                // 設定画面へ遷移
+                // グループ一覧画面へ遷移
                 findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToGroupListFragment())
             }
             // 設定メニュー
             R.id.setting_menu -> {
                 // 設定画面へ遷移
-                val intent = Intent(requireContext(), SettingActivity::class.java)
-                startActivityForResult(intent, START_SETTING)
+                findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToSettingFragment())
             }
 
             else -> {}
@@ -548,6 +545,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         if (mAdView != null) mAdView!!.destroy()
         //バックグラウンドの場合、全てのActivityを破棄してログイン画面に戻る
         if (loginDataManager!!.displayBackgroundSwitchEnable && PasswordMemoLifecycle.Companion.isBackground) {
+            // TODO:これでログイン画面に戻るのか？
             requireActivity().finishAffinity()
         }
     }

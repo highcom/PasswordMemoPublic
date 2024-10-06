@@ -52,9 +52,9 @@ class TextSizeUtil(context: Context, listener: TextSizeListener) {
      *
      * @param spinner スピナー
      */
-    fun createTextSizeSpinner(spinner: Spinner) {
-        spinner.adapter = mTextSizeAdapter
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+    fun createTextSizeSpinner(spinner: Spinner?) {
+        spinner?.adapter = mTextSizeAdapter
+        spinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
