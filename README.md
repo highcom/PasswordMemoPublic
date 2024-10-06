@@ -43,9 +43,9 @@ Android標準の生体認証を利用して安全かつ簡単にログインで�
 - [x] Java→Kotlin化
 - [x] SQLiteOpenHelper→Room化
 - [x] Coroutines Flow化
+- [x] SingleActivity/MultiFragment化
+- [x] NavigationFragment適用
 - [ ] ViewBinding/DataBinding化
-- [ ] SingleActivity/MultiFragment化
-- [ ] NavigationFragment適用
 - [ ] Dagger Hilt化
 - [ ] JUnit作成
 ## バージョンについて
