@@ -18,6 +18,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
@@ -135,6 +136,8 @@ class LoginFragment : Fragment(), View.OnClickListener {
         loginViewModel.resetKeyIconRotate()
         loginViewModel.resetNaviMessage(requireContext())
 
+        // 戻るボタンを無効化
+        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
         // 背景色を設定する
         (view?.findViewById<View>(R.id.loginFragmentView) as ConstraintLayout?)?.setBackgroundColor(
             loginDataManager!!.backgroundColor

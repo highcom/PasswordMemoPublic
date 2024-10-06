@@ -370,8 +370,6 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
             android.R.id.home -> {
                 // 編集状態は解除する
                 adapter?.editEnable = false
-                // Fragmentを離れるときに戻るボタンを無効化
-                (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
                 findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToLoginFragment())
             }
             // 編集モード
