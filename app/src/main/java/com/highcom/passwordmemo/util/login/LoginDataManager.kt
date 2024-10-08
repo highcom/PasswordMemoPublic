@@ -77,8 +77,7 @@ class LoginDataManager private constructor(application: Application) {
         memoVisibleSwitchEnable = sharedPref.getBoolean("memoVisibleSwitchEnable", false)
         passwordVisibleSwitchEnable = sharedPref.getBoolean("passwordVisibleSwitchEnable", false)
         backgroundColor = sharedPref.getInt("backgroundColor", 0)
-        textSize =
-            sharedPref.getFloat("textSize", TextSizeUtil.Companion.TEXT_SIZE_MEDIUM.toFloat())
+        textSize = sharedPref.getFloat("textSize", TextSizeUtil.TEXT_SIZE_MEDIUM.toFloat())
         copyClipboard = sharedPref.getInt("copyClipboard", 0)
         selectGroup = sharedPref.getLong("selectGroup", 1)
         try {
