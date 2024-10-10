@@ -242,7 +242,7 @@ class LoginDataManager private constructor(application: Application) {
          * ログイン管理インスタンス取得処理
          * * シングルトンのログイン管理インスタンスを取得する
          *
-         * @param activity アクティビティ
+         * @param application アプリケーション
          * @return ログイン管理インスタンス
          */
         fun getInstance(application: Application): LoginDataManager? {

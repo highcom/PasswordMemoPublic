@@ -19,16 +19,17 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.data.PasswordEntity
+import com.highcom.passwordmemo.databinding.FragmentPasswordListBinding
 import com.highcom.passwordmemo.ui.DividerItemDecoration
 import com.highcom.passwordmemo.ui.PasswordEditData
 import com.highcom.passwordmemo.ui.list.PasswordListAdapter
@@ -48,8 +49,8 @@ import java.util.Locale
  *
  */
 class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
-    /** パスワード一覧画面のビュー */
-    private var rootView: View? = null
+    /** パスワード一覧画面のバインディング */
+    private lateinit var binding: FragmentPasswordListBinding
     /** 選択グループ名称 */
     private var selectGroupName: String? = null
     /** ログインデータ管理 */
@@ -92,15 +93,17 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        rootView = inflater.inflate(R.layout.fragment_password_list, container, false)
-        return rootView
+    ): View {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_password_list, container, false)
+        binding.passwordListViewModel = passwordListViewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+        return binding.root
     }
 
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adContainerView = rootView?.findViewById(R.id.adView_frame)
+        adContainerView = binding.adViewFrame
         adBanner = AdBanner(this, adContainerView)
         adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_1)) }
         // ActionBarに戻るボタンを設定
@@ -157,16 +160,18 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         currentMemoVisible = loginDataManager!!.memoVisibleSwitchEnable
         adapter = PasswordListAdapter(
             requireContext(),
+            viewLifecycleOwner,
             loginDataManager,
             this
         )
         adapter?.textSize = loginDataManager!!.textSize
-        recyclerView = rootView?.findViewById(R.id.password_list_view)
+        recyclerView = binding.passwordListView
         recyclerView!!.layoutManager = LinearLayoutManager(context)
         recyclerView!!.adapter = adapter
 
         // 選択されているグループのパスワード一覧を設定する
         passwordListViewModel.setSelectGroup(loginDataManager?.selectGroup ?: 1L)
+        @Suppress("DEPRECATION")
         lifecycleScope.launchWhenStarted {
             passwordListViewModel.passwordList.collect { list ->
                 adapter?.setList(list)
@@ -193,19 +198,19 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                         getString(R.string.delete),
                         BitmapFactory.decodeResource(resources, R.drawable.ic_delete),
                         Color.parseColor(getString(R.color.underlay_red)),
-                        viewHolder as PasswordListAdapter.ViewHolder,
+                        viewHolder,
                         object : UnderlayButtonClickListener {
                             override fun onClick(holder: RecyclerView.ViewHolder, pos: Int) {
                                 context?.let {
                                     AlertDialog.Builder(it)
                                         .setTitle(
-                                            getString(R.string.delete_title_head) + (holder as PasswordListAdapter.ViewHolder).title?.text.toString() + getString(
+                                            getString(R.string.delete_title_head) + (holder as PasswordListAdapter.RowPasswordViewHolder).binding.passwordEntity?.title + getString(
                                                 R.string.delete_title
                                             )
                                         )
                                         .setMessage(getString(R.string.delete_message))
                                         .setPositiveButton(getString(R.string.delete_execute)) { _: DialogInterface?, _: Int ->
-                                            holder.id?.let { id -> passwordListViewModel.delete(id) }
+                                            holder.binding.passwordEntity?.id?.let { id -> passwordListViewModel.delete(id) }
                                             simpleCallbackHelper!!.resetSwipePos()
                                             reflesh()
                                         }
@@ -223,16 +228,16 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                         object : UnderlayButtonClickListener {
                             override fun onClick(holder: RecyclerView.ViewHolder, pos: Int) {
                                 // 選択アイテムを編集モードで設定
-                                val vh = holder as PasswordListAdapter.ViewHolder
+                                val entity = (holder as PasswordListAdapter.RowPasswordViewHolder).binding.passwordEntity
                                 val passwordEditData = PasswordEditData(
                                     edit = true,
-                                    id = vh.id ?: 0,
-                                    title = vh.title?.text.toString(),
-                                    account = vh.account ?: "",
-                                    password =  vh.password ?: "",
-                                    url = vh.url ?: "",
-                                    groupId = vh.groupId ?: 1,
-                                    memo = vh.memo ?: ""
+                                    id = entity?.id ?: 0,
+                                    title = entity?.title ?: "",
+                                    account = entity?.account ?: "",
+                                    password =  entity?.password ?: "",
+                                    url = entity?.url ?: "",
+                                    groupId = entity?.groupId ?: 1,
+                                    memo = entity?.memo ?: ""
                                 )
                                 findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToInputPasswordFragment(editData = passwordEditData))
                             }
@@ -245,16 +250,16 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                         viewHolder,
                         object : UnderlayButtonClickListener {
                             override fun onClick(holder: RecyclerView.ViewHolder, pos: Int) {
-                                val vh = holder as PasswordListAdapter.ViewHolder
                                 // 選択アイテムを複製モードで設定
+                                val entity = (holder as PasswordListAdapter.RowPasswordViewHolder).binding.passwordEntity
                                 val passwordEditData = PasswordEditData(
                                     edit = false,
-                                    title = vh.title?.text.toString() + " " + getString(R.string.copy_title),
-                                    account = vh.account ?: "",
-                                    password =  vh.password ?: "",
-                                    url = vh.url ?: "",
-                                    groupId = vh.groupId ?: 1,
-                                    memo = vh.memo ?: ""
+                                    title = entity?.title + " " + getString(R.string.copy_title),
+                                    account = entity?.account ?: "",
+                                    password =  entity?.password ?: "",
+                                    url = entity?.url ?: "",
+                                    groupId = entity?.groupId ?: 1,
+                                    memo = entity?.memo ?: ""
                                 )
                                 findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToInputPasswordFragment(editData = passwordEditData))
                             }
@@ -264,8 +269,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
             }
 
         // フローティングボタンからの新規追加処理
-        val fab = rootView?.findViewById<FloatingActionButton>(R.id.fab)
-        fab?.setOnClickListener {
+        binding.fab.setOnClickListener {
             val passwordEditData = PasswordEditData()
             findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToInputPasswordFragment(editData = passwordEditData))
         }
@@ -401,9 +405,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     override fun onStart() {
         super.onStart()
         // 背景色を設定する
-        rootView?.findViewById<ConstraintLayout>(R.id.password_list_fragment_view)?.setBackgroundColor(
-            loginDataManager!!.backgroundColor
-        )
+        binding.passwordListFragmentView.setBackgroundColor(loginDataManager!!.backgroundColor)
         selectGroupName = getString(R.string.list_title)
         var isSelectGroupExist = false
         lifecycleScope.launch {
@@ -495,25 +497,24 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     /**
      * パスワード一覧の項目タップ時の処理
      *
-     * @param view タップされた項目のビュー
+     * @param passwordEntity 選択対象パスワードデータ
      */
-    override fun onAdapterClicked(view: View) {
+    override fun onAdapterClicked(passwordEntity: PasswordEntity) {
         // 編集状態の場合は入力画面に遷移しない
         if (adapter?.editEnable == true) {
             return
         }
         // 選択アイテムを設定
-        val holder = view.tag as PasswordListAdapter.ViewHolder
-        // 入力画面に遷移
         val passwordEditData = PasswordEditData(
-            id = holder.id ?: -1,
-            title = holder.title?.text.toString(),
-            account = holder.account ?: "",
-            password =  holder.password ?: "",
-            url = holder.url ?: "",
-            groupId = holder.groupId ?: 1,
-            memo = holder.memo ?: ""
+            id = passwordEntity.id,
+            title = passwordEntity.title,
+            account = passwordEntity.account,
+            password =  passwordEntity.password,
+            url = passwordEntity.url,
+            groupId = passwordEntity.groupId,
+            memo = passwordEntity.memo
         )
+        // 入力画面に遷移
         findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToReferencePasswordFragment(editData = passwordEditData))
     }
 

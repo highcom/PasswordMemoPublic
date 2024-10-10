@@ -8,12 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.TextView
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.PasswordEntity
+import com.highcom.passwordmemo.databinding.RowPasswordBinding
+import com.highcom.passwordmemo.databinding.RowFooterBinding
 import com.highcom.passwordmemo.util.TextSizeUtil
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import java.util.Locale
@@ -30,10 +31,14 @@ import java.util.Locale
  */
 class PasswordListAdapter(
     context: Context,
+    private val lifecycleOwner: LifecycleOwner,
     private val loginDataManager: LoginDataManager?,
     private val adapterListener: AdapterListener
-) : RecyclerView.Adapter<PasswordListAdapter.ViewHolder?>(), Filterable {
-    private val inflater: LayoutInflater
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
+    /** パスワードビューホルダーのbinding */
+    private var bindingPassword: RowPasswordBinding? = null
+    /** フッタービューホルダーのbinding */
+    private var bindingFooter: RowFooterBinding? = null
     /** DBに登録されているパスワード一覧データ */
     private var origPasswordList: List<PasswordEntity>? = null
     /** ソートやフィルタされた表示用のパスワード一覧データ */
@@ -55,9 +60,9 @@ class PasswordListAdapter(
         /**
          * パスワードデータ選択イベント
          *
-         * @param view 選択対象ビュー
+         * @param passwordEntity 選択対象パスワードデータ
          */
-        fun onAdapterClicked(view: View)
+        fun onAdapterClicked(passwordEntity: PasswordEntity)
     }
 
     /**
@@ -66,54 +71,23 @@ class PasswordListAdapter(
      * @constructor
      * パスワード一覧表示用ビューホルダーコンストラクタ
      *
-     * @param itemView 表示アイテムビュー
+     * @param binding 表示アイテムビュー
      */
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        /** パスワード一覧表示用レイアウト */
-        var rowLinearLayout: LinearLayout? = null
-        /** パスワードデータID */
-        var id: Long? = null
-        /** パスワードアイコン画像 */
-        var imageButton: ImageButton? = null
-        /** パスワードデータ名称 */
-        var title: TextView? = null
-        /** アカウント名称 */
-        var account: String? = null
-        /** パスワード */
-        var password: String? = null
-        /** サイトURL */
-        var url: String? = null
-        /** 所属グループID */
-        var groupId: Long? = null
-        /** パスワードデータ用メモ */
-        var memo: String? = null
-        /** パスワードデータ更新日付 */
-        var date: TextView? = null
-        /** 並べ替えアイコン画像 */
-        private var rearrangebtn: ImageButton? = null
-        /** パスワードデータ用メモビュー */
-        var memoView: TextView? = null
-
-        init {
-            // フッターの場合には何も設定しない
-            if (itemView.id != R.id.row_footer) {
-                rowLinearLayout = itemView.findViewById<View>(R.id.rowLinearLayout) as LinearLayout
-                imageButton = itemView.findViewById<View>(R.id.round_key_icon) as ImageButton
-                title = itemView.findViewById<View>(R.id.title) as TextView
-                date = itemView.findViewById<View>(R.id.date) as TextView
-                rearrangebtn = itemView.findViewById<View>(R.id.rearrangebutton) as ImageButton
-                memoView = itemView.findViewById<View>(R.id.memoView) as TextView
-                if (editEnable) {
-                    rearrangebtn?.visibility = View.VISIBLE
-                } else {
-                    rearrangebtn?.visibility = View.GONE
-                }
-            }
+    inner class RowPasswordViewHolder(val binding: RowPasswordBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(passwordEntity: PasswordEntity) {
+            binding.passwordEntity = passwordEntity
+            binding.executePendingBindings()
         }
     }
 
+    /**
+     * パスワード一覧フッター用ビューホルダー
+     *
+     * @property binding
+     */
+    inner class RowFooterViewHolder(private val binding: RowFooterBinding) : RecyclerView.ViewHolder(binding.root)
+
     init {
-        inflater = LayoutInflater.from(context)
         layoutHeightMap = object : HashMap<Int, Float>() {
             init {
                 put(
@@ -190,63 +164,64 @@ class PasswordListAdapter(
      * @param viewType ビュー種別
      * @return 生成したビューホルダー
      */
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             TYPE_ITEM -> {
-                ViewHolder(inflater.inflate(R.layout.row, parent, false))
+                bindingPassword = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.row_password, parent, false)
+                bindingPassword?.lifecycleOwner = lifecycleOwner
+                RowPasswordViewHolder(bindingPassword!!)
             }
             TYPE_FOOTER -> {
-                ViewHolder(inflater.inflate(R.layout.row_footer, parent, false))
+                bindingFooter = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.row_footer, parent, false)
+                bindingFooter?.lifecycleOwner = lifecycleOwner
+                RowFooterViewHolder(bindingFooter!!)
             }
             else -> {
-                ViewHolder(inflater.inflate(R.layout.row, parent, false))
+                bindingPassword = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.row_password, parent, false)
+                bindingPassword?.lifecycleOwner = lifecycleOwner
+                RowPasswordViewHolder(bindingPassword!!)
             }
         }
     }
 
-    /**
-     * ビューホルダーのバインド処理
-     *
-     * @param holder ビューホルダー
-     * @param position 表示位置
-     */
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        // フッターの場合にはデータをバインドしない
-        if (position >= passwordList!!.size) return
-        val layoutHeight = layoutHeightMap[textSize.toInt()]
-        if (layoutHeight != null) {
-            val params = holder.rowLinearLayout?.layoutParams
-            params?.height = layoutHeight.toInt()
-            holder.rowLinearLayout?.layoutParams = params
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (holder) {
+            is RowPasswordViewHolder -> {
+                passwordList?.let { holder.bind(it[position]) }
+                // レイアウト高さの設定
+                val layoutHeight = layoutHeightMap[textSize.toInt()]
+                if (layoutHeight != null) {
+                    val params = holder.binding.rowLinearLayout.layoutParams
+                    params?.height = layoutHeight.toInt()
+                    holder.binding.rowLinearLayout.layoutParams = params
+                }
+                // 文字サイズの設定
+                holder.binding.titleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
+                holder.binding.dateView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize - 3)
+                // メモ表示が有効でメモが入力されている場合は表示する
+                if (loginDataManager!!.memoVisibleSwitchEnable && holder.binding.memoView.text != "") {
+                    holder.binding.memoView.visibility = View.VISIBLE
+                } else {
+                    holder.binding.memoView.visibility = View.GONE
+                }
+                holder.binding.memoView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize - 3)
+                // アイテムクリック時ののイベントを追加
+                holder.binding.roundKeyIcon.setOnClickListener { view ->
+                    val parentView = view.parent as View
+                    parentView.callOnClick()
+                }
+                holder.binding.rowLinearLayout.setOnClickListener {
+                    holder.binding.passwordEntity?.let { adapterListener.onAdapterClicked(it) }
+                }
+                // 編集モードの場合には並べ替えアイコンを表示する
+                if (editEnable) {
+                    holder.binding.rearrangeButton.visibility = View.VISIBLE
+                } else {
+                    holder.binding.rearrangeButton.visibility = View.GONE
+                }
+            }
+            is RowFooterViewHolder -> {}
         }
-        passwordList?.let {
-            holder.id = it[position].id
-            holder.title?.text = it[position].title
-            holder.title?.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
-            holder.account = it[position].account
-            holder.password = it[position].password
-            holder.url = it[position].url
-            holder.groupId = it[position].groupId
-            holder.memo = it[position].memo
-            holder.date?.text = it[position].inputDate
-            holder.date?.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize - 3)
-        }
-        // メモ表示が有効でメモが入力されている場合は表示する
-        if (loginDataManager!!.memoVisibleSwitchEnable && holder.memo != "") {
-            holder.memoView?.visibility = View.VISIBLE
-            holder.memoView?.text = holder.memo
-        } else {
-            holder.memoView?.visibility = View.GONE
-            holder.memoView?.text = ""
-        }
-        holder.memoView?.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize - 3)
-        holder.itemView.tag = holder
-        // アイテムクリック時ののイベントを追加
-        holder.imageButton?.setOnClickListener { view ->
-            val parentView = view.parent as View
-            parentView.callOnClick()
-        }
-        holder.itemView.setOnClickListener { view -> adapterListener.onAdapterClicked(view) }
     }
 
     /**
