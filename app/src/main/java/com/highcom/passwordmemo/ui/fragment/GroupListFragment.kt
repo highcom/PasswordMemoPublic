@@ -369,10 +369,12 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
             if (fromPos == -1) fromPos = viewHolder.adapterPosition
             // 通知用の移動元位置は毎回更新する
             val notifyFromPos = viewHolder.adapterPosition
+            // 通知用の移動先位置は毎回更新する
+            val notifyToPos = target.adapterPosition
+            // 1番目のデータは「すべて」なので並べ替え不可にする
+            if (fromPos == 0 || notifyToPos == 0) return true
             // 移動先位置は最後イベント時の値を保持する
             toPos = target.adapterPosition
-            // 1番目のデータは「すべて」なので並べ替え不可にする
-            if (fromPos == 0 || toPos == 0) return false
             adapter?.notifyItemMoved(notifyFromPos, toPos)
             return true
         }
@@ -387,6 +389,13 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder
         ) {
+            // 1番目のデータは「すべて」なので並べ替え不可にする
+            if (fromPos == 0 || toPos == 0) {
+                // 移動位置情報を初期化
+                fromPos = -1
+                toPos = -1
+                return
+            }
             // 入れ替え完了後に最後に一度DBの更新をする
             val rearrangeList = adapter?.rearrangeGroupList(fromPos, toPos)
             rearrangeList?.let { groupListViewModel.update(rearrangeList) }
