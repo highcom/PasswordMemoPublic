@@ -22,6 +22,7 @@ import java.util.Locale
 /**
  * パスワード一覧表示用アダプタ
  *
+ * @property lifecycleOwner ライフサイクル
  * @property loginDataManager ログインデータ管理インスタンス
  * @property adapterListener パスワード一覧表示用アダプタリスナーインスタンス
  * @constructor
@@ -36,9 +37,9 @@ class PasswordListAdapter(
     private val adapterListener: AdapterListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
     /** パスワードビューホルダーのbinding */
-    private var bindingPassword: RowPasswordBinding? = null
+    private var passwordBinding: RowPasswordBinding? = null
     /** フッタービューホルダーのbinding */
-    private var bindingFooter: RowFooterBinding? = null
+    private var footerBinding: RowFooterBinding? = null
     /** DBに登録されているパスワード一覧データ */
     private var origPasswordList: List<PasswordEntity>? = null
     /** ソートやフィルタされた表示用のパスワード一覧データ */
@@ -71,9 +72,14 @@ class PasswordListAdapter(
      * @constructor
      * パスワード一覧表示用ビューホルダーコンストラクタ
      *
-     * @param binding 表示アイテムビュー
+     * @param binding 表示アイテムバインド
      */
     inner class RowPasswordViewHolder(val binding: RowPasswordBinding) : RecyclerView.ViewHolder(binding.root) {
+        /**
+         * パスワードデータバインド処理
+         *
+         * @param passwordEntity パスワードデータエンティティ
+         */
         fun bind(passwordEntity: PasswordEntity) {
             binding.passwordEntity = passwordEntity
             binding.executePendingBindings()
@@ -167,19 +173,19 @@ class PasswordListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             TYPE_ITEM -> {
-                bindingPassword = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.row_password, parent, false)
-                bindingPassword?.lifecycleOwner = lifecycleOwner
-                RowPasswordViewHolder(bindingPassword!!)
+                passwordBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.row_password, parent, false)
+                passwordBinding?.lifecycleOwner = lifecycleOwner
+                RowPasswordViewHolder(passwordBinding!!)
             }
             TYPE_FOOTER -> {
-                bindingFooter = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.row_footer, parent, false)
-                bindingFooter?.lifecycleOwner = lifecycleOwner
-                RowFooterViewHolder(bindingFooter!!)
+                footerBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.row_footer, parent, false)
+                footerBinding?.lifecycleOwner = lifecycleOwner
+                RowFooterViewHolder(footerBinding!!)
             }
             else -> {
-                bindingPassword = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.row_password, parent, false)
-                bindingPassword?.lifecycleOwner = lifecycleOwner
-                RowPasswordViewHolder(bindingPassword!!)
+                passwordBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.row_password, parent, false)
+                passwordBinding?.lifecycleOwner = lifecycleOwner
+                RowPasswordViewHolder(passwordBinding!!)
             }
         }
     }
