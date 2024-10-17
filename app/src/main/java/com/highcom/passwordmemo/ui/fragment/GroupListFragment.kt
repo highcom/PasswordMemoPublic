@@ -390,7 +390,7 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
             viewHolder: RecyclerView.ViewHolder
         ) {
             // 1番目のデータは「すべて」なので並べ替え不可にする
-            if (fromPos == 0 || toPos == 0) {
+            if (fromPos == -1 || toPos == -1 || fromPos == 0 || toPos == 0) {
                 // 移動位置情報を初期化
                 fromPos = -1
                 toPos = -1
