@@ -408,7 +408,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         binding.passwordListFragmentView.setBackgroundColor(loginDataManager!!.backgroundColor)
         selectGroupName = getString(R.string.list_title)
         var isSelectGroupExist = false
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenStarted {
             groupListViewModel.groupList.collect { list ->
                 for (entity in list) {
                     if (entity.groupId == loginDataManager?.selectGroup) {
