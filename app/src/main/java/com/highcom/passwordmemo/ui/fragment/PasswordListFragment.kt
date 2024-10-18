@@ -40,7 +40,6 @@ import com.highcom.passwordmemo.util.AdBanner
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import jp.co.recruit_mp.android.rmp_appirater.RmpAppirater
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Locale
 
@@ -401,6 +400,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         item.title = selectMenuTitle
     }
 
+    @Suppress("DEPRECATION")
     @SuppressLint("ResourceType")
     override fun onStart() {
         super.onStart()

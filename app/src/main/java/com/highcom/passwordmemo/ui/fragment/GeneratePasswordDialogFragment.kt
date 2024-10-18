@@ -3,7 +3,6 @@ package com.highcom.passwordmemo.ui.fragment
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
