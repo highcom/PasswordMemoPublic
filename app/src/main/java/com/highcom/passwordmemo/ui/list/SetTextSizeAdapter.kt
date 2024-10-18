@@ -1,6 +1,5 @@
 package com.highcom.passwordmemo.ui.list
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -8,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
-import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.databinding.RowSpinnerSetTextsizeBinding
 
 /**
  * テキストサイズ表示用アダプタ
@@ -78,21 +77,20 @@ class SetTextSizeAdapter(
      * @param parent 親のビューグループ
      * @return テキストサイズビュー
      */
-    @SuppressLint("InflateParams")
-    @Suppress("NAME_SHADOWING")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        var convertView = convertView
+        var view = convertView
         val holder: TextSizeViewHolder
-        if (convertView == null) {
-            convertView = inflater.inflate(R.layout.row_spinner_set_textsize, null)
+        if (view == null) {
+            val binding = RowSpinnerSetTextsizeBinding.inflate(inflater)
+            view = binding.root
             holder = TextSizeViewHolder()
-            holder.textView = convertView.findViewById(R.id.select_spinner_set_textsize_view)
-            convertView.tag = holder
+            holder.textView = binding.selectSpinnerSetTextsizeView
+            view.tag = holder
         } else {
-            holder = convertView.tag as TextSizeViewHolder
+            holder = view.tag as TextSizeViewHolder
         }
         holder.textView!!.text = names!![position]
         holder.textView!!.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size.toFloat())
-        return convertView!!
+        return view
     }
 }

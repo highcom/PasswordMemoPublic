@@ -1,6 +1,5 @@
 package com.highcom.passwordmemo.util.file
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
@@ -15,6 +14,7 @@ import androidx.annotation.WorkerThread
 import androidx.core.os.HandlerCompat
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
+import com.highcom.passwordmemo.databinding.AlertProgressbarBinding
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -194,7 +194,6 @@ class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListe
      * * DBファイル復元処理をバックグラウンドで実行する
      *
      */
-    @SuppressLint("InflateParams")
     private fun execRestoreDatabase() {
         AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.restore_db))
@@ -203,14 +202,15 @@ class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListe
                 // リストアする前にDBを閉じる
                 PasswordMemoRoomDatabase.closeDatabase()
                 // 取込み中のプログレスバーを表示する
+                val binding = AlertProgressbarBinding.inflate(activity.layoutInflater)
                 progressAlertDialog = AlertDialog.Builder(context)
                     .setTitle(R.string.db_restore_processing)
-                    .setView(activity.layoutInflater.inflate(R.layout.alert_progressbar, null))
+                    .setView(binding.root)
                     .create()
                 progressAlertDialog?.show()
                 progressAlertDialog?.setCancelable(false)
                 progressAlertDialog?.setCanceledOnTouchOutside(false)
-                progressBar = progressAlertDialog?.findViewById(R.id.ProgressBarHorizontal)
+                progressBar = binding.progressBarHorizontal
 
                 // ワーカースレッドで取込みを開始する
                 val mainLooper = Looper.getMainLooper()

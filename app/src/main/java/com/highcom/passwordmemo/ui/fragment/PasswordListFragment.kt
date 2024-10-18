@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.PasswordEntity
+import com.highcom.passwordmemo.databinding.AlertOperatingInstructionsBinding
 import com.highcom.passwordmemo.databinding.FragmentPasswordListBinding
 import com.highcom.passwordmemo.ui.DividerItemDecoration
 import com.highcom.passwordmemo.ui.PasswordEditData
@@ -454,13 +455,14 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
      */
     @SuppressLint("InflateParams")
     private fun operationInstructionDialog() {
-        val alertDialog = android.app.AlertDialog.Builder(requireContext())
+        val alertBinding = AlertOperatingInstructionsBinding.inflate(layoutInflater)
+        val alertDialog = AlertDialog.Builder(requireContext())
             .setTitle(R.string.operation_opening_title)
-            .setView(layoutInflater.inflate(R.layout.alert_operating_instructions, null))
+            .setView(alertBinding.root)
             .setPositiveButton(R.string.close, null)
             .create()
         alertDialog.show()
-        alertDialog.findViewById<View>(R.id.operation_instruction_message).visibility = View.VISIBLE
+        alertBinding.operationInstructionMessage.visibility = View.VISIBLE
         alertDialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE)
             .setOnClickListener { alertDialog.dismiss() }
     }

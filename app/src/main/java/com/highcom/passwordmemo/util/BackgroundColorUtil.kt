@@ -1,13 +1,12 @@
 package com.highcom.passwordmemo.util
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.widget.AdapterView.OnItemClickListener
-import android.widget.ListView
 import androidx.annotation.ColorInt
 import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.databinding.AlertBackgroundColorBinding
 import com.highcom.passwordmemo.ui.list.BackgroundColorAdapter
 import com.highcom.passwordmemo.ui.list.BackgroundColorItem
 
@@ -71,13 +70,13 @@ class BackgroundColorUtil(context: Context, listener: BackgroundColorListener?) 
      * @param activity アクティビティ
      * @return 背景色選択ダイアログ
      */
-    @SuppressLint("ResourceType", "InflateParams")
     fun createBackgroundColorDialog(activity: Activity): AlertDialog {
+        val binding = AlertBackgroundColorBinding.inflate(activity.layoutInflater)
         val alertDialog = AlertDialog.Builder(activity)
-            .setView(activity.layoutInflater.inflate(R.layout.alert_background_color, null))
+            .setView(binding.root)
             .create()
         alertDialog.show()
-        val listView = alertDialog.findViewById<ListView>(R.id.backgroundColorListView)
+        val listView = binding.backgroundColorListView
         val colorItems: MutableList<BackgroundColorItem> = ArrayList()
         colorItems.add(BackgroundColorItem(activity.getString(R.string.color_white), colors[0]))
         colorItems.add(BackgroundColorItem(activity.getString(R.string.color_lightgray), colors[1]))

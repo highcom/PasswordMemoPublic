@@ -1,13 +1,12 @@
 package com.highcom.passwordmemo.ui.list
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.LinearLayout
-import android.widget.TextView
-import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.databinding.RowBackgroundColorBinding
 
 /**
  * 背景色一覧表示用アダプタ
@@ -30,16 +29,18 @@ class BackgroundColorAdapter(
         mInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     }
 
+    @SuppressLint("ViewHolder")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view: View = convertView ?: mInflater.inflate(mResource, null)
+        val binding = RowBackgroundColorBinding.inflate(mInflater)
+        val view: View = convertView ?: binding.root
 
         // リストビューに表示する要素を取得
         val item = mItems[position]
 
         // 背景色と名前を設定
-        val title = view.findViewById<TextView>(R.id.backgroundColorName)
+        val title = binding.backgroundColorName
         title.text = item.colorName
-        val linearLayout = view.findViewById<LinearLayout>(R.id.backgroundColorRow)
+        val linearLayout = binding.backgroundColorRow
         item.colorCode?.let { linearLayout.setBackgroundColor(it) }
         return view
     }
