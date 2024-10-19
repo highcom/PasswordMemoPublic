@@ -7,6 +7,7 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.InputType
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.Menu
@@ -88,6 +89,11 @@ class ReferencePasswordFragment : Fragment() {
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager!!.displayBackgroundSwitchEnable) {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        }
+
+        // パスワードの初期表示設定
+        if (loginDataManager!!.passwordVisibleSwitchEnable) {
+            binding.editRefPassword.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
         }
 
         requireActivity().title = passwordEditData.title
