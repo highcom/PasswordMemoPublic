@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
-import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.databinding.RowTextSizeBinding
 
 /**
  * テキストサイズ一覧表示用アダプタ
@@ -80,20 +80,20 @@ class TextSizeAdapter(
      * @param parent 親のビューグループ
      * @return 生成したビュー
      */
-    @Suppress("NAME_SHADOWING")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        var convertView = convertView
+        var view = convertView
         val holder: TextSizeViewHolder
-        if (convertView == null) {
-            convertView = inflater.inflate(layoutID, null)
+        if (view == null) {
+            val binding = RowTextSizeBinding.inflate(inflater)
+            view = binding.root
             holder = TextSizeViewHolder()
-            holder.textView = convertView.findViewById(R.id.select_text_size_view)
-            convertView.tag = holder
+            holder.textView = binding.selectTextSizeView
+            view.tag = holder
         } else {
-            holder = convertView.tag as TextSizeViewHolder
+            holder = view.tag as TextSizeViewHolder
         }
         holder.textView!!.text = names[position]
         holder.textView!!.setTextSize(TypedValue.COMPLEX_UNIT_DIP, sizes[position].toFloat())
-        return convertView!!
+        return view
     }
 }

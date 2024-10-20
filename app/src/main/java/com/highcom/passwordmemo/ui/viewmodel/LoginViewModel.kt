@@ -31,6 +31,8 @@ class LoginViewModel(private val repository: PasswordMemoRepository, private val
     /** ログイン時の案内メッセージ */
     private val _keyIconRotate = MutableStateFlow(false)
     val keyIconRotate: StateFlow<Boolean> = _keyIconRotate.asStateFlow()
+    /** 入力パスワード */
+    val editMasterPassword = MutableStateFlow("")
     /** 初回ログインかどうか */
     var firstTime = false
     /** マスターパスワード作成時の1回目の入力値 */
@@ -153,6 +155,8 @@ class LoginViewModel(private val repository: PasswordMemoRepository, private val
                     )
             }
         }
+        // 入力したパスワードはクリアする
+        editMasterPassword.value = ""
     }
 
     /**

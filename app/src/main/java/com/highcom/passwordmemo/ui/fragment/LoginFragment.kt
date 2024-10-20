@@ -2,7 +2,6 @@ package com.highcom.passwordmemo.ui.fragment
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Bundle
 import android.util.TypedValue
 import androidx.fragment.app.Fragment
@@ -13,38 +12,29 @@ import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.textfield.TextInputEditText
 import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.ui.viewmodel.LoginViewModel
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import kotlinx.coroutines.launch
+import com.highcom.passwordmemo.databinding.FragmentLoginBinding
 
 /**
  * ログイン画面フラグメント
  *
  */
-class LoginFragment : Fragment(), View.OnClickListener {
-
-    /** ログイン画面のビュー */
-    private var rootView: View? = null
+class LoginFragment : Fragment() {
+    /** ログイン画面のbinding */
+    private lateinit var binding: FragmentLoginBinding
     /** ログインデータ管理 */
     private var loginDataManager: LoginDataManager? = null
-    /** ログイン時の案内メッセージビュー */
-    private var naviText: TextView? = null
-    /** 鍵アイコン */
-    private var masterKeyIcon: ImageView? = null
     /** ログインビューモデル */
     private val loginViewModel: LoginViewModel by viewModels {
         LoginViewModel.Factory(
@@ -55,9 +45,11 @@ class LoginFragment : Fragment(), View.OnClickListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        rootView = inflater.inflate(R.layout.fragment_login, container, false)
-        return rootView
+    ): View {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false)
+        binding.loginViewModel = loginViewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,22 +61,13 @@ class LoginFragment : Fragment(), View.OnClickListener {
         if (loginDataManager!!.displayBackgroundSwitchEnable) {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
-        val versionText = rootView?.findViewById<TextView>(R.id.versionText)
         try {
             val info = requireActivity().packageManager.getPackageInfo(requireActivity().packageName, PackageManager.GET_META_DATA)
-            versionText?.text = String.format("%s %s", getString(R.string.version), info.versionName)
+            binding.versionText.text = String.format("%s %s", getString(R.string.version), info.versionName)
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
         }
-        // パスワードログインボタンの設定
-        naviText = rootView?.findViewById<View>(R.id.navigateText) as TextView
-        val loginbtn = rootView?.findViewById<View>(R.id.loginButton) as Button
-        loginbtn.setOnClickListener(this)
-        // 生体認証ログインボタンの設定
-        val biometricloginbtn = rootView?.findViewById<View>(R.id.biometricLoginButton) as ImageButton
-        biometricloginbtn.setOnClickListener(this)
         // ログイン時のアニメーション設定
-        masterKeyIcon = rootView?.findViewById(R.id.masterKeyIcon)
         val rotateAnimation = AnimationUtils.loadAnimation(activity, R.anim.rotate_animation)
         rotateAnimation?.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation) {}
@@ -95,10 +78,10 @@ class LoginFragment : Fragment(), View.OnClickListener {
             override fun onAnimationRepeat(animation: Animation) {}
         })
 
-        // 案内メッセージを更新する
+        // ナビゲーションメッセージ更新時にボタンの有効無効を更新
         lifecycleScope.launch {
-            loginViewModel.naviMessage.collect { message ->
-                naviText?.text = message
+            loginViewModel.naviMessage.collect {
+                checkBiometricSetting()
             }
         }
 
@@ -106,44 +89,26 @@ class LoginFragment : Fragment(), View.OnClickListener {
         lifecycleScope.launch {
             loginViewModel.keyIconRotate.collect {
                 if (it) {
-                    masterKeyIcon?.startAnimation(rotateAnimation)
+                    binding.masterKeyIcon.startAnimation(rotateAnimation)
                 }
             }
         }
-    }
-
-    override fun onClick(v: View?) {
-        when (v?.id) {
-            R.id.loginButton -> {
-                val editPassword =
-                    (rootView?.findViewById<View>(R.id.editMasterPassword) as TextInputEditText).text.toString()
-                loginViewModel.passwordLogin(requireContext(), editPassword)
-            }
-
-            R.id.biometricLoginButton -> loginViewModel.biometricLogin(requireContext())
-            else -> {}
-        }
-        (rootView?.findViewById<View>(R.id.editMasterPassword) as EditText).editableText.clear()
-        loginDataManager?.updateSetting()
-        checkBiometricSetting()
     }
 
     override fun onStart() {
         super.onStart()
         loginDataManager!!.updateSetting()
         checkBiometricSetting()
-        masterKeyIcon?.clearAnimation()
+        binding.masterKeyIcon.clearAnimation()
         loginViewModel.resetKeyIconRotate()
         loginViewModel.resetNaviMessage(requireContext())
 
         // 戻るボタンを無効化
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
         // 背景色を設定する
-        (view?.findViewById<View>(R.id.loginFragmentView) as ConstraintLayout?)?.setBackgroundColor(
-            loginDataManager!!.backgroundColor
-        )
+        binding.loginFragmentView.setBackgroundColor(loginDataManager!!.backgroundColor)
         // 入力内容は一旦クリアする
-        (view?.findViewById<View>(R.id.editMasterPassword) as EditText?)?.editableText?.clear()
+        binding.editMasterPassword.editableText?.clear()
         // テキストサイズを設定する
         setTextSize(loginDataManager!!.textSize)
     }
@@ -153,7 +118,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
         loginDataManager!!.updateSetting()
         loginViewModel.firstPassword = null
         checkBiometricSetting()
-        masterKeyIcon?.clearAnimation()
+        binding.masterKeyIcon.clearAnimation()
         loginViewModel.resetKeyIconRotate()
         loginViewModel.resetNaviMessage(requireContext())
     }
@@ -166,17 +131,13 @@ class LoginFragment : Fragment(), View.OnClickListener {
     private fun checkBiometricSetting() {
         if (!loginDataManager!!.biometricLoginSwitchEnable) {
             // 生体認証ログインが無効の場合は非表示
-            view?.findViewById<View>(R.id.biometricLoginButton)?.visibility = View.INVISIBLE
+            binding.biometricLoginButton.visibility = View.INVISIBLE
             return
         } else if (!loginDataManager!!.isMasterPasswordCreated) {
             // 生体認証ログインが有効でマスターパスワードが作成済みなら有効化
-            view?.findViewById<View>(R.id.biometricLoginButton)?.visibility = View.VISIBLE
-            view?.findViewById<View>(R.id.biometricLoginButton)?.isEnabled = false
-            (view?.findViewById<View>(R.id.biometricLoginButton) as ImageButton?)?.setColorFilter(
-                Color.parseColor(
-                    "#CCCCCC"
-                )
-            )
+            binding.biometricLoginButton.visibility = View.VISIBLE
+            binding.biometricLoginButton.isEnabled = false
+            binding.biometricLoginButton.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
             return
         }
         val biometricManager = context?.let { BiometricManager.from(it) }
@@ -184,26 +145,17 @@ class LoginFragment : Fragment(), View.OnClickListener {
         @Suppress("DEPRECATION")
         when (biometricManager?.canAuthenticate()) {
             BiometricManager.BIOMETRIC_SUCCESS -> {
-                view?.findViewById<View>(R.id.biometricLoginButton)?.visibility = View.VISIBLE
-                view?.findViewById<View>(R.id.biometricLoginButton)?.isEnabled = true
-                view?.findViewById<ImageView>(R.id.biometricLoginButton)?.setColorFilter(
-                    Color.parseColor(
-                        "#007AFF"
-                    )
-                )
+                binding.biometricLoginButton.visibility = View.VISIBLE
+                binding.biometricLoginButton.isEnabled = true
+                binding.biometricLoginButton.setColorFilter(ContextCompat.getColor(requireContext(), R.color.blue))
             }
 
-            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> view?.findViewById<View>(R.id.biometricLoginButton)?.visibility =
-                View.INVISIBLE
+            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> binding.biometricLoginButton.visibility = View.INVISIBLE
 
             BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE, BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
-                view?.findViewById<View>(R.id.biometricLoginButton)?.visibility = View.VISIBLE
-                view?.findViewById<View>(R.id.biometricLoginButton)?.isEnabled = false
-                view?.findViewById<ImageButton>(R.id.biometricLoginButton)?.setColorFilter(
-                    Color.parseColor(
-                        "#CCCCCC"
-                    )
-                )
+                binding.biometricLoginButton.visibility = View.VISIBLE
+                binding.biometricLoginButton.isEnabled = false
+                binding.biometricLoginButton.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray))
             }
 
             BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED,
@@ -219,18 +171,9 @@ class LoginFragment : Fragment(), View.OnClickListener {
      * @param size 指定テキストサイズ
      */
     private fun setTextSize(size: Float) {
-        view?.findViewById<TextView>(R.id.navigateText)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        view?.findViewById<EditText>(R.id.editMasterPassword)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        view?.findViewById<Button>(R.id.loginButton)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size - 3
-        )
+        binding.navigateText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.editMasterPassword.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.loginButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
     }
 
     /**

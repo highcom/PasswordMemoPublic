@@ -1,51 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/rowGroupLayout"
-    android:layout_width="match_parent"
-    android:layout_height="45dp"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:weightSum="1">
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <ImageButton
-        android:layout_width="30dp"
-        android:layout_height="match_parent"
-        android:layout_marginStart="10dp"
-        android:focusableInTouchMode="false"
-        android:adjustViewBounds="true"
-        android:background="@null"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_folder"
-        android:id="@+id/folder_icon" />
+    <data>
+        <variable
+            name="groupEntity"
+            type="com.highcom.passwordmemo.data.GroupEntity" />
+    </data>
 
-    <com.highcom.passwordmemo.ui.DisableNoFocusEditText
-        android:id="@+id/groupName"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginStart="10dp"
-        android:layout_weight="1"
-        android:inputType="text"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:imeOptions="flagNoExtractUi"
-        android:background="#00000000"
+    <LinearLayout
+        android:id="@+id/rowGroupLayout"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
         android:gravity="center_vertical"
-        android:textColor="@android:color/black"
-        android:text=""
-        android:textSize="15dp" />
+        android:orientation="horizontal"
+        android:weightSum="1">
 
-    <ImageButton
-        android:layout_width="35dp"
-        android:layout_height="match_parent"
-        android:focusableInTouchMode="false"
-        android:layout_margin="10dp"
-        android:adjustViewBounds="true"
-        android:background="@null"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_baseline_drag_handle_24"
-        android:id="@+id/groupRearrangeButton" />
+        <ImageButton
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:focusableInTouchMode="false"
+            android:adjustViewBounds="true"
+            android:background="@null"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_folder"
+            android:id="@+id/folder_icon"
+            android:importantForAccessibility="no" />
 
-</LinearLayout>
+        <com.highcom.passwordmemo.ui.DisableNoFocusEditText
+            android:id="@+id/groupName"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:inputType="text"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:imeOptions="flagNoExtractUi"
+            android:background="#00000000"
+            android:gravity="center_vertical"
+            android:textColor="@android:color/black"
+            android:text="@={groupEntity.name}"
+            android:textSize="15dp" />
+
+        <ImageButton
+            android:layout_width="35dp"
+            android:layout_height="match_parent"
+            android:focusableInTouchMode="false"
+            android:layout_margin="10dp"
+            android:adjustViewBounds="true"
+            android:background="@null"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_baseline_drag_handle_24"
+            android:id="@+id/groupRearrangeButton"
+            android:importantForAccessibility="no" />
+
+    </LinearLayout>
+</layout>

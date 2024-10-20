@@ -14,21 +14,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.AdapterView
-import android.widget.Button
-import android.widget.ScrollView
 import android.widget.Spinner
-import android.widget.Switch
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.textfield.TextInputEditText
 import com.highcom.passwordmemo.PasswordMemoActivity
 import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.databinding.FragmentSettingBinding
 import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
 import com.highcom.passwordmemo.ui.viewmodel.SettingViewModel
 import com.highcom.passwordmemo.util.BackgroundColorUtil
@@ -49,9 +45,9 @@ import java.util.Date
  */
 class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
     TextSizeUtil.TextSizeListener, SelectInputOutputFileDialog.InputOutputFileDialogListener,
-    RestoreDbFile.RestoreDbFileListener {
-    /** 設定画面のビュー */
-    private var rootView: View? = null
+    RestoreDbFile.RestoreDbFileListener, EditMasterPasswordDialogFragment.EditMasterPasswordListener {
+    /** 設定画面のbinding */
+    private lateinit var binding: FragmentSettingBinding
     /** ログインデータ管理 */
     private var loginDataManager: LoginDataManager? = null
     /** 処理ハンドラ */
@@ -77,9 +73,9 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        rootView = inflater.inflate(R.layout.fragment_setting, container, false)
-        return rootView
+    ): View {
+        binding = FragmentSettingBinding.inflate(inflater)
+        return binding.root
     }
 
     @Suppress("DEPRECATION")
@@ -97,61 +93,61 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
         }
 
         // 背景色を設定する
-        rootView?.findViewById<ScrollView>(R.id.setting_view)?.setBackgroundColor(
+        binding.settingView.setBackgroundColor(
             loginDataManager!!.backgroundColor
         )
 
         // データ削除スイッチ処理
-        val deleteSwitch = rootView?.findViewById<Switch>(R.id.delete_switch)
-        deleteSwitch?.isChecked = loginDataManager!!.deleteSwitchEnable
-        deleteSwitch?.setOnCheckedChangeListener { _, b ->
+        val deleteSwitch = binding.deleteSwitch
+        deleteSwitch.isChecked = loginDataManager!!.deleteSwitchEnable
+        deleteSwitch.setOnCheckedChangeListener { _, b ->
             loginDataManager?.setDeleteSwitchEnable(b)
         }
 
         // 生体認証ログインスイッチ処理
-        val biometricLoginSwitch = rootView?.findViewById<Switch>(R.id.biometric_login_switch)
+        val biometricLoginSwitch = binding.biometricLoginSwitch
         val biometricManager = BiometricManager.from(requireContext())
         if (biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE) {
-            biometricLoginSwitch?.isChecked = false
-            biometricLoginSwitch?.isEnabled = false
+            biometricLoginSwitch.isChecked = false
+            biometricLoginSwitch.isEnabled = false
         } else {
-            biometricLoginSwitch?.isChecked = loginDataManager!!.biometricLoginSwitchEnable
-            biometricLoginSwitch?.isEnabled = true
+            biometricLoginSwitch.isChecked = loginDataManager!!.biometricLoginSwitchEnable
+            biometricLoginSwitch.isEnabled = true
         }
-        biometricLoginSwitch?.setOnCheckedChangeListener { _, b ->
+        biometricLoginSwitch.setOnCheckedChangeListener { _, b ->
             loginDataManager!!.setBiometricLoginSwitchEnable(b)
         }
 
         // バックグラウンド時の非表示設定
-        val displayBackgroundSwitch = rootView?.findViewById<Switch>(R.id.display_background_switch)
-        displayBackgroundSwitch?.isChecked = loginDataManager!!.displayBackgroundSwitchEnable
-        displayBackgroundSwitch?.setOnCheckedChangeListener { _, b ->
+        val displayBackgroundSwitch = binding.displayBackgroundSwitch
+        displayBackgroundSwitch.isChecked = loginDataManager!!.displayBackgroundSwitchEnable
+        displayBackgroundSwitch.setOnCheckedChangeListener { _, b ->
             loginDataManager!!.setDisplayBackgroundSwitchEnable(b)
             restartPasswordMemoActivity()
         }
 
         // メモ表示スイッチ処理
-        val memoVisibleSwitch = rootView?.findViewById<Switch>(R.id.memo_visible_switch)
-        memoVisibleSwitch?.isChecked = loginDataManager!!.memoVisibleSwitchEnable
-        memoVisibleSwitch?.setOnCheckedChangeListener { _, b ->
+        val memoVisibleSwitch = binding.memoVisibleSwitch
+        memoVisibleSwitch.isChecked = loginDataManager!!.memoVisibleSwitchEnable
+        memoVisibleSwitch.setOnCheckedChangeListener { _, b ->
             loginDataManager?.setMemoVisibleSwitchEnable(b)
         }
 
         // パスワード表示スイッチ処理
-        val passwordVisibleSwitch = rootView?.findViewById<Switch>(R.id.password_visible_switch)
-        passwordVisibleSwitch?.isChecked = loginDataManager!!.passwordVisibleSwitchEnable
-        passwordVisibleSwitch?.setOnCheckedChangeListener { _, b ->
+        val passwordVisibleSwitch = binding.passwordVisibleSwitch
+        passwordVisibleSwitch.isChecked = loginDataManager!!.passwordVisibleSwitchEnable
+        passwordVisibleSwitch.setOnCheckedChangeListener { _, b ->
             loginDataManager?.setPasswordVisibleSwitchEnable(b)
         }
 
         // テキストサイズスピナー処理
-        val textSizeSpinner = rootView?.findViewById<Spinner>(R.id.text_size_spinner)
+        val textSizeSpinner = binding.textSizeSpinner
         val textSizeUtil = TextSizeUtil(requireContext(), this)
         textSizeUtil.createTextSizeSpinner(textSizeSpinner)
-        textSizeSpinner?.setSelection(textSizeUtil.getSpecifiedValuePosition(loginDataManager!!.textSize))
+        textSizeSpinner.setSelection(textSizeUtil.getSpecifiedValuePosition(loginDataManager!!.textSize))
 
         // パスワードコピー方法スピナー処理
-        copyClipboardSpinner = rootView?.findViewById(R.id.copy_clipboard_spinner)
+        copyClipboardSpinner = binding.copyClipboardSpinner
         copyClipboardNames = ArrayList()
         copyClipboardNames?.add(getString(R.string.copy_with_longpress))
         copyClipboardNames?.add(getString(R.string.copy_with_tap))
@@ -168,28 +164,22 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
         }
 
         // DBバックアップ復元ボタン処理
-        val dbBackupBtn = rootView?.findViewById<Button>(R.id.db_backup_button)
-        dbBackupBtn?.setOnClickListener { confirmSelectOperation(SelectInputOutputFileDialog.Operation.DB_RESTORE_BACKUP) }
+        binding.dbBackupButton.setOnClickListener { confirmSelectOperation(SelectInputOutputFileDialog.Operation.DB_RESTORE_BACKUP) }
 
         // CSV出力ボタン処理
-        val csvOutputBtn = rootView?.findViewById<Button>(R.id.csv_output_button)
-        csvOutputBtn?.setOnClickListener { confirmSelectOperation(SelectInputOutputFileDialog.Operation.CSV_INPUT_OUTPUT) }
+        binding.csvOutputButton.setOnClickListener { confirmSelectOperation(SelectInputOutputFileDialog.Operation.CSV_INPUT_OUTPUT) }
 
         // 背景色ボタン処理
-        val colorSelectBtn = rootView?.findViewById<Button>(R.id.color_select_button)
-        colorSelectBtn?.setOnClickListener { colorSelectDialog() }
+        binding.colorSelectButton.setOnClickListener { colorSelectDialog() }
 
         // パスワード設定ボタン処理
-        val masterPasswordSetBtn = rootView?.findViewById<Button>(R.id.master_password_set_button)
-        masterPasswordSetBtn?.setOnClickListener { editMasterPassword() }
+        binding.masterPasswordSetButton.setOnClickListener { editMasterPassword() }
 
         // 操作説明ボタン処理
-        val operationInstructionBtn = rootView?.findViewById<Button>(R.id.operation_instruction_button)
-        operationInstructionBtn?.setOnClickListener { operationInstructionDialog() }
+        binding.operationInstructionButton.setOnClickListener { operationInstructionDialog() }
 
         // このアプリを評価ボタン押下処理
-        val rateBtn = rootView?.findViewById<Button>(R.id.rate_button)
-        rateBtn?.setOnClickListener {
+        binding.rateButton.setOnClickListener {
             val uri =
                 Uri.parse("https://play.google.com/store/apps/details?id=com.highcom.passwordmemo")
             val intent = Intent(Intent.ACTION_VIEW, uri)
@@ -197,14 +187,12 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
         }
 
         // ライセンスボタン処理
-        val licenseBtn = rootView?.findViewById<Button>(R.id.license_button)
-        licenseBtn?.setOnClickListener {
+        binding.licenseButton.setOnClickListener {
             findNavController().navigate(SettingFragmentDirections.actionSettingFragmentToLicenseFragment())
         }
 
         // プライバシーポリシーボタン処理
-        val privacyPolicyBtn = rootView?.findViewById<Button>(R.id.privacy_policy_button)
-        privacyPolicyBtn?.setOnClickListener {
+        binding.privacyPolicyButton.setOnClickListener {
             val uri = Uri.parse("https://high-commu.amebaownd.com/pages/2891722/page_201905200001")
             val intent = Intent(Intent.ACTION_VIEW, uri)
             startActivity(intent)
@@ -241,9 +229,8 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
      * パスワード変更完了時の通知処理
      *
      */
-    private fun passwordChangeComplete() {
-        val ts =
-            Toast.makeText(requireContext(), getString(R.string.password_change_message), Toast.LENGTH_SHORT)
+    override fun passwordChangeComplete() {
+        val ts = Toast.makeText(requireContext(), getString(R.string.password_change_message), Toast.LENGTH_SHORT)
         ts.show()
     }
 
@@ -342,7 +329,7 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
 
     @Deprecated("Deprecated in Java")
     @Suppress("DEPRECATION")
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
         if (resultCode == AppCompatActivity.RESULT_OK && resultData!!.data != null) {
             val uri = resultData.data
@@ -386,40 +373,9 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
      * マスターパスワード編集処理
      *
      */
-    @SuppressLint("InflateParams")
     private fun editMasterPassword() {
-        val alertDialog = AlertDialog.Builder(requireContext())
-            .setTitle(R.string.change_master_password)
-            .setView(layoutInflater.inflate(R.layout.alert_edit_master_password, null))
-            .setPositiveButton(R.string.execute, null)
-            .setNegativeButton(R.string.discard, null)
-            .create()
-        alertDialog.show()
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(View.OnClickListener {
-            val orgPassword = loginDataManager!!.masterPassword
-            val newPassword =
-                alertDialog.findViewById<TextInputEditText>(R.id.edit_new_master_password).text.toString()
-            val newPassword2 =
-                alertDialog.findViewById<TextInputEditText>(R.id.edit_new_master_password2).text.toString()
-            if (newPassword != newPassword2) {
-                // 入力内容が異なっていたらエラー
-                alertDialog.findViewById<TextView>(R.id.input_navigate_text).setText(R.string.input_different_message)
-                return@OnClickListener
-            } else if (newPassword == "") {
-                // 入力内容が空ならエラー
-                alertDialog.findViewById<TextView>(R.id.input_navigate_text).setText(R.string.nothing_entered_message)
-                return@OnClickListener
-            } else if (newPassword == orgPassword) {
-                // マスターパスワードと同じならエラー
-                alertDialog.findViewById<TextView>(R.id.input_navigate_text).setText(R.string.password_same_message)
-                return@OnClickListener
-            } else {
-                alertDialog.findViewById<TextView>(R.id.input_navigate_text).text = " "
-                loginDataManager!!.setMasterPassword(newPassword)
-                passwordChangeComplete()
-                alertDialog.dismiss()
-            }
-        })
+        val dialog = EditMasterPasswordDialogFragment(loginDataManager!!)
+        dialog.show(childFragmentManager, "EditMasterPasswordDialog")
     }
 
     /**
@@ -445,7 +401,7 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
      */
     @SuppressLint("ResourceType")
     override fun onSelectColorClicked(color: Int) {
-        rootView?.findViewById<ScrollView>(R.id.setting_view)?.setBackgroundColor(color)
+        binding.settingView.setBackgroundColor(color)
         loginDataManager!!.setBackgroundColor(color)
     }
 
@@ -475,102 +431,33 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
      */
     private fun setTextSize(size: Float) {
         // レイアウトが崩れるので詳細説明のテキストはサイズ変更しない
-        rootView?.findViewById<Switch>(R.id.delete_switch)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<Switch>(R.id.biometric_login_switch)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<Switch>(R.id.display_background_switch)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<Switch>(R.id.memo_visible_switch)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<Switch>(R.id.password_visible_switch)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<TextView>(R.id.text_size_view)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
+        binding.deleteSwitch.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.biometricLoginSwitch.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.displayBackgroundSwitch.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.memoVisibleSwitch.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.passwordVisibleSwitch.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.textSizeView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         // テキストサイズ設定のSpinnerは設定不要
-        rootView?.findViewById<TextView>(R.id.copy_clipboard_view)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
+        binding.copyClipboardView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         val copyClipboardAdapter = SetTextSizeAdapter(requireContext(), copyClipboardNames, size.toInt())
-        copyClipboardSpinner!!.adapter = copyClipboardAdapter
-        copyClipboardSpinner!!.setSelection(loginDataManager!!.copyClipboard)
-        rootView?.findViewById<TextView>(R.id.text_db_backup_view)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<Button>(R.id.db_backup_button)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size - 3
-        )
-        rootView?.findViewById<TextView>(R.id.text_csv_output_view)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<Button>(R.id.csv_output_button)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size - 3
-        )
-        rootView?.findViewById<TextView>(R.id.text_color_select_view)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<Button>(R.id.color_select_button)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size - 3
-        )
-        rootView?.findViewById<TextView>(R.id.text_master_password_view)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<Button>(R.id.master_password_set_button)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size - 3
-        )
-        rootView?.findViewById<TextView>(R.id.text_operation_instruction_view)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<Button>(R.id.operation_instruction_button)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size - 3
-        )
-        rootView?.findViewById<TextView>(R.id.text_rate_view)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<Button>(R.id.rate_button)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size - 3
-        )
-        rootView?.findViewById<TextView>(R.id.text_license_view)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<Button>(R.id.license_button)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size - 3
-        )
-        rootView?.findViewById<TextView>(R.id.text_privacy_policy_view)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<Button>(R.id.privacy_policy_button)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size - 3
-        )
+        copyClipboardSpinner?.adapter = copyClipboardAdapter
+        copyClipboardSpinner?.setSelection(loginDataManager!!.copyClipboard)
+        binding.textDbBackupView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.dbBackupButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.textCsvOutputView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.csvOutputButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.textColorSelectView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.colorSelectButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.textMasterPasswordView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.masterPasswordSetButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.textOperationInstructionView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.operationInstructionButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.textRateView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.rateButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.textLicenseView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.licenseButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.textPrivacyPolicyView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.privacyPolicyButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
     }
 
     /**

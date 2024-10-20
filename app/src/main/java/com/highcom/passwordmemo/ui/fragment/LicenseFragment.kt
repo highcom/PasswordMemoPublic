@@ -9,10 +9,10 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
-import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import com.highcom.passwordmemo.PasswordMemoApplication
+import com.highcom.passwordmemo.databinding.FragmentLicenseBinding
 import com.highcom.passwordmemo.util.login.LoginDataManager
 
 /**
@@ -20,8 +20,8 @@ import com.highcom.passwordmemo.util.login.LoginDataManager
  *
  */
 class LicenseFragment : Fragment() {
-    /** ライセンス画面のビュー */
-    private var rootView: View? = null
+    /** ライセンス画面のbinding */
+    private lateinit var binding: FragmentLicenseBinding
     /** ログインデータ管理 */
     private var loginDataManager: LoginDataManager? = null
 
@@ -36,9 +36,9 @@ class LicenseFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        rootView = inflater.inflate(R.layout.fragment_license, container, false)
-        return rootView
+    ): View {
+        binding = FragmentLicenseBinding.inflate(inflater)
+        return binding.root
     }
 
     @SuppressLint("ResourceType")
@@ -58,9 +58,7 @@ class LicenseFragment : Fragment() {
     @SuppressLint("ResourceType")
     override fun onStart() {
         super.onStart()
-        rootView?.findViewById<LinearLayout>(R.id.licenseView)?.setBackgroundColor(
-            loginDataManager!!.backgroundColor
-        )
+        binding.licenseView.setBackgroundColor(loginDataManager!!.backgroundColor)
     }
 
     @Suppress("DEPRECATION")

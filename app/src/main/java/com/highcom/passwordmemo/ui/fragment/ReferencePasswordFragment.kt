@@ -18,8 +18,8 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -28,6 +28,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.databinding.FragmentReferencePasswordBinding
 import com.highcom.passwordmemo.ui.PasswordEditData
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.util.AdBanner
@@ -39,14 +40,14 @@ import kotlinx.coroutines.launch
  *
  */
 class ReferencePasswordFragment : Fragment() {
-    /** パスワード参照画面のビュー */
-    private var rootView: View? = null
+    /** パスワード参照画面のbinding */
+    private lateinit var binding: FragmentReferencePasswordBinding
+    /** Navigationで渡された引数 */
+    private val args: ReferencePasswordFragmentArgs by navArgs()
+    /** パスワード編集データ */
+    lateinit var passwordEditData: PasswordEditData
     /** ログインデータ管理 */
     private var loginDataManager: LoginDataManager? = null
-    /** パスワードデータID */
-    private var id: Long = 0
-    /** グループID */
-    private var groupId: Long = 0
     /** バナー広告処理 */
     private var adBanner: AdBanner? = null
     /** 広告コンテナ */
@@ -67,14 +68,17 @@ class ReferencePasswordFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        rootView = inflater.inflate(R.layout.fragment_reference_password, container, false)
-        return rootView
+    ): View {
+        // 渡されたデータを取得する
+        passwordEditData = args.editData
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_reference_password, container, false)
+        binding.fragment = this
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adContainerView = rootView?.findViewById(R.id.adView_frame_reference)
+        adContainerView = binding.adViewFrameReference
         adBanner = AdBanner(this, adContainerView)
         adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_2)) }
         loginDataManager = (requireActivity().application as PasswordMemoApplication).loginDataManager
@@ -87,77 +91,65 @@ class ReferencePasswordFragment : Fragment() {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
 
-        // 渡されたデータを取得する
-        val args: ReferencePasswordFragmentArgs by navArgs()
-        id = args.editData.id
-        groupId = args.editData.groupId
-        requireActivity().title = args.editData.title
-        rootView?.findViewById<EditText>(R.id.edit_ref_account)?.setText(args.editData.account)
-        rootView?.findViewById<EditText>(R.id.edit_ref_password)?.setText(args.editData.password)
-        rootView?.findViewById<EditText>(R.id.edit_ref_url)?.setText(args.editData.url)
-        rootView?.findViewById<EditText>(R.id.edit_ref_memo)?.setText(args.editData.memo)
+        // パスワードの初期表示設定
+        if (loginDataManager!!.passwordVisibleSwitchEnable) {
+            binding.editRefPassword.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+        }
+
+        requireActivity().title = passwordEditData.title
         lifecycleScope.launch {
             groupListViewModel.groupList.collect { list ->
                 for (group in list) {
-                    if (groupId == group.groupId) {
-                        rootView?.findViewById<EditText>(R.id.edit_ref_group)?.setText(group.name)
+                    if (passwordEditData.groupId == group.groupId) {
+                        binding.editRefGroup.setText(group.name)
                         break
                     }
                 }
             }
         }
+    }
 
-        // アカウントIDをクリックor長押し時の処理
-        val accountText = rootView?.findViewById<EditText>(R.id.edit_ref_account)
-        accountText?.setOnClickListener { v ->
+    /**
+     * タップ操作時のクリップボードへのコピーイベント
+     *
+     * @param view 選択ビュー
+     */
+    fun onTextClick(view: View) {
+        if (view is EditText) {
             if (loginDataManager!!.copyClipboard == OPERATION_TAP) {
-                copyClipBoard(
-                    v,
-                    rootView?.findViewById<EditText>(R.id.edit_ref_account)?.text.toString()
-                )
+                copyClipBoard(view, view.text.toString())
             }
         }
-        accountText?.setOnLongClickListener { arg0 ->
-            if (loginDataManager!!.copyClipboard == OPERATION_LONGPRESS) {
-                copyClipBoard(
-                    arg0,
-                    rootView?.findViewById<EditText>(R.id.edit_ref_account)?.text.toString()
-                )
-            }
-            true
-        }
-        val passwordText = rootView?.findViewById<EditText>(R.id.edit_ref_password)
-        // パスワードの初期表示設定
-        if (loginDataManager!!.passwordVisibleSwitchEnable) passwordText?.inputType =
-            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-        // パスワードをクリックor長押し時の処理
-        passwordText?.setOnClickListener { v ->
-            if (loginDataManager!!.copyClipboard == OPERATION_TAP) {
-                copyClipBoard(
-                    v,
-                    rootView?.findViewById<EditText>(R.id.edit_ref_password)?.text.toString()
-                )
-            }
-        }
-        passwordText?.setOnLongClickListener { arg0 ->
-            if (loginDataManager!!.copyClipboard == OPERATION_LONGPRESS) {
-                copyClipBoard(
-                    arg0,
-                    rootView?.findViewById<EditText>(R.id.edit_ref_password)?.text.toString()
-                )
-            }
-            true
-        }
+    }
 
-        // URLをクリック時の処理
-        val urlText = rootView?.findViewById<EditText>(R.id.edit_ref_url)
-        urlText?.setOnClickListener(View.OnClickListener { // 何も入力されていなかったら何もしない
-            if (urlText.text.toString() == "") return@OnClickListener
-            val uri = Uri.parse(urlText.text.toString())
+    /**
+     * 長押し操作時のクリップボードへのコピーイベント
+     *
+     * @param view 選択ビュー
+     * @return イベントを消費したか
+     */
+    fun onTextLongClick(view: View): Boolean {
+        if (view is EditText) {
+            if (loginDataManager!!.copyClipboard == OPERATION_LONGPRESS) {
+                copyClipBoard(view, view.text.toString())
+            }
+        }
+        return true
+    }
+
+    /**
+     * URLクリック時のブラウザ選択遷移処理
+     *
+     * @param view 選択ビュー
+     */
+    fun onUrlParseTextClick(view: View) {
+        if (view is EditText) {
+            if (view.text.toString() == "") return
+            val uri = Uri.parse(view.text.toString())
             val intent = Intent(Intent.ACTION_VIEW, uri)
             val chooser = Intent.createChooser(intent, "選択")
             startActivity(chooser)
-        })
+        }
     }
 
     @Deprecated("Deprecated in Java", ReplaceWith(
@@ -178,30 +170,15 @@ class ReferencePasswordFragment : Fragment() {
             // 複製して編集
             R.id.action_copy -> {
                 // 入力画面に遷移
-                val passwordEditData = PasswordEditData(
-                    edit = false,
-                    title = requireActivity().title?.toString() + " " + getString(R.string.copy_title),
-                    account = rootView?.findViewById<EditText>(R.id.edit_ref_account)?.text.toString(),
-                    password = rootView?.findViewById<EditText>(R.id.edit_ref_password)?.text.toString(),
-                    url = rootView?.findViewById<EditText>(R.id.edit_ref_url)?.text.toString(),
-                    groupId = groupId,
-                    memo = rootView?.findViewById<EditText>(R.id.edit_ref_memo)?.text.toString()
-                )
+                passwordEditData.edit = false
+                passwordEditData.id = 0
+                passwordEditData.title += " " + getString(R.string.copy_title)
                 findNavController().navigate(ReferencePasswordFragmentDirections.actionReferencePasswordFragmentToInputPasswordFragment(editData = passwordEditData))
             }
             // 編集
             R.id.action_edit -> {
                 // 入力画面に遷移
-                val passwordEditData = PasswordEditData(
-                    edit = true,
-                    id = id,
-                    title = requireActivity().title?.toString() ?: "",
-                    account = rootView?.findViewById<EditText>(R.id.edit_ref_account)?.text.toString(),
-                    password = rootView?.findViewById<EditText>(R.id.edit_ref_password)?.text.toString(),
-                    url = rootView?.findViewById<EditText>(R.id.edit_ref_url)?.text.toString(),
-                    groupId = groupId,
-                    memo = rootView?.findViewById<EditText>(R.id.edit_ref_memo)?.text.toString()
-                )
+                passwordEditData.edit = true
                 findNavController().navigate(ReferencePasswordFragmentDirections.actionReferencePasswordFragmentToInputPasswordFragment(editData = passwordEditData))
             }
 
@@ -215,7 +192,7 @@ class ReferencePasswordFragment : Fragment() {
         super.onStart()
 
         // 背景色を設定する
-        rootView?.findViewById<View>(R.id.reference_password_view)?.setBackgroundColor(loginDataManager!!.backgroundColor)
+        binding.referencePasswordView.setBackgroundColor(loginDataManager!!.backgroundColor)
         // テキストサイズを設定する
         setTextSize(loginDataManager!!.textSize)
     }
@@ -276,42 +253,15 @@ class ReferencePasswordFragment : Fragment() {
      * @param size 指定テキストサイズ
      */
     private fun setTextSize(size: Float) {
-        rootView?.findViewById<TextView>(R.id.account_ref_view)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size - 3
-        )
-        rootView?.findViewById<EditText>(R.id.edit_ref_account)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<TextView>(R.id.password_ref_view)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size - 3
-        )
-        rootView?.findViewById<EditText>(R.id.edit_ref_password)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<TextView>(R.id.url_ref_view)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size - 3
-        )
-        rootView?.findViewById<EditText>(R.id.edit_ref_url)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<TextView>(R.id.group_ref_view)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size - 3
-        )
-        rootView?.findViewById<EditText>(R.id.edit_ref_group)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
-        rootView?.findViewById<EditText>(R.id.edit_ref_memo)?.setTextSize(
-            TypedValue.COMPLEX_UNIT_DIP,
-            size
-        )
+        binding.accountRefView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.editRefAccount.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.passwordRefView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.editRefPassword.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.urlRefView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.editRefUrl.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.groupRefView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.editRefGroup.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.editRefMemo.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
     }
 
     companion object {

@@ -16,6 +16,7 @@ import androidx.core.os.HandlerCompat
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.data.PasswordEntity
+import com.highcom.passwordmemo.databinding.AlertProgressbarBinding
 import com.highcom.passwordmemo.ui.viewmodel.SettingViewModel
 import java.io.BufferedReader
 import java.io.InputStream
@@ -124,6 +125,7 @@ class InputExternalFile(private val activity: Activity,
      * @param uri 取込元ファイルURI
      * @return 取込完了可否
      */
+    @Suppress("KotlinConstantConditions")
     private fun importDatabase(uri: Uri?): Boolean {
         var inputStream: InputStream? = null
         try {
@@ -244,14 +246,15 @@ class InputExternalFile(private val activity: Activity,
             .setTitle(activity.getString(R.string.input_csv))
             .setMessage(activity.getString(R.string.csv_input_confirm_message))
             .setPositiveButton(R.string.execute) { _, _ -> // 取込み中のプログレスバーを表示する
+                val binding = AlertProgressbarBinding.inflate(activity.layoutInflater)
                 progressAlertDialog = AlertDialog.Builder(activity)
                     .setTitle(R.string.csv_input_processing)
-                    .setView(activity.layoutInflater.inflate(R.layout.alert_progressbar, null))
+                    .setView(binding.root)
                     .create()
                 progressAlertDialog?.show()
                 progressAlertDialog?.setCancelable(false)
                 progressAlertDialog?.setCanceledOnTouchOutside(false)
-                progressBar = progressAlertDialog?.findViewById(R.id.ProgressBarHorizontal)
+                progressBar = binding.progressBarHorizontal
 
                 // ワーカースレッドで取込みを開始する
                 val mainLooper = Looper.getMainLooper()

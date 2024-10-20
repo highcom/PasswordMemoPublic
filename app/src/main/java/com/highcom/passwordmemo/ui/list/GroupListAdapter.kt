@@ -7,18 +7,19 @@ import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.LinearLayout
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.GroupEntity
-import com.highcom.passwordmemo.ui.list.GroupListAdapter.GroupViewHolder
+import com.highcom.passwordmemo.databinding.RowFooterBinding
+import com.highcom.passwordmemo.databinding.RowGroupBinding
 import com.highcom.passwordmemo.util.TextSizeUtil
 
 /**
  * グループ一覧表示用アダプタ
  *
+ * @property lifecycleOwner ライフサイクル
  * @property adapterListener グループ一覧表示用アダプタリスナーインスタンス
  * @constructor
  * グループ一覧表示用アダプタコンストラクタ
@@ -27,9 +28,13 @@ import com.highcom.passwordmemo.util.TextSizeUtil
  */
 class GroupListAdapter(
     context: Context,
+    private val lifecycleOwner: LifecycleOwner,
     private val adapterListener: GroupAdapterListener
-) : RecyclerView.Adapter<GroupViewHolder?>() {
-    private val inflater: LayoutInflater
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    /** グループビューホルダーのbinding */
+    private var groupBinding: RowGroupBinding? = null
+    /** フッタービューホルダーのbinding */
+    private var footerBinding: RowFooterBinding? = null
     /** レイアウト高さ設定マップデータ */
     private val layoutHeightMap: Map<Int, Float>
     /** 表示用グループ一覧データ */
@@ -66,74 +71,30 @@ class GroupListAdapter(
      * @constructor
      * コンストラクタ
      *
-     * @param itemView 表示アイテムビュー
+     * @param binding 表示アイテムバインド
      */
-    inner class GroupViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        /** グループデータ表示用レイアウト */
-        var rowLinearLayout: LinearLayout? = null
-        /** グループID */
-        var groupId: Long? = null
-        /** グループデータの並び順 */
-        var groupOrder = 0
-        /** グループアイコン画像 */
-        private var groupImage: ImageButton? = null
-        /** グループ名称 */
-        var groupName: EditText? = null
-        /** 編集前のグループ名称 */
-        private var orgGroupName = ""
-        /** 並べ替えアイコン画像 */
-        var groupRearrangeButton: ImageButton? = null
-
-        init {
-            // フッターの場合には何も設定しない
-            if (itemView.id != R.id.row_footer) {
-                rowLinearLayout = itemView.findViewById<View>(R.id.rowGroupLayout) as LinearLayout
-                groupImage = itemView.findViewById<View>(R.id.folder_icon) as ImageButton
-                groupName = itemView.findViewById<View>(R.id.groupName) as EditText
-                groupImage?.setOnClickListener { view: View ->
-                    if (!editEnable) {
-                        orgGroupName = groupName?.text.toString()
-                        adapterListener.onGroupNameClicked(view, groupId)
-                    }
-                }
-                groupName?.setOnClickListener { view: View ->
-                    orgGroupName = groupName?.text.toString()
-                    adapterListener.onGroupNameClicked(view, groupId)
-                }
-                groupName?.onFocusChangeListener = OnFocusChangeListener { view: View, b: Boolean ->
-                    if (b) {
-                        orgGroupName = groupName?.text.toString()
-                        adapterListener.onGroupNameClicked(view, groupId)
-                    } else {
-                        // グループ名を空欄で登録することは出来ないので元の名前にする
-                        if (groupName?.text.toString() == "") {
-                            groupName?.setText(orgGroupName)
-                        }
-                        val groupEntity = GroupEntity(
-                            groupId = groupId!!,
-                            groupOrder = groupOrder,
-                            name = groupName?.text.toString()
-                        )
-                        // フォーカスが外れた時に内容が変更されていたら更新する
-                        adapterListener.onGroupNameOutOfFocused(view, groupEntity)
-                    }
-                }
-                // キーボードのエンターが押下された場合
-                groupName?.setOnEditorActionListener { textView, i, _ ->
-                    if (i == EditorInfo.IME_ACTION_DONE) {
-                        textView.isFocusable = false
-                        textView.isFocusableInTouchMode = false
-                        textView.requestFocus()
-                    }
-                    false
-                }
-                groupRearrangeButton = itemView.findViewById(R.id.groupRearrangeButton)
-            }
+    inner class RowGroupViewHolder(val binding: RowGroupBinding) : RecyclerView.ViewHolder(binding.root) {
+        /**
+         * グループデータバインド処理
+         *
+         * @param groupEntity グループデータエンティティ
+         */
+        fun bind(groupEntity: GroupEntity) {
+            binding.groupEntity = groupEntity
+            binding.executePendingBindings()
         }
+        /** 編集前のグループ名称 */
+        var orgGroupName = ""
     }
 
+    /**
+     * グループ一覧フッター用ビューホルダー
+     *
+     * @property binding
+     */
+    inner class RowFooterViewHolder(private val binding: RowFooterBinding) : RecyclerView.ViewHolder(binding.root)
+
     init {
-        inflater = LayoutInflater.from(context)
         layoutHeightMap = object : HashMap<Int, Float>() {
             init {
                 put(
@@ -200,16 +161,22 @@ class GroupListAdapter(
      * @param viewType ビュー種別
      * @return 生成したビューホルダー
      */
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             TYPE_ITEM -> {
-                GroupViewHolder(inflater.inflate(R.layout.row_group, parent, false))
+                groupBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.row_group, parent, false)
+                groupBinding?.lifecycleOwner = lifecycleOwner
+                RowGroupViewHolder(groupBinding!!)
             }
             TYPE_FOOTER -> {
-                GroupViewHolder(inflater.inflate(R.layout.row_footer, parent, false))
+                footerBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.row_footer, parent, false)
+                footerBinding?.lifecycleOwner = lifecycleOwner
+                RowFooterViewHolder(footerBinding!!)
             }
             else -> {
-                GroupViewHolder(inflater.inflate(R.layout.row_group, parent, false))
+                groupBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.row_group, parent, false)
+                groupBinding?.lifecycleOwner = lifecycleOwner
+                RowGroupViewHolder(groupBinding!!)
             }
         }
     }
@@ -220,34 +187,68 @@ class GroupListAdapter(
      * @param holder ビューホルダー
      * @param position 表示位置
      */
-    override fun onBindViewHolder(holder: GroupViewHolder, position: Int) {
-        // フッターの場合にはデータをバインドしない
-        if (position >= groupList!!.size) return
-        val layoutHeight = layoutHeightMap[textSize.toInt()]
-        if (layoutHeight != null) {
-            val params = holder.rowLinearLayout?.layoutParams
-            params?.height = layoutHeight.toInt()
-            holder.rowLinearLayout?.layoutParams = params
-        }
-        groupList?.let {
-            holder.groupId = it[position].groupId
-            holder.groupOrder = it[position].groupOrder
-            holder.groupName?.setText(it[position].name)
-            holder.groupName?.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
-            holder.itemView.tag = holder
-            // グループ名が空欄があった場合は新規追加時なのでフォーカスする
-            if (editEnable && it[position].name == "") {
-                adapterListener.onGroupNameClicked(
-                    holder.itemView.findViewById(R.id.groupName),
-                    holder.groupId
-                )
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (holder) {
+            is RowGroupViewHolder -> {
+                groupList?.let { holder.bind(it[position]) }
+                // レイアウト高さの設定
+                val layoutHeight = layoutHeightMap[textSize.toInt()]
+                if (layoutHeight != null) {
+                    val params = holder.binding.rowGroupLayout.layoutParams
+                    params?.height = layoutHeight.toInt()
+                    holder.binding.rowGroupLayout.layoutParams = params
+                }
+                holder.binding.groupName.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize)
+                // グループ名が空欄があった場合は新規追加時なのでフォーカスする
+                if (editEnable && holder.binding.groupEntity?.name == "") {
+                    adapterListener.onGroupNameClicked(
+                        holder.binding.groupName,
+                        holder.binding.groupEntity?.groupId
+                    )
+                }
+                // 変数モードではない状態でタップされた場合は選択されたとみなす
+                holder.binding.folderIcon.setOnClickListener { view: View ->
+                    if (!editEnable) {
+                        holder.orgGroupName = holder.binding.groupName.text.toString()
+                        adapterListener.onGroupNameClicked(view, holder.binding.groupEntity?.groupId)
+                    }
+                }
+                // グループ名称を選択された場合はイベントを発生
+                holder.binding.groupName.setOnClickListener { view: View ->
+                    holder.orgGroupName = holder.binding.groupName.text.toString()
+                    adapterListener.onGroupNameClicked(view, holder.binding.groupEntity?.groupId)
+                }
+                // グループ名称のフォーカス変更についての処理
+                holder.binding.groupName.onFocusChangeListener = OnFocusChangeListener { view: View, b: Boolean ->
+                    if (b) {
+                        holder.orgGroupName = holder.binding.groupName.text.toString()
+                        adapterListener.onGroupNameClicked(view, holder.binding.groupEntity?.groupId)
+                    } else {
+                        // グループ名を空欄で登録することは出来ないので元の名前にする
+                        if (holder.binding.groupName.text.toString() == "") {
+                            holder.binding.groupName.setText(holder.orgGroupName)
+                        }
+                        // フォーカスが外れた時に内容が変更されていたら更新する
+                        adapterListener.onGroupNameOutOfFocused(view, holder.binding.groupEntity!!)
+                    }
+                }
+                // キーボードのエンターが押下された場合
+                holder.binding.groupName.setOnEditorActionListener { textView, i, _ ->
+                    if (i == EditorInfo.IME_ACTION_DONE) {
+                        textView.isFocusable = false
+                        textView.isFocusableInTouchMode = false
+                        textView.requestFocus()
+                    }
+                    false
+                }
+                // 編集モードでも1番目の「すべて」は並べ替えさせない
+                if (editEnable && holder.binding.groupEntity?.groupId != 1L) {
+                    holder.binding.groupRearrangeButton.visibility = View.VISIBLE
+                } else {
+                    holder.binding.groupRearrangeButton.visibility = View.GONE
+                }
             }
-        }
-        // 編集モードでも1番目の「すべて」は並べ替えさせない
-        if (editEnable && holder.groupId != null && holder.groupId != 1L) {
-            holder.groupRearrangeButton?.visibility = View.VISIBLE
-        } else {
-            holder.groupRearrangeButton?.visibility = View.GONE
+            is RowFooterViewHolder -> {}
         }
     }
 
@@ -266,9 +267,9 @@ class GroupListAdapter(
             }
         }
         // 引数で渡された位置で並べ替え
-        val fromentity = rearrangeList[fromPos]
+        val fromEntity = rearrangeList[fromPos]
         rearrangeList.removeAt(fromPos)
-        rearrangeList.add(toPos, fromentity)
+        rearrangeList.add(toPos, fromEntity)
         // 再度順番を振り直す
         var order = 1
         for (entity in rearrangeList) {
