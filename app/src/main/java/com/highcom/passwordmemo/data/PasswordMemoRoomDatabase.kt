@@ -92,17 +92,15 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             var newId = 1
             val cursor = database.query("SELECT id FROM passworddata ORDER BY id;")
 
-            if (cursor != null) {
-                while (cursor.moveToNext()) {
-                    val currentId = cursor.getInt(cursor.getColumnIndex("id"))
-                    database.execSQL(
-                        "UPDATE passworddata SET id = ? WHERE id = ?",
-                        arrayOf<Any>(newId, currentId)
-                    )
-                    newId++
-                }
-                cursor.close()
+            while (cursor.moveToNext()) {
+                val currentId = cursor.getInt(cursor.getColumnIndex("id"))
+                database.execSQL(
+                    "UPDATE passworddata SET id = ? WHERE id = ?",
+                    arrayOf<Any>(newId, currentId)
+                )
+                newId++
             }
+            cursor.close()
 
             // 旧テーブルのデータを全て一時テーブルに追加
             database.execSQL("""
