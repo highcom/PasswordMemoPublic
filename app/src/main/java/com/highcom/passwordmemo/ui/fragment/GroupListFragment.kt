@@ -131,6 +131,13 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
                 }
                 adapter?.groupList = list
                 adapter?.notifyDataSetChanged()
+                // 新規作成時は対象のセルにフォーカスされるようにスクロールする
+                for (position in list.indices) {
+                    if (list[position].name == "") {
+                        recyclerView!!.scrollToPosition(position)
+                        break
+                    }
+                }
             }
         }
 
@@ -141,18 +148,6 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
         groupFab = binding.groupFab
         groupFab?.setOnClickListener {
             groupListViewModel.insert(GroupEntity(0, (adapter?.groupList?.size ?: 0) + 1, ""))
-            lifecycleScope.launch {
-                groupListViewModel.groupList.collect { list ->
-                    adapter?.notifyDataSetChanged()
-                    // 新規作成時は対象のセルにフォーカスされるようにスクロールする
-                    for (position in list.indices) {
-                        if (list[position].name == "") {
-                            recyclerView!!.smoothScrollToPosition(position)
-                            break
-                        }
-                    }
-                }
-            }
         }
         if (adapter?.editEnable == false) groupFab?.visibility = View.GONE
         val scale = resources.displayMetrics.density
