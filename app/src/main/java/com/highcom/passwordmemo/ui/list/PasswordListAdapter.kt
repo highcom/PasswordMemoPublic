@@ -332,7 +332,7 @@ class PasswordListAdapter(
         private const val TYPE_FOOTER = 2
         private const val ROW_LAYOUT_HEIGHT_SMALL = 40f
         private const val ROW_LAYOUT_HEIGHT_MEDIUM = 45f
-        private const val ROW_LAYOUT_HEIGHT_LARGE = 50f
-        private const val ROW_LAYOUT_HEIGHT_EXTRA_LARGE = 55f
+        private const val ROW_LAYOUT_HEIGHT_LARGE = 53f
+        private const val ROW_LAYOUT_HEIGHT_EXTRA_LARGE = 60f
     }
 }

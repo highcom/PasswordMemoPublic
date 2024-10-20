@@ -290,8 +290,8 @@ class GroupListAdapter(
         /** テキストサイズが中の場合の高さ */
         private const val ROW_LAYOUT_HEIGHT_MEDIUM = 45f
         /** テキストサイズが大の場合の高さ */
-        private const val ROW_LAYOUT_HEIGHT_LARGE = 50f
+        private const val ROW_LAYOUT_HEIGHT_LARGE = 53f
         /** テキストサイズが特大の場合の高さ */
-        private const val ROW_LAYOUT_HEIGHT_EXTRA_LARGE = 55f
+        private const val ROW_LAYOUT_HEIGHT_EXTRA_LARGE = 60f
     }
 }
