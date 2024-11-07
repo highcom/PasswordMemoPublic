@@ -11,19 +11,22 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
-import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.databinding.FragmentLicenseBinding
 import com.highcom.passwordmemo.util.login.LoginDataManager
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * ライセンス画面フラグメント
  *
  */
+@AndroidEntryPoint
 class LicenseFragment : Fragment() {
     /** ライセンス画面のbinding */
     private lateinit var binding: FragmentLicenseBinding
     /** ログインデータ管理 */
-    private var loginDataManager: LoginDataManager? = null
+    @Inject
+    lateinit var loginDataManager: LoginDataManager
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,10 +50,9 @@ class LicenseFragment : Fragment() {
         requireActivity().title = getString(R.string.license)
         // ActionBarに戻るボタンを設定
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        loginDataManager = (requireActivity().application as PasswordMemoApplication).loginDataManager
 
         // バックグラウンドでは画面の中身が見えないようにする
-        if (loginDataManager!!.displayBackgroundSwitchEnable) {
+        if (loginDataManager.displayBackgroundSwitchEnable) {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
     }
@@ -58,7 +60,7 @@ class LicenseFragment : Fragment() {
     @SuppressLint("ResourceType")
     override fun onStart() {
         super.onStart()
-        binding.licenseView.setBackgroundColor(loginDataManager!!.backgroundColor)
+        binding.licenseView.setBackgroundColor(loginDataManager.backgroundColor)
     }
 
     @Suppress("DEPRECATION")

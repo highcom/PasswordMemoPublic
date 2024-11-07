@@ -1,35 +1,24 @@
 package com.highcom.passwordmemo.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.data.PasswordMemoRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * パスワード一覧ビューモデル
  *
  * @property repository データアクセスリポジトリ
  */
-class PasswordListViewModel(private val repository: PasswordMemoRepository) : ViewModel() {
-    /**
-     * パスワード一覧ビューモデル生成クラス
-     *
-     * @property repository
-     */
-    class Factory(private val repository: PasswordMemoRepository) : ViewModelProvider.NewInstanceFactory() {
-
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return PasswordListViewModel(repository) as T
-        }
-    }
-
+@HiltViewModel
+class PasswordListViewModel @Inject constructor(private val repository: PasswordMemoRepository) : ViewModel() {
     /** 洗濯中のグループID */
     private val _groupIdFlow = MutableStateFlow(1L)
     /** パスワード一覧 */

@@ -1,31 +1,20 @@
 package com.highcom.passwordmemo.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.data.PasswordMemoRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * グループ一覧ビューモデル
  *
  * @property repository データアクセスリポジトリ
  */
-class GroupListViewModel(private val repository: PasswordMemoRepository) : ViewModel() {
-    /**
-     * グループ一覧ビューモデル生成クラス
-     *
-     * @property repository
-     */
-    class Factory(private val repository: PasswordMemoRepository) : ViewModelProvider.NewInstanceFactory() {
-
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return GroupListViewModel(repository) as T
-        }
-    }
-
+@HiltViewModel
+class GroupListViewModel @Inject constructor(private val repository: PasswordMemoRepository) : ViewModel() {
     /** グループ一覧 */
     val groupList = repository.groupList
 

@@ -26,7 +26,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.databinding.AlertOperatingInstructionsBinding
@@ -39,22 +38,26 @@ import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import com.highcom.passwordmemo.util.AdBanner
 import com.highcom.passwordmemo.util.login.LoginDataManager
+import dagger.hilt.android.AndroidEntryPoint
 import jp.co.recruit_mp.android.rmp_appirater.RmpAppirater
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.Date
 import java.util.Locale
+import javax.inject.Inject
 
 /**
  * パスワード一覧画面フラグメント
  *
  */
+@AndroidEntryPoint
 class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     /** パスワード一覧画面のバインディング */
     private lateinit var binding: FragmentPasswordListBinding
     /** 選択グループ名称 */
     private var selectGroupName: String? = null
     /** ログインデータ管理 */
-    private var loginDataManager: LoginDataManager? = null
+    @Inject
+    lateinit var loginDataManager: LoginDataManager
     /** スワイプボタン表示用通知ヘルパー */
     private var simpleCallbackHelper: SimpleCallbackHelper? = null
     /** バナー広告処理 */
@@ -74,13 +77,9 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     /** 検索文字列 */
     var seachViewWord: String? = null
     /** パスワード一覧ビューモデル */
-    private val passwordListViewModel: PasswordListViewModel by viewModels {
-        PasswordListViewModel.Factory((requireActivity().application as PasswordMemoApplication).repository)
-    }
+    private val passwordListViewModel: PasswordListViewModel by viewModels()
     /** グループ一覧ビューモデル */
-    private val groupListViewModel: GroupListViewModel by viewModels {
-        GroupListViewModel.Factory((requireActivity().application as PasswordMemoApplication).repository)
-    }
+    private val groupListViewModel: GroupListViewModel by viewModels()
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -151,31 +150,30 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                 true
             }, options
         )
-        loginDataManager = (requireActivity().application as PasswordMemoApplication).loginDataManager
 
         // バックグラウンドでは画面の中身が見えないようにする
-        if (loginDataManager!!.displayBackgroundSwitchEnable) {
+        if (loginDataManager.displayBackgroundSwitchEnable) {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
-        currentMemoVisible = loginDataManager!!.memoVisibleSwitchEnable
+        currentMemoVisible = loginDataManager.memoVisibleSwitchEnable
         adapter = PasswordListAdapter(
             requireContext(),
             viewLifecycleOwner,
             loginDataManager,
             this
         )
-        adapter?.textSize = loginDataManager!!.textSize
+        adapter?.textSize = loginDataManager.textSize
         recyclerView = binding.passwordListView
         recyclerView!!.layoutManager = LinearLayoutManager(context)
         recyclerView!!.adapter = adapter
 
         // 選択されているグループのパスワード一覧を設定する
-        passwordListViewModel.setSelectGroup(loginDataManager?.selectGroup ?: 1L)
+        passwordListViewModel.setSelectGroup(loginDataManager.selectGroup)
         @Suppress("DEPRECATION")
         lifecycleScope.launchWhenStarted {
             passwordListViewModel.passwordList.collect { list ->
                 adapter?.setList(list)
-                adapter?.sortPasswordList(loginDataManager?.sortKey)
+                adapter?.sortPasswordList(loginDataManager.sortKey)
                 reflesh()
             }
         }
@@ -285,7 +283,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_list, menu)
         this.menu = menu
-        currentMenuSelect = when (loginDataManager!!.sortKey) {
+        currentMenuSelect = when (loginDataManager.sortKey) {
             PasswordListAdapter.SORT_ID -> R.id.sort_default
             PasswordListAdapter.SORT_TITLE -> R.id.sort_title
             PasswordListAdapter.SORT_INPUTDATE -> R.id.sort_update
@@ -338,7 +336,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                 }
                 requireActivity().title = getString(R.string.sort_name_default) + "：" + selectGroupName
                 recyclerView!!.adapter = adapter
-                loginDataManager!!.setSortKey(PasswordListAdapter.SORT_ID)
+                loginDataManager.setSortKey(PasswordListAdapter.SORT_ID)
             }
             // 標準ソート
             R.id.sort_default -> {
@@ -347,7 +345,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                 adapter?.sortPasswordList(PasswordListAdapter.SORT_ID)
                 if (adapter?.editEnable == true) adapter?.editEnable = false
                 recyclerView!!.adapter = adapter
-                loginDataManager!!.setSortKey(PasswordListAdapter.SORT_ID)
+                loginDataManager.setSortKey(PasswordListAdapter.SORT_ID)
             }
             // タイトルソート
             R.id.sort_title -> {
@@ -356,7 +354,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                 adapter?.sortPasswordList(PasswordListAdapter.SORT_TITLE)
                 if (adapter?.editEnable == true) adapter?.editEnable = false
                 recyclerView!!.adapter = adapter
-                loginDataManager!!.setSortKey(PasswordListAdapter.SORT_TITLE)
+                loginDataManager.setSortKey(PasswordListAdapter.SORT_TITLE)
             }
             // 更新日ソート
             R.id.sort_update -> {
@@ -365,7 +363,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                 adapter?.sortPasswordList(PasswordListAdapter.SORT_INPUTDATE)
                 if (adapter?.editEnable == true) adapter?.editEnable = false
                 recyclerView!!.adapter = adapter
-                loginDataManager!!.setSortKey(PasswordListAdapter.SORT_INPUTDATE)
+                loginDataManager.setSortKey(PasswordListAdapter.SORT_INPUTDATE)
             }
             // グループ選択
             R.id.select_group -> {
@@ -406,24 +404,24 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     override fun onStart() {
         super.onStart()
         // 背景色を設定する
-        binding.passwordListFragmentView.setBackgroundColor(loginDataManager!!.backgroundColor)
+        binding.passwordListFragmentView.setBackgroundColor(loginDataManager.backgroundColor)
         selectGroupName = getString(R.string.list_title)
         var isSelectGroupExist = false
         lifecycleScope.launchWhenStarted {
             groupListViewModel.groupList.collect { list ->
                 for (entity in list) {
-                    if (entity.groupId == loginDataManager?.selectGroup) {
+                    if (entity.groupId == loginDataManager.selectGroup) {
                         selectGroupName = entity.name
                         isSelectGroupExist = true
                     }
                 }
                 // 選択していたグループが存在しなくなった場合には「すべて」にリセットする
                 if (!isSelectGroupExist) {
-                    loginDataManager!!.setSelectGroup(1L)
+                    loginDataManager.setSelectGroup(1L)
                     passwordListViewModel.setSelectGroup(1L)
                 }
                 // タイトルに選択しているグループ名を設定
-                requireActivity().title = when (loginDataManager!!.sortKey) {
+                requireActivity().title = when (loginDataManager.sortKey) {
                     PasswordListAdapter.SORT_ID -> getString(R.string.sort_name_default) + "：" + selectGroupName
                     PasswordListAdapter.SORT_TITLE -> getString(R.string.sort_name_title) + "：" + selectGroupName
                     PasswordListAdapter.SORT_INPUTDATE -> getString(R.string.sort_name_update) + "：" + selectGroupName
@@ -437,13 +435,13 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         super.onResume()
         var needRefresh = false
         // メモ表示設定に変更があった場合には再描画する
-        if (currentMemoVisible != loginDataManager!!.memoVisibleSwitchEnable) {
-            currentMemoVisible = loginDataManager!!.memoVisibleSwitchEnable
+        if (currentMemoVisible != loginDataManager.memoVisibleSwitchEnable) {
+            currentMemoVisible = loginDataManager.memoVisibleSwitchEnable
             needRefresh = true
         }
         // テキストサイズ設定に変更があった場合には再描画する
-        if (adapter?.textSize != loginDataManager!!.textSize) {
-            adapter?.textSize = loginDataManager!!.textSize
+        if (adapter?.textSize != loginDataManager.textSize) {
+            adapter?.textSize = loginDataManager.textSize
             needRefresh = true
         }
         if (needRefresh) reflesh()

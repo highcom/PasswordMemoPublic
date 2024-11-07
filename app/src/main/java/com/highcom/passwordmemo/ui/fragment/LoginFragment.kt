@@ -19,28 +19,27 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.ui.viewmodel.LoginViewModel
 import com.highcom.passwordmemo.util.login.LoginDataManager
 import kotlinx.coroutines.launch
 import com.highcom.passwordmemo.databinding.FragmentLoginBinding
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * ログイン画面フラグメント
  *
  */
+@AndroidEntryPoint
 class LoginFragment : Fragment() {
     /** ログイン画面のbinding */
     private lateinit var binding: FragmentLoginBinding
     /** ログインデータ管理 */
-    private var loginDataManager: LoginDataManager? = null
+    @Inject
+    lateinit var loginDataManager: LoginDataManager
     /** ログインビューモデル */
-    private val loginViewModel: LoginViewModel by viewModels {
-        LoginViewModel.Factory(
-            (requireActivity().application as PasswordMemoApplication).repository,
-            (requireActivity().application as PasswordMemoApplication).loginDataManager)
-    }
+    private val loginViewModel: LoginViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,11 +53,10 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        loginDataManager = (requireActivity().application as PasswordMemoApplication).loginDataManager
         requireActivity().title = getString(R.string.app_name)
 
         // バックグラウンドでは画面の中身が見えないようにする
-        if (loginDataManager!!.displayBackgroundSwitchEnable) {
+        if (loginDataManager.displayBackgroundSwitchEnable) {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
         try {
@@ -97,7 +95,7 @@ class LoginFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        loginDataManager!!.updateSetting()
+        loginDataManager.updateSetting()
         checkBiometricSetting()
         binding.masterKeyIcon.clearAnimation()
         loginViewModel.resetKeyIconRotate()
@@ -106,16 +104,16 @@ class LoginFragment : Fragment() {
         // 戻るボタンを無効化
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
         // 背景色を設定する
-        binding.loginFragmentView.setBackgroundColor(loginDataManager!!.backgroundColor)
+        binding.loginFragmentView.setBackgroundColor(loginDataManager.backgroundColor)
         // 入力内容は一旦クリアする
         binding.editMasterPassword.editableText?.clear()
         // テキストサイズを設定する
-        setTextSize(loginDataManager!!.textSize)
+        setTextSize(loginDataManager.textSize)
     }
 
     override fun onResume() {
         super.onResume()
-        loginDataManager!!.updateSetting()
+        loginDataManager.updateSetting()
         loginViewModel.firstPassword = null
         checkBiometricSetting()
         binding.masterKeyIcon.clearAnimation()
@@ -129,11 +127,11 @@ class LoginFragment : Fragment() {
      *
      */
     private fun checkBiometricSetting() {
-        if (!loginDataManager!!.biometricLoginSwitchEnable) {
+        if (!loginDataManager.biometricLoginSwitchEnable) {
             // 生体認証ログインが無効の場合は非表示
             binding.biometricLoginButton.visibility = View.INVISIBLE
             return
-        } else if (!loginDataManager!!.isMasterPasswordCreated) {
+        } else if (!loginDataManager.isMasterPasswordCreated) {
             // 生体認証ログインが有効でマスターパスワードが作成済みなら有効化
             binding.biometricLoginButton.visibility = View.VISIBLE
             binding.biometricLoginButton.isEnabled = false

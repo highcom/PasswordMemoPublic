@@ -199,8 +199,6 @@ class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListe
             .setTitle(context.getString(R.string.restore_db))
             .setMessage(context.getString(R.string.db_restore_confirm_message))
             .setPositiveButton(R.string.execute) { _, _ ->
-                // リストアする前にDBを閉じる
-                PasswordMemoRoomDatabase.closeDatabase()
                 // 取込み中のプログレスバーを表示する
                 val binding = AlertProgressbarBinding.inflate(activity.layoutInflater)
                 progressAlertDialog = AlertDialog.Builder(context)

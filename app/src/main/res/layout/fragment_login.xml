@@ -90,7 +90,7 @@
                 android:textSize="12sp"
                 android:background="@drawable/original_button"
                 android:textColor="@color/blue"
-                android:onClick="@{() -> loginViewModel.passwordLogin(context, loginViewModel.editMasterPassword)}"
+                android:onClick="@{() -> loginViewModel.passwordLogin(context)}"
                 android:text="@string/login" />
 
             <ImageButton
@@ -105,7 +105,7 @@
                 android:textColor="@color/blue"
                 android:src="@drawable/ic_baseline_fingerprint_24"
                 android:visibility="gone"
-                android:onClick="@{() -> loginViewModel.biometricLogin(context)}"
+                android:onClick="@{loginViewModel::biometricLogin}"
                 android:text="@string/biometrics"
                 android:importantForAccessibility="no" />
 

@@ -5,14 +5,20 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.highcom.passwordmemo.util.login.LoginDataManager
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * ログイン画面アクティビティ
  *
  */
+@AndroidEntryPoint
 class PasswordMemoActivity : AppCompatActivity() {
     /** Firebase解析 */
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
+    @Inject
+    lateinit var loginDataManager: LoginDataManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +41,7 @@ class PasswordMemoActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         //バックグラウンドの場合、Activityを破棄してログイン画面に戻る
-        if ((application as PasswordMemoApplication).loginDataManager.displayBackgroundSwitchEnable && PasswordMemoLifecycle.isBackground) {
+        if (loginDataManager.displayBackgroundSwitchEnable && PasswordMemoLifecycle.isBackground) {
             finishAffinity()
         }
     }
