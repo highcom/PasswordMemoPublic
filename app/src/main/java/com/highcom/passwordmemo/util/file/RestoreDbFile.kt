@@ -72,6 +72,12 @@ class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListe
             val srcPath = context.getDatabasePath("PasswordMemoDB_tmp").path
             val srcFile = File(srcPath)
             srcFile.renameTo(destFile)
+            val walPath = context.getDatabasePath("PasswordMemoDB-wal").path
+            val walFile = File(walPath)
+            walFile.delete()
+            val shmPath = context.getDatabasePath("PasswordMemoDB-shm").path
+            val shmFile = File(shmPath)
+            shmFile.delete()
             progressBar!!.progress = 100
             val postExecutor = PostExecutor()
             _handler.post(postExecutor)
