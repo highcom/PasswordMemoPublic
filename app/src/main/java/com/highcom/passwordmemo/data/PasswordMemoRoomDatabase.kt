@@ -1,17 +1,10 @@
 package com.highcom.passwordmemo.data
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.util.Log
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.highcom.passwordmemo.R
-import net.sqlcipher.database.SQLiteDatabase
-import net.sqlcipher.database.SQLiteDatabaseHook
-import net.sqlcipher.database.SupportFactory
 
 /**
  * SQLiteからRoomへのマイグレーション操作
@@ -159,65 +152,4 @@ abstract class PasswordMemoRoomDatabase : RoomDatabase() {
      * @return グループデータアクセスオブジェクト
      */
     abstract fun groupDao(): GroupDao
-
-    companion object {
-        @Volatile
-        private var INSTANCE: PasswordMemoRoomDatabase? = null
-
-        /**
-         * データベース取得処理
-         *
-         * @param context コンテキスト
-         * @return データベースインスタンス
-         */
-        fun getDatabase(
-            context: Context,
-        ): PasswordMemoRoomDatabase {
-            return INSTANCE ?: synchronized(this) {
-                // 4.4.2を3.5.9@aarに下げるとSupportFactoryが使えなくなるためSQLCipher4にアップグレード
-                // net.sqlcipher.database.SQLiteException: file is not a database: , while compiling: select count(*) from sqlite_master;
-                // 上記エラーが発生するのでSQLiteDatabaseHookにてPRAGMAの設定をする必要がある
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    PasswordMemoRoomDatabase::class.java,
-                    "PasswordMemoDB"
-                ).allowMainThreadQueries()
-                    .fallbackToDestructiveMigration()
-                    .addMigrations(MIGRATION_2_3, MIGRATION_3_4)
-                    .openHelperFactory(SupportFactory(SQLiteDatabase.getBytes(context.getString(R.string.db_secret_key).toCharArray()), object : SQLiteDatabaseHook {
-                        override fun preKey(database: SQLiteDatabase?) {}
-
-                        override fun postKey(database: SQLiteDatabase?) {
-                            val cursor = database?.rawQuery("PRAGMA cipher_migrate", null)
-
-                            var migrationOccurred = false
-
-                            if (cursor?.count == 1) {
-                                cursor.moveToFirst()
-                                val selection: String = cursor.getString(0)
-                                migrationOccurred = selection == "0"
-                                Log.d("selection", selection)
-                            }
-
-                            cursor?.close()
-
-                            Log.d("migrationOccurred:", migrationOccurred.toString())
-                        }
-
-                    }))
-                    .build()
-                INSTANCE = instance
-                instance
-            }
-        }
-
-        /**
-         * データベースのクローズ処理
-         */
-        fun closeDatabase() {
-            INSTANCE?.close()
-            INSTANCE = null
-        }
-    }
-
 }

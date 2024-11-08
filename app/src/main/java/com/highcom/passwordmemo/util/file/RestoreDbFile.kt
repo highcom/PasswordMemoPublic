@@ -72,6 +72,12 @@ class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListe
             val srcPath = context.getDatabasePath("PasswordMemoDB_tmp").path
             val srcFile = File(srcPath)
             srcFile.renameTo(destFile)
+            val walPath = context.getDatabasePath("PasswordMemoDB-wal").path
+            val walFile = File(walPath)
+            walFile.delete()
+            val shmPath = context.getDatabasePath("PasswordMemoDB-shm").path
+            val shmFile = File(shmPath)
+            shmFile.delete()
             progressBar!!.progress = 100
             val postExecutor = PostExecutor()
             _handler.post(postExecutor)
@@ -199,8 +205,6 @@ class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListe
             .setTitle(context.getString(R.string.restore_db))
             .setMessage(context.getString(R.string.db_restore_confirm_message))
             .setPositiveButton(R.string.execute) { _, _ ->
-                // リストアする前にDBを閉じる
-                PasswordMemoRoomDatabase.closeDatabase()
                 // 取込み中のプログレスバーを表示する
                 val binding = AlertProgressbarBinding.inflate(activity.layoutInflater)
                 progressAlertDialog = AlertDialog.Builder(context)

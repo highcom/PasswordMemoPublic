@@ -8,6 +8,8 @@ import androidx.annotation.ColorInt
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.util.BackgroundColorUtil
 import com.highcom.passwordmemo.util.TextSizeUtil
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * ログインデータ管理クラス
@@ -15,9 +17,10 @@ import com.highcom.passwordmemo.util.TextSizeUtil
  * @constructor
  * ログインデータ管理コンストラクタ
  *
- * @param application プリファレンス利用のためのアクティビティ
+ * @param application プリファレンス利用のためのアプリケーションインスタンス
  */
-class LoginDataManager private constructor(application: Application) {
+@Singleton
+class LoginDataManager @Inject constructor(application: Application) {
     /** ログインデータ保存用のSharedPreferences */
     private val sharedPref: SharedPreferences
     /** ログイン用マスターパスワードユーティリティ */
@@ -231,25 +234,9 @@ class LoginDataManager private constructor(application: Application) {
     }
 
     companion object {
-        /** ログインデータ管理インスタンス */
-        private var manager: LoginDataManager? = null
         /** ログ出力用タグ */
         private const val TAG = "LoginDataManager"
         /** SharedPreferencesのファイル名 */
         private const val PREF_FILE_NAME = "com.highcom.LoginActivity.MasterPass"
-
-        /**
-         * ログイン管理インスタンス取得処理
-         * * シングルトンのログイン管理インスタンスを取得する
-         *
-         * @param application アプリケーション
-         * @return ログイン管理インスタンス
-         */
-        fun getInstance(application: Application): LoginDataManager? {
-            if (manager == null) {
-                manager = LoginDataManager(application)
-            }
-            return manager
-        }
     }
 }

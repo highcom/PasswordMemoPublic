@@ -20,7 +20,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.databinding.FragmentInputPasswordBinding
@@ -30,14 +29,17 @@ import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import com.highcom.passwordmemo.util.AdBanner
 import com.highcom.passwordmemo.util.login.LoginDataManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
+import javax.inject.Inject
 
 /**
  * パスワード入力画面フラグメント
  *
  */
+@AndroidEntryPoint
 class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.GeneratePasswordDialogListener {
     /** パスワード入力画面のbinding */
     private lateinit var binding: FragmentInputPasswordBinding
@@ -50,7 +52,8 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
     /** 広告コンテナ */
     private var adContainerView: FrameLayout? = null
     /** ログインデータ管理 */
-    private var loginDataManager: LoginDataManager? = null
+    @Inject
+    lateinit var loginDataManager: LoginDataManager
     /** グループ選択スピナー */
     private var selectGroupSpinner: Spinner? = null
     /** グループ名称一覧 */
@@ -58,13 +61,9 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
     /** 選択グループID */
     private var selectGroupId: Long? = null
     /** パスワード一覧ビューモデル */
-    private val passwordListViewModel: PasswordListViewModel by viewModels {
-        PasswordListViewModel.Factory((requireActivity().application as PasswordMemoApplication).repository)
-    }
+    private val passwordListViewModel: PasswordListViewModel by viewModels()
     /** グループ一覧ビューモデル */
-    private val groupListViewModel: GroupListViewModel by viewModels {
-        GroupListViewModel.Factory((requireActivity().application as PasswordMemoApplication).repository)
-    }
+    private val groupListViewModel: GroupListViewModel by viewModels()
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,10 +88,9 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
         adContainerView = binding.adViewFrameInput
         adBanner = AdBanner(this, adContainerView)
         adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_3)) }
-        loginDataManager = (requireActivity().application as PasswordMemoApplication).loginDataManager
 
         // バックグラウンドでは画面の中身が見えないようにする
-        if (loginDataManager!!.displayBackgroundSwitchEnable) {
+        if (loginDataManager.displayBackgroundSwitchEnable) {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
 
@@ -117,7 +115,7 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
                     selectGroupNames?.add(group.name)
                 }
                 val selectGroupAdapter =
-                    SetTextSizeAdapter(requireContext(), selectGroupNames, loginDataManager!!.textSize.toInt())
+                    SetTextSizeAdapter(requireContext(), selectGroupNames, loginDataManager.textSize.toInt())
                 selectGroupSpinner?.adapter = selectGroupAdapter
                 for (i in list.indices) {
                     if (passwordEditData.groupId == list[i].groupId) {
@@ -180,9 +178,9 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
     override fun onStart() {
         super.onStart()
         // 背景色を設定する
-        binding.inputPasswordView.setBackgroundColor(loginDataManager!!.backgroundColor)
+        binding.inputPasswordView.setBackgroundColor(loginDataManager.backgroundColor)
         // テキストサイズを設定する
-        setTextSize(loginDataManager!!.textSize)
+        setTextSize(loginDataManager.textSize)
     }
 
     /**

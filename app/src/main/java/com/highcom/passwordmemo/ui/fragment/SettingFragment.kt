@@ -22,7 +22,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.highcom.passwordmemo.PasswordMemoActivity
-import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.databinding.FragmentSettingBinding
 import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
@@ -35,21 +34,25 @@ import com.highcom.passwordmemo.util.file.OutputExternalFile
 import com.highcom.passwordmemo.util.file.RestoreDbFile
 import com.highcom.passwordmemo.util.file.SelectInputOutputFileDialog
 import com.highcom.passwordmemo.util.login.LoginDataManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
+import javax.inject.Inject
 
 /**
  * 設定画面フラグメント
  *
  */
+@AndroidEntryPoint
 class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
     TextSizeUtil.TextSizeListener, SelectInputOutputFileDialog.InputOutputFileDialogListener,
     RestoreDbFile.RestoreDbFileListener, EditMasterPasswordDialogFragment.EditMasterPasswordListener {
     /** 設定画面のbinding */
     private lateinit var binding: FragmentSettingBinding
     /** ログインデータ管理 */
-    private var loginDataManager: LoginDataManager? = null
+    @Inject
+    lateinit var loginDataManager: LoginDataManager
     /** 処理ハンドラ */
     @Suppress("DEPRECATION")
     private val handler = Handler()
@@ -58,9 +61,7 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
     /** クリップボードコピー設定名 */
     private var copyClipboardNames: ArrayList<String?>? = null
     /** 設定ビューモデル */
-    private val settingViewModel: SettingViewModel by viewModels {
-        SettingViewModel.Factory((requireActivity().application as PasswordMemoApplication).repository)
-    }
+    private val settingViewModel: SettingViewModel by viewModels()
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,23 +86,22 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
         requireActivity().title = getString(R.string.setting)
         // ActionBarに戻るボタンを設定
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        loginDataManager = (requireActivity().application as PasswordMemoApplication).loginDataManager
 
         // バックグラウンドでは画面の中身が見えないようにする
-        if (loginDataManager!!.displayBackgroundSwitchEnable) {
+        if (loginDataManager.displayBackgroundSwitchEnable) {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
 
         // 背景色を設定する
         binding.settingView.setBackgroundColor(
-            loginDataManager!!.backgroundColor
+            loginDataManager.backgroundColor
         )
 
         // データ削除スイッチ処理
         val deleteSwitch = binding.deleteSwitch
-        deleteSwitch.isChecked = loginDataManager!!.deleteSwitchEnable
+        deleteSwitch.isChecked = loginDataManager.deleteSwitchEnable
         deleteSwitch.setOnCheckedChangeListener { _, b ->
-            loginDataManager?.setDeleteSwitchEnable(b)
+            loginDataManager.setDeleteSwitchEnable(b)
         }
 
         // 生体認証ログインスイッチ処理
@@ -111,40 +111,40 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
             biometricLoginSwitch.isChecked = false
             biometricLoginSwitch.isEnabled = false
         } else {
-            biometricLoginSwitch.isChecked = loginDataManager!!.biometricLoginSwitchEnable
+            biometricLoginSwitch.isChecked = loginDataManager.biometricLoginSwitchEnable
             biometricLoginSwitch.isEnabled = true
         }
         biometricLoginSwitch.setOnCheckedChangeListener { _, b ->
-            loginDataManager!!.setBiometricLoginSwitchEnable(b)
+            loginDataManager.setBiometricLoginSwitchEnable(b)
         }
 
         // バックグラウンド時の非表示設定
         val displayBackgroundSwitch = binding.displayBackgroundSwitch
-        displayBackgroundSwitch.isChecked = loginDataManager!!.displayBackgroundSwitchEnable
+        displayBackgroundSwitch.isChecked = loginDataManager.displayBackgroundSwitchEnable
         displayBackgroundSwitch.setOnCheckedChangeListener { _, b ->
-            loginDataManager!!.setDisplayBackgroundSwitchEnable(b)
+            loginDataManager.setDisplayBackgroundSwitchEnable(b)
             restartPasswordMemoActivity()
         }
 
         // メモ表示スイッチ処理
         val memoVisibleSwitch = binding.memoVisibleSwitch
-        memoVisibleSwitch.isChecked = loginDataManager!!.memoVisibleSwitchEnable
+        memoVisibleSwitch.isChecked = loginDataManager.memoVisibleSwitchEnable
         memoVisibleSwitch.setOnCheckedChangeListener { _, b ->
-            loginDataManager?.setMemoVisibleSwitchEnable(b)
+            loginDataManager.setMemoVisibleSwitchEnable(b)
         }
 
         // パスワード表示スイッチ処理
         val passwordVisibleSwitch = binding.passwordVisibleSwitch
-        passwordVisibleSwitch.isChecked = loginDataManager!!.passwordVisibleSwitchEnable
+        passwordVisibleSwitch.isChecked = loginDataManager.passwordVisibleSwitchEnable
         passwordVisibleSwitch.setOnCheckedChangeListener { _, b ->
-            loginDataManager?.setPasswordVisibleSwitchEnable(b)
+            loginDataManager.setPasswordVisibleSwitchEnable(b)
         }
 
         // テキストサイズスピナー処理
         val textSizeSpinner = binding.textSizeSpinner
         val textSizeUtil = TextSizeUtil(requireContext(), this)
         textSizeUtil.createTextSizeSpinner(textSizeSpinner)
-        textSizeSpinner.setSelection(textSizeUtil.getSpecifiedValuePosition(loginDataManager!!.textSize))
+        textSizeSpinner.setSelection(textSizeUtil.getSpecifiedValuePosition(loginDataManager.textSize))
 
         // パスワードコピー方法スピナー処理
         copyClipboardSpinner = binding.copyClipboardSpinner
@@ -152,12 +152,12 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
         copyClipboardNames?.add(getString(R.string.copy_with_longpress))
         copyClipboardNames?.add(getString(R.string.copy_with_tap))
         val copyClipboardAdapter =
-            SetTextSizeAdapter(requireContext(), copyClipboardNames, loginDataManager!!.textSize.toInt())
+            SetTextSizeAdapter(requireContext(), copyClipboardNames, loginDataManager.textSize.toInt())
         copyClipboardSpinner?.adapter = copyClipboardAdapter
-        copyClipboardSpinner?.setSelection(loginDataManager!!.copyClipboard)
+        copyClipboardSpinner?.setSelection(loginDataManager.copyClipboard)
         copyClipboardSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, i: Int, l: Long) {
-                loginDataManager!!.setCopyClipboard(i)
+                loginDataManager.setCopyClipboard(i)
             }
 
             override fun onNothingSelected(adapterView: AdapterView<*>?) {}
@@ -199,7 +199,7 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
         }
 
         // テキストサイズを設定する
-        setTextSize(loginDataManager!!.textSize)
+        setTextSize(loginDataManager.textSize)
     }
 
     /**
@@ -374,7 +374,7 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
      *
      */
     private fun editMasterPassword() {
-        val dialog = EditMasterPasswordDialogFragment(loginDataManager!!)
+        val dialog = EditMasterPasswordDialogFragment(loginDataManager)
         dialog.show(childFragmentManager, "EditMasterPasswordDialog")
     }
 
@@ -402,7 +402,7 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
     @SuppressLint("ResourceType")
     override fun onSelectColorClicked(color: Int) {
         binding.settingView.setBackgroundColor(color)
-        loginDataManager!!.setBackgroundColor(color)
+        loginDataManager.setBackgroundColor(color)
     }
 
     @Suppress("DEPRECATION")
@@ -421,7 +421,7 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
      */
     override fun onTextSizeSelected(size: Float) {
         setTextSize(size)
-        loginDataManager!!.setTextSize(size)
+        loginDataManager.setTextSize(size)
     }
 
     /**
@@ -441,7 +441,7 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
         binding.copyClipboardView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         val copyClipboardAdapter = SetTextSizeAdapter(requireContext(), copyClipboardNames, size.toInt())
         copyClipboardSpinner?.adapter = copyClipboardAdapter
-        copyClipboardSpinner?.setSelection(loginDataManager!!.copyClipboard)
+        copyClipboardSpinner?.setSelection(loginDataManager.copyClipboard)
         binding.textDbBackupView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.dbBackupButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
         binding.textCsvOutputView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
@@ -465,9 +465,8 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
      *
      */
     override fun restoreComplete() {
-        // データベースとリポジトリを初期化する
-        (requireActivity().application as PasswordMemoApplication).initializeDatabaseAndRepository()
         // 起動しているActivityをすべて削除し、新しいタスクでActivityを起動する
+        // Hilt用モジュールがActivityRetainedComponentなので、データベースとリポジトリも再読み込みされる
         val intent = Intent(requireContext(), PasswordMemoActivity::class.java)
         intent.flags =
             Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK

@@ -1,6 +1,7 @@
 package com.highcom.passwordmemo.data
 
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
 /**
  * パスワードメモデータアクセスリポジトリ
@@ -8,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
  * @property passwordDao パスワードデータアクセスオブジェクト
  * @property groupDao グループデータアクセスオブジェクト
  */
-class PasswordMemoRepository(private val passwordDao: PasswordDao, private val groupDao: GroupDao) {
+class PasswordMemoRepository @Inject constructor(private val passwordDao: PasswordDao, private val groupDao: GroupDao) {
     /** グループ一覧データ */
     val groupList: Flow<List<GroupEntity>> = groupDao.getGroupList()
 

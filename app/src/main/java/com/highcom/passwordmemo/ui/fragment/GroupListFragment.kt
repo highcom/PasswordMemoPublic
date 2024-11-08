@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.databinding.FragmentGroupListBinding
 import com.highcom.passwordmemo.ui.DividerItemDecoration
@@ -38,19 +37,23 @@ import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper.SimpleCallbackListe
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.util.AdBanner
 import com.highcom.passwordmemo.util.login.LoginDataManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 /**
  * グループ一覧画面フラグメント
  *
  */
+@AndroidEntryPoint
 class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
     /** グループ一覧画面のバインディング */
     private lateinit var binding: FragmentGroupListBinding
     /** ログインデータ管理 */
-    private var loginDataManager: LoginDataManager? = null
+    @Inject
+    lateinit var loginDataManager: LoginDataManager
     /** バナー広告処理 */
     private var adBanner: AdBanner? = null
     /** 広告用コンテナ */
@@ -64,9 +67,7 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
     /** スワイプボタン表示用通知ヘルパー */
     private var simpleCallbackHelper: SimpleCallbackHelper? = null
     /** グループ一覧ビューモデル */
-    private val groupListViewModel: GroupListViewModel by viewModels {
-        GroupListViewModel.Factory((requireActivity().application as PasswordMemoApplication).repository)
-    }
+    private val groupListViewModel: GroupListViewModel by viewModels()
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,9 +96,8 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
         requireActivity().title = getString(R.string.group_title) + getString(R.string.group_title_select)
         // ActionBarに戻るボタンを設定
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        loginDataManager = (requireActivity().application as PasswordMemoApplication).loginDataManager
         // バックグラウンドでは画面の中身が見えないようにする
-        if (loginDataManager?.displayBackgroundSwitchEnable == true) {
+        if (loginDataManager.displayBackgroundSwitchEnable) {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
         adapter = GroupListAdapter(
@@ -105,7 +105,7 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
             viewLifecycleOwner,
             this
         )
-        adapter?.textSize = loginDataManager!!.textSize
+        adapter?.textSize = loginDataManager.textSize
         recyclerView = binding.groupListView
         recyclerView!!.layoutManager = LinearLayoutManager(requireContext())
         recyclerView!!.adapter = adapter
@@ -119,8 +119,8 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
                     groupListViewModel.resetGroupId(group.groupId)
                 }
                 // 削除するデータが選択されていた場合には「すべて」にリセットする
-                if (loginDataManager?.selectGroup == group.groupId) {
-                    loginDataManager?.setSelectGroup(1L)
+                if (loginDataManager.selectGroup == group.groupId) {
+                    loginDataManager.setSelectGroup(1L)
                 }
             }
             // グループリストの監視をする
@@ -181,8 +181,8 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
                                             groupListViewModel.delete(it)
                                             groupListViewModel.resetGroupId(it)
                                         }
-                                        if (loginDataManager?.selectGroup == holder.binding.groupEntity?.groupId) {
-                                            loginDataManager?.setSelectGroup(1L)
+                                        if (loginDataManager.selectGroup == holder.binding.groupEntity?.groupId) {
+                                            loginDataManager.setSelectGroup(1L)
                                         }
                                         simpleCallbackHelper?.resetSwipePos()
                                         adapter!!.notifyDataSetChanged()
@@ -202,7 +202,7 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
         super.onStart()
         // 背景色を設定する
         binding.groupListFragmentView.setBackgroundColor(
-            loginDataManager!!.backgroundColor
+            loginDataManager.backgroundColor
         )
     }
 
@@ -211,8 +211,8 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
         super.onResume()
         var needRefresh = false
         // テキストサイズ設定に変更があった場合には再描画する
-        if (adapter?.textSize != loginDataManager?.textSize) {
-            adapter?.textSize = loginDataManager!!.textSize
+        if (adapter?.textSize != loginDataManager.textSize) {
+            adapter?.textSize = loginDataManager.textSize
             needRefresh = true
         }
         if (needRefresh) adapter!!.notifyDataSetChanged()
@@ -290,7 +290,7 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
                 inputMethodManager?.showSoftInput(view, 0)
             }
         } else {
-            loginDataManager?.setSelectGroup(groupId!!)
+            loginDataManager.setSelectGroup(groupId!!)
             findNavController().navigate(GroupListFragmentDirections.actionGroupListFragmentToPasswordListFragment())
         }
     }
@@ -319,8 +319,8 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
         if (groupEntity.name.isEmpty()) {
             groupListViewModel.delete(groupEntity.groupId)
             groupListViewModel.resetGroupId(groupEntity.groupId)
-            if (loginDataManager?.selectGroup == groupEntity.groupId) {
-                loginDataManager?.setSelectGroup(1L)
+            if (loginDataManager.selectGroup == groupEntity.groupId) {
+                loginDataManager.setSelectGroup(1L)
             }
             return
         }

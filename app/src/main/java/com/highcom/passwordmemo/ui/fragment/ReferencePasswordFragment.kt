@@ -26,19 +26,21 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
-import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.databinding.FragmentReferencePasswordBinding
 import com.highcom.passwordmemo.ui.PasswordEditData
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.util.AdBanner
 import com.highcom.passwordmemo.util.login.LoginDataManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * パスワード参照画面フラグメント
  *
  */
+@AndroidEntryPoint
 class ReferencePasswordFragment : Fragment() {
     /** パスワード参照画面のbinding */
     private lateinit var binding: FragmentReferencePasswordBinding
@@ -47,15 +49,14 @@ class ReferencePasswordFragment : Fragment() {
     /** パスワード編集データ */
     lateinit var passwordEditData: PasswordEditData
     /** ログインデータ管理 */
-    private var loginDataManager: LoginDataManager? = null
+    @Inject
+    lateinit var loginDataManager: LoginDataManager
     /** バナー広告処理 */
     private var adBanner: AdBanner? = null
     /** 広告コンテナ */
     private var adContainerView: FrameLayout? = null
     /** グループ一覧ビューモデル */
-    private val groupListViewModel: GroupListViewModel by viewModels {
-        GroupListViewModel.Factory((requireActivity().application as PasswordMemoApplication).repository)
-    }
+    private val groupListViewModel: GroupListViewModel by viewModels()
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,18 +82,17 @@ class ReferencePasswordFragment : Fragment() {
         adContainerView = binding.adViewFrameReference
         adBanner = AdBanner(this, adContainerView)
         adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_2)) }
-        loginDataManager = (requireActivity().application as PasswordMemoApplication).loginDataManager
 
         // ActionBarに戻るボタンを設定
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // バックグラウンドでは画面の中身が見えないようにする
-        if (loginDataManager!!.displayBackgroundSwitchEnable) {
+        if (loginDataManager.displayBackgroundSwitchEnable) {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
 
         // パスワードの初期表示設定
-        if (loginDataManager!!.passwordVisibleSwitchEnable) {
+        if (loginDataManager.passwordVisibleSwitchEnable) {
             binding.editRefPassword.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
         }
 
@@ -116,7 +116,7 @@ class ReferencePasswordFragment : Fragment() {
      */
     fun onTextClick(view: View) {
         if (view is EditText) {
-            if (loginDataManager!!.copyClipboard == OPERATION_TAP) {
+            if (loginDataManager.copyClipboard == OPERATION_TAP) {
                 copyClipBoard(view, view.text.toString())
             }
         }
@@ -130,7 +130,7 @@ class ReferencePasswordFragment : Fragment() {
      */
     fun onTextLongClick(view: View): Boolean {
         if (view is EditText) {
-            if (loginDataManager!!.copyClipboard == OPERATION_LONGPRESS) {
+            if (loginDataManager.copyClipboard == OPERATION_LONGPRESS) {
                 copyClipBoard(view, view.text.toString())
             }
         }
@@ -192,9 +192,9 @@ class ReferencePasswordFragment : Fragment() {
         super.onStart()
 
         // 背景色を設定する
-        binding.referencePasswordView.setBackgroundColor(loginDataManager!!.backgroundColor)
+        binding.referencePasswordView.setBackgroundColor(loginDataManager.backgroundColor)
         // テキストサイズを設定する
-        setTextSize(loginDataManager!!.textSize)
+        setTextSize(loginDataManager.textSize)
     }
 
     /**

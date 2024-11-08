@@ -2,21 +2,24 @@ package com.highcom.passwordmemo.ui.viewmodel
 
 import android.content.Context
 import android.os.Handler
+import android.view.View
 import android.widget.Toast
 import androidx.biometric.BiometricPrompt
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.findFragment
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.data.PasswordMemoRepository
 import com.highcom.passwordmemo.util.login.LoginDataManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executor
+import javax.inject.Inject
 
 /**
  * ログイン画面のビューモデル
@@ -24,7 +27,8 @@ import java.util.concurrent.Executor
  * @property repository データアクセスリポジトリ
  * @property loginDataManager ログインデータ管理
  */
-class LoginViewModel(private val repository: PasswordMemoRepository, private val loginDataManager: LoginDataManager) : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor(private val repository: PasswordMemoRepository, private val loginDataManager: LoginDataManager) : ViewModel() {
     /** ログイン時の案内メッセージ */
     private val _naviMessage = MutableStateFlow("")
     val naviMessage: StateFlow<String> = _naviMessage.asStateFlow()
@@ -45,24 +49,11 @@ class LoginViewModel(private val repository: PasswordMemoRepository, private val
     private val executor = Executor { command -> handler.post(command) }
 
     /**
-     * ログイン画面ビューモデル生成クラス
-     *
-     * @property repository
-     */
-    class Factory(private val repository: PasswordMemoRepository, private val loginDataManager: LoginDataManager) : ViewModelProvider.NewInstanceFactory() {
-
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return LoginViewModel(repository, loginDataManager) as T
-        }
-    }
-
-    /**
      * 全てのデータのデータ削除
      *
      * @param groupEntity リセット後の初期グループデータ
      */
-    fun reset(groupEntity: GroupEntity) = viewModelScope.launch {
+    private fun reset(groupEntity: GroupEntity) = viewModelScope.launch {
         repository.deleteAllPassword()
         repository.deleteAllGroup()
         repository.insertGroup(groupEntity)
@@ -94,20 +85,19 @@ class LoginViewModel(private val repository: PasswordMemoRepository, private val
      * * パスワードの生成が必要か照合したかの判定処理をしてメッセージを返却する
      *
      * @param context コンテキスト
-     * @param editPassword 入力パスワード
      * @return 判定メッセージ
      */
-    fun passwordLogin(context: Context, editPassword: String) {
+    fun passwordLogin(context: Context) {
         val masterPassword = loginDataManager.masterPassword
-        if (editPassword == "") {
+        if (editMasterPassword.value == "") {
             _naviMessage.value = context.getString(R.string.err_empty)
         } else if (!loginDataManager.isMasterPasswordCreated) {
             if (firstPassword == null) {
-                firstPassword = editPassword
+                firstPassword = editMasterPassword.value
                 _naviMessage.value = context.getString(R.string.err_input_same)
-            } else if (editPassword == firstPassword) {
+            } else if (editMasterPassword.value == firstPassword) {
                 // マスターパスワードが作成されていない場合は新規作成
-                loginDataManager.setMasterPassword(editPassword)
+                loginDataManager.setMasterPassword(editMasterPassword.value)
                 // ログイン中の表示に切り替える
                 firstTime = true
                 _naviMessage.value = context.getString(R.string.login_success)
@@ -123,7 +113,7 @@ class LoginViewModel(private val repository: PasswordMemoRepository, private val
                 firstPassword = null
                 _naviMessage.value = context.getString(R.string.new_password)
             }
-        } else if (editPassword == masterPassword) {
+        } else if (editMasterPassword.value == masterPassword) {
             // ログイン中の表示に切り替える
             firstTime = false
             _naviMessage.value = context.getString(R.string.login_success)
@@ -162,22 +152,22 @@ class LoginViewModel(private val repository: PasswordMemoRepository, private val
     /**
      * 生体認証ログイン処理
      *
-     * @param context コンテキスト
+     * @param view レイアウトビュー
      */
-    fun biometricLogin(context: Context) {
+    fun biometricLogin(view: View) {
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle(context.getString(R.string.login_biometrics))
-            .setSubtitle(context.getString(R.string.login_biometrics_message))
-            .setNegativeButtonText(context.getString(R.string.cancel))
+            .setTitle(view.context.getString(R.string.login_biometrics))
+            .setSubtitle(view.context.getString(R.string.login_biometrics_message))
+            .setNegativeButtonText(view.context.getString(R.string.cancel))
             .build()
         val biometricPrompt = BiometricPrompt(
-            (context as FragmentActivity),
+            view.findFragment() as Fragment,
             executor, object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
                     Toast.makeText(
-                        context.getApplicationContext(),
-                        context.getString(R.string.err_authentication_message) + errString,
+                        view.context.applicationContext,
+                        view.context.getString(R.string.err_authentication_message) + errString,
                         Toast.LENGTH_SHORT
                     )
                         .show()
@@ -187,15 +177,15 @@ class LoginViewModel(private val repository: PasswordMemoRepository, private val
                     super.onAuthenticationSucceeded(result)
                     // ログイン中の表示に切り替える
                     firstTime = false
-                    _naviMessage.value = context.getString(R.string.login_success)
+                    _naviMessage.value = view.context.getString(R.string.login_success)
                     _keyIconRotate.value = true
                 }
 
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
                     Toast.makeText(
-                        context.getApplicationContext(),
-                        context.getString(R.string.err_authentication_failure),
+                        view.context.applicationContext,
+                        view.context.getString(R.string.err_authentication_failure),
                         Toast.LENGTH_SHORT
                     )
                         .show()
