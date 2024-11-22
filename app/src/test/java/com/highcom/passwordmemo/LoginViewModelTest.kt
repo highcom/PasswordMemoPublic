@@ -19,7 +19,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 /**
- * ログイン画面のビューモデルのUnitTest
+ * ログイン画面ビューモデルのUnitTest
  *
  */
 @OptIn(ExperimentalCoroutinesApi::class)

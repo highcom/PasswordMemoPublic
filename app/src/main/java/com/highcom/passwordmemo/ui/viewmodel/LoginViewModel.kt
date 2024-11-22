@@ -22,7 +22,7 @@ import java.util.concurrent.Executor
 import javax.inject.Inject
 
 /**
- * ログイン画面のビューモデル
+ * ログイン画面ビューモデル
  *
  * @property repository データアクセスリポジトリ
  * @property loginDataManager ログインデータ管理

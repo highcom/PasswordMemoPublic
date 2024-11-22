@@ -22,7 +22,7 @@ class SettingViewModel @Inject constructor(private val repository: PasswordMemoR
     val groupList = repository.groupList
 
     /**
-     * パスワードデータ一覧の再挿入クラス
+     * パスワードデータ一覧の再挿入
      * * 既存のパスワード一覧を削除して再度パスワード一覧データを挿入する
      *
      * @param passwordList 再挿入するパスワード一覧
@@ -33,7 +33,7 @@ class SettingViewModel @Inject constructor(private val repository: PasswordMemoR
     }
 
     /**
-     * グループデータ一覧の再挿入クラス
+     * グループデータ一覧の再挿入
      * * 既存のグループ一覧を削除して再度グループ一覧データを挿入する
      *
      * @param groupList 再挿入するグループ一覧
