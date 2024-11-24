@@ -1,4 +1,4 @@
-package com.highcom.passwordmemo
+package com.highcom.passwordmemo.viewmodel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.data.PasswordMemoRepository

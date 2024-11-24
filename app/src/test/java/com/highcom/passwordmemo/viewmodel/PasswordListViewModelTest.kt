@@ -1,4 +1,4 @@
-package com.highcom.passwordmemo
+package com.highcom.passwordmemo.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.highcom.passwordmemo.data.PasswordEntity
@@ -67,7 +67,7 @@ class PasswordListViewModelTest {
         val groupId = 1L
         val expectedPasswords = listOf(
             PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = groupId, memo = "a", inputDate = "20241111"),
-            PasswordEntity(id = 1, title = "b", account = "b", password = "b", url = "test", groupId = groupId, memo = "b", inputDate = "20241111"),
+            PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = groupId, memo = "b", inputDate = "20241111"),
         )
         val mockFlow: Flow<List<PasswordEntity>> = flow { emit(expectedPasswords) }
 
@@ -111,7 +111,7 @@ class PasswordListViewModelTest {
     fun insert_passwords_called_success() = runTest {
         val testPasswords = listOf(
             PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111"),
-            PasswordEntity(id = 1, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111"),
+            PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111"),
         )
 
         viewModel.insert(testPasswords)
@@ -144,7 +144,7 @@ class PasswordListViewModelTest {
     fun update_passwords_called_success() = runTest {
         val testPasswords = listOf(
             PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111"),
-            PasswordEntity(id = 1, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111"),
+            PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111"),
         )
 
         viewModel.update(testPasswords)

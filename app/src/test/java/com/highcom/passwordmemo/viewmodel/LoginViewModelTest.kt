@@ -1,8 +1,9 @@
-package com.highcom.passwordmemo
+package com.highcom.passwordmemo.viewmodel
 
 import android.content.Context
 import android.os.Handler
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.PasswordMemoRepository
 import com.highcom.passwordmemo.ui.viewmodel.LoginViewModel
 import com.highcom.passwordmemo.util.login.LoginDataManager
