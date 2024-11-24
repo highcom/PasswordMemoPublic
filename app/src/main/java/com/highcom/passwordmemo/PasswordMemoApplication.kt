@@ -2,9 +2,6 @@ package com.highcom.passwordmemo
 
 import android.app.Application
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.highcom.passwordmemo.data.PasswordMemoRepository
-import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
-import com.highcom.passwordmemo.util.login.LoginDataManager
 import dagger.hilt.android.HiltAndroidApp
 
 /**

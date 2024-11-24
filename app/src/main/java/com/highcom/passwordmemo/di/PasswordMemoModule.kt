@@ -3,23 +3,19 @@ package com.highcom.passwordmemo.di
 import android.content.Context
 import android.util.Log
 import androidx.room.Room
-import com.highcom.passwordmemo.PasswordMemoApplication
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.MIGRATION_2_3
 import com.highcom.passwordmemo.data.MIGRATION_3_4
 import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
-import com.highcom.passwordmemo.util.login.LoginDataManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityRetainedScoped
-import dagger.hilt.components.SingletonComponent
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SQLiteDatabaseHook
 import net.sqlcipher.database.SupportFactory
-import javax.inject.Singleton
 
 /**
  * パスワードメモアプリDagger Hilt用モジュール定義クラス

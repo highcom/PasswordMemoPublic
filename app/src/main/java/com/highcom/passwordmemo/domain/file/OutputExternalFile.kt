@@ -1,4 +1,4 @@
-package com.highcom.passwordmemo.util.file
+package com.highcom.passwordmemo.domain.file
 
 import android.app.AlertDialog
 import android.content.Context

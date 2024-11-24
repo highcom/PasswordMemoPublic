@@ -6,7 +6,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.PasswordMemoRepository
 import com.highcom.passwordmemo.ui.viewmodel.LoginViewModel
-import com.highcom.passwordmemo.util.login.LoginDataManager
+import com.highcom.passwordmemo.domain.login.LoginDataManager
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

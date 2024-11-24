@@ -1,4 +1,4 @@
-package com.highcom.passwordmemo.util.login
+package com.highcom.passwordmemo.domain.login
 
 import android.app.Application
 import android.content.Context
@@ -6,8 +6,8 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.annotation.ColorInt
 import com.highcom.passwordmemo.R
-import com.highcom.passwordmemo.util.BackgroundColorUtil
-import com.highcom.passwordmemo.util.TextSizeUtil
+import com.highcom.passwordmemo.domain.BackgroundColorUtil
+import com.highcom.passwordmemo.domain.TextSizeUtil
 import javax.inject.Inject
 import javax.inject.Singleton
 

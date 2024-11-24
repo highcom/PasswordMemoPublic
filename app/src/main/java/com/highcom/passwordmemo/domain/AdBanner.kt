@@ -1,4 +1,4 @@
-package com.highcom.passwordmemo.util
+package com.highcom.passwordmemo.domain
 
 import android.util.DisplayMetrics
 import android.widget.FrameLayout
