@@ -7,7 +7,7 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.databinding.AlertEditMasterPasswordBinding
-import com.highcom.passwordmemo.util.login.LoginDataManager
+import com.highcom.passwordmemo.domain.login.LoginDataManager
 import java.lang.ClassCastException
 
 /**

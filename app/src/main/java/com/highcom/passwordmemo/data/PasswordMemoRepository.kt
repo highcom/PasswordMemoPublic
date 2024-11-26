@@ -38,7 +38,7 @@ class PasswordMemoRepository @Inject constructor(private val passwordDao: Passwo
     }
 
     /**
-     * パスワードデータ追加
+     * パスワードデータ一括追加
      *
      * @param passwordList パスワードデータリスト
      */

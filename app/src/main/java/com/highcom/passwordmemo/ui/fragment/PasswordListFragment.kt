@@ -36,8 +36,8 @@ import com.highcom.passwordmemo.ui.list.PasswordListAdapter
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
-import com.highcom.passwordmemo.util.AdBanner
-import com.highcom.passwordmemo.util.login.LoginDataManager
+import com.highcom.passwordmemo.domain.AdBanner
+import com.highcom.passwordmemo.domain.login.LoginDataManager
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.recruit_mp.android.rmp_appirater.RmpAppirater
 import kotlinx.coroutines.ExperimentalCoroutinesApi

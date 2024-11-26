@@ -12,7 +12,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import com.highcom.passwordmemo.databinding.FragmentLicenseBinding
-import com.highcom.passwordmemo.util.login.LoginDataManager
+import com.highcom.passwordmemo.domain.login.LoginDataManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

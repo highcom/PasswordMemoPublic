@@ -1,4 +1,4 @@
-package com.highcom.passwordmemo.util.login
+package com.highcom.passwordmemo.domain.login
 
 import android.content.Context
 import android.content.SharedPreferences

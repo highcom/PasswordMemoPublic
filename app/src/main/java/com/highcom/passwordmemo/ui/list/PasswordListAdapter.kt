@@ -15,8 +15,8 @@ import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.databinding.RowPasswordBinding
 import com.highcom.passwordmemo.databinding.RowFooterBinding
-import com.highcom.passwordmemo.util.TextSizeUtil
-import com.highcom.passwordmemo.util.login.LoginDataManager
+import com.highcom.passwordmemo.domain.TextSizeUtil
+import com.highcom.passwordmemo.domain.login.LoginDataManager
 import java.util.Locale
 
 /**

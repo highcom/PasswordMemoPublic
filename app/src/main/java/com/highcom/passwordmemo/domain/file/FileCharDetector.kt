@@ -1,4 +1,4 @@
-package com.highcom.passwordmemo.util.file
+package com.highcom.passwordmemo.domain.file
 
 import android.annotation.SuppressLint
 import android.content.Context

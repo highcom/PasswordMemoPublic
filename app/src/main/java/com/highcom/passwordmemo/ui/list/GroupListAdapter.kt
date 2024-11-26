@@ -14,7 +14,7 @@ import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.databinding.RowFooterBinding
 import com.highcom.passwordmemo.databinding.RowGroupBinding
-import com.highcom.passwordmemo.util.TextSizeUtil
+import com.highcom.passwordmemo.domain.TextSizeUtil
 
 /**
  * グループ一覧表示用アダプタ

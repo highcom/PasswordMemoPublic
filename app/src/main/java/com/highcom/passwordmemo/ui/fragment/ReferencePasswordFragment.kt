@@ -30,8 +30,8 @@ import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.databinding.FragmentReferencePasswordBinding
 import com.highcom.passwordmemo.ui.PasswordEditData
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
-import com.highcom.passwordmemo.util.AdBanner
-import com.highcom.passwordmemo.util.login.LoginDataManager
+import com.highcom.passwordmemo.domain.AdBanner
+import com.highcom.passwordmemo.domain.login.LoginDataManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject

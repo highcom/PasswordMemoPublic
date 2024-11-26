@@ -12,7 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.data.PasswordMemoRepository
-import com.highcom.passwordmemo.util.login.LoginDataManager
+import com.highcom.passwordmemo.domain.login.LoginDataManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +22,7 @@ import java.util.concurrent.Executor
 import javax.inject.Inject
 
 /**
- * ログイン画面のビューモデル
+ * ログイン画面ビューモデル
  *
  * @property repository データアクセスリポジトリ
  * @property loginDataManager ログインデータ管理

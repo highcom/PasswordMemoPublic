@@ -21,7 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.ui.viewmodel.LoginViewModel
-import com.highcom.passwordmemo.util.login.LoginDataManager
+import com.highcom.passwordmemo.domain.login.LoginDataManager
 import kotlinx.coroutines.launch
 import com.highcom.passwordmemo.databinding.FragmentLoginBinding
 import dagger.hilt.android.AndroidEntryPoint

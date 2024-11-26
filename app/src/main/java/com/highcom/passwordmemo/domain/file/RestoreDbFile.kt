@@ -1,4 +1,4 @@
-package com.highcom.passwordmemo.util.file
+package com.highcom.passwordmemo.domain.file
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -13,7 +13,6 @@ import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.os.HandlerCompat
 import com.highcom.passwordmemo.R
-import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
 import com.highcom.passwordmemo.databinding.AlertProgressbarBinding
 import java.io.File
 import java.io.FileOutputStream
