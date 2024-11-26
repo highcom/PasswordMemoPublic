@@ -46,8 +46,8 @@ Android標準の生体認証を利用して安全かつ簡単にログインで�
 - [x] SingleActivity/MultiFragment化
 - [x] NavigationFragment適用
 - [x] ViewBinding/DataBinding化
-- [ ] Dagger Hilt化
-- [ ] JUnit作成
+- [x] Dagger Hilt化
+- [x] JUnit作成
 ## バージョンについて
 vX.X.Xとしてタグを付けていますので、過去のリリースバージョンのコードはタグを過去に辿ることで参照出来ます。
 ## ライセンス
