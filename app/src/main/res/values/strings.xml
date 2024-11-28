@@ -196,4 +196,7 @@
     <string name="operation_group_edit">Edit group</string>
     <string name="operation_group_edit_instruction">By selecting the upper right button, you can switch to edit mode.</string>
     <string name="operation_group_edit_disp_instruction">Switching to edit mode allows groups to be added or edited.</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
 </resources>

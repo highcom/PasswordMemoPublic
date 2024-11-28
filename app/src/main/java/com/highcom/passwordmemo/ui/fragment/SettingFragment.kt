@@ -21,7 +21,7 @@ import androidx.biometric.BiometricManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.highcom.passwordmemo.PasswordMemoActivity
+import com.highcom.passwordmemo.PasswordMemoDrawerActivity
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.databinding.FragmentSettingBinding
 import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
@@ -218,7 +218,7 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
      *
      */
     private fun executeRestart() {
-        val intent = Intent(requireContext(), PasswordMemoActivity::class.java)
+        val intent = Intent(requireContext(), PasswordMemoDrawerActivity::class.java)
         // 起動しているActivityをすべて削除し、新しいタスクでMainActivityを起動する
         intent.flags =
             Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -467,7 +467,7 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
     override fun restoreComplete() {
         // 起動しているActivityをすべて削除し、新しいタスクでActivityを起動する
         // Hilt用モジュールがActivityRetainedComponentなので、データベースとリポジトリも再読み込みされる
-        val intent = Intent(requireContext(), PasswordMemoActivity::class.java)
+        val intent = Intent(requireContext(), PasswordMemoDrawerActivity::class.java)
         intent.flags =
             Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
