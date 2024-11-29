@@ -17,10 +17,8 @@ import android.view.WindowManager
 import android.widget.Filterable
 import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -107,12 +105,9 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         adContainerView = binding.adViewFrame
         adBanner = AdBanner(this, adContainerView)
         adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_1)) }
-        // ActionBarに戻るボタンを設定
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        // ドロワーを操作可能にする
         val activity = requireActivity()
-        if (activity is PasswordMemoDrawerActivity) {
-            activity.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-        }
+        if (activity is PasswordMemoDrawerActivity) activity.drawerMenuEnabled()
 
         // レビュー評価依頼のダイアログに表示する内容を設定
         val options = RmpAppirater.Options(
@@ -323,6 +318,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            // TODO:ドロワーメニューのログアウトボタンに移行する
             // 戻るボタン
             android.R.id.home -> {
                 // 編集状態は解除する

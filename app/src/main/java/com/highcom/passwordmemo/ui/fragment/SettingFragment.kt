@@ -85,7 +85,13 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
         super.onViewCreated(view, savedInstanceState)
         requireActivity().title = getString(R.string.setting)
         // ActionBarに戻るボタンを設定
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val activity = requireActivity()
+        if (activity is PasswordMemoDrawerActivity) {
+            activity.drawerMenuDisabled()
+            activity.toggle.setToolbarNavigationClickListener {
+                findNavController().navigate(SettingFragmentDirections.actionSettingFragmentToPasswordListFragment())
+            }
+        }
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager.displayBackgroundSwitchEnable) {
@@ -403,15 +409,6 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
     override fun onSelectColorClicked(color: Int) {
         binding.settingView.setBackgroundColor(color)
         loginDataManager.setBackgroundColor(color)
-    }
-
-    @Suppress("DEPRECATION")
-    @Deprecated("Deprecated in Java")
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> findNavController().navigate(SettingFragmentDirections.actionSettingFragmentToPasswordListFragment())
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     /**

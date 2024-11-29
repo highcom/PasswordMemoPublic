@@ -24,6 +24,8 @@
     <string name="review_dialig_rate_later">Remind me later</string>
     <string name="review_dialig_rate_cancel">Do not rate</string>
 
+    <string name="drawer_open">Menu opened</string>
+    <string name="drawer_close">Menu closed</string>
     <string name="list_title">All</string>
     <string name="group_title">Group list</string>
     <string name="group_title_select">(Select)</string>

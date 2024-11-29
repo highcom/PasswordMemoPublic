@@ -18,7 +18,6 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -27,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.highcom.passwordmemo.PasswordMemoDrawerActivity
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.databinding.FragmentGroupListBinding
 import com.highcom.passwordmemo.ui.DividerItemDecoration
@@ -95,7 +95,15 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
         adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_4)) }
         requireActivity().title = getString(R.string.group_title) + getString(R.string.group_title_select)
         // ActionBarに戻るボタンを設定
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val activity = requireActivity()
+        if (activity is PasswordMemoDrawerActivity) {
+            activity.drawerMenuDisabled()
+            activity.toggle.setToolbarNavigationClickListener {
+                recyclerView!!.adapter = adapter
+                findNavController().navigate(GroupListFragmentDirections.actionGroupListFragmentToPasswordListFragment())
+            }
+        }
+
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager.displayBackgroundSwitchEnable) {
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
@@ -231,11 +239,6 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
     @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> {
-                recyclerView!!.adapter = adapter
-                findNavController().navigate(GroupListFragmentDirections.actionGroupListFragmentToPasswordListFragment())
-            }
-
             R.id.select_group_mode -> {
                 if (adapter?.editEnable == true) {
                     adapter?.editEnable = false

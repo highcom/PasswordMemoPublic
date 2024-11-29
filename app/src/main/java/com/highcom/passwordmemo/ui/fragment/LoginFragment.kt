@@ -19,6 +19,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.highcom.passwordmemo.PasswordMemoDrawerActivity
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.ui.viewmodel.LoginViewModel
 import com.highcom.passwordmemo.domain.login.LoginDataManager
@@ -54,6 +55,9 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().title = getString(R.string.app_name)
+        // ログイン画面では全てのメニューを表示しない
+        val activity = requireActivity()
+        if (activity is PasswordMemoDrawerActivity) activity.allMenuDisabled()
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager.displayBackgroundSwitchEnable) {

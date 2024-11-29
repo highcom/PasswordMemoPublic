@@ -14,12 +14,12 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.FrameLayout
 import android.widget.Spinner
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.highcom.passwordmemo.PasswordMemoDrawerActivity
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.databinding.FragmentInputPasswordBinding
@@ -88,6 +88,14 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
         adContainerView = binding.adViewFrameInput
         adBanner = AdBanner(this, adContainerView)
         adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_3)) }
+        // ActionBarに戻るボタンを設定
+        val activity = requireActivity()
+        if (activity is PasswordMemoDrawerActivity) {
+            activity.drawerMenuDisabled()
+            activity.toggle.setToolbarNavigationClickListener {
+                findNavController().navigate(InputPasswordFragmentDirections.actionInputPasswordFragmentToPasswordListFragment())
+            }
+        }
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager.displayBackgroundSwitchEnable) {
@@ -132,8 +140,6 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
         } else {
             getString(R.string.create_new)
         }
-        // ActionBarに戻るボタンを設定
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     @Deprecated("Deprecated in Java", ReplaceWith(
@@ -149,7 +155,6 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
     @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> findNavController().navigate(R.id.action_inputPasswordFragment_to_passwordListFragment)
             R.id.action_done -> {
                 // 入力データを登録する
                 val passwordEntity = PasswordEntity(
@@ -168,7 +173,7 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
                     passwordListViewModel.insert(passwordEntity)
                 }
                 // 詳細画面を終了
-                findNavController().navigate(R.id.action_inputPasswordFragment_to_passwordListFragment)
+                findNavController().navigate(InputPasswordFragmentDirections.actionInputPasswordFragmentToPasswordListFragment())
             }
         }
         return super.onOptionsItemSelected(item)

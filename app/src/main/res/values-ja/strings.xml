@@ -24,6 +24,8 @@
     <string name="review_dialig_rate_later">後で応援をする</string>
     <string name="review_dialig_rate_cancel">応援しない</string>
 
+    <string name="drawer_open">メニューを開く</string>
+    <string name="drawer_close">メニューを閉じる</string>
     <string name="list_title">すべて</string>
     <string name="group_title">グループ一覧</string>
     <string name="group_title_select">(選択)</string>

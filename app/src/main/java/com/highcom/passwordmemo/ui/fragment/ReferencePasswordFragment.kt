@@ -26,6 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
+import com.highcom.passwordmemo.PasswordMemoDrawerActivity
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.databinding.FragmentReferencePasswordBinding
 import com.highcom.passwordmemo.ui.PasswordEditData
@@ -84,7 +85,13 @@ class ReferencePasswordFragment : Fragment() {
         adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_2)) }
 
         // ActionBarに戻るボタンを設定
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val activity = requireActivity()
+        if (activity is PasswordMemoDrawerActivity) {
+            activity.drawerMenuDisabled()
+            activity.toggle.setToolbarNavigationClickListener {
+                findNavController().navigate(ReferencePasswordFragmentDirections.actionReferencePasswordFragmentToPasswordListFragment())
+            }
+        }
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager.displayBackgroundSwitchEnable) {
@@ -165,8 +172,6 @@ class ReferencePasswordFragment : Fragment() {
     @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            // 戻るボタン
-            android.R.id.home -> findNavController().navigate(R.id.action_referencePasswordFragment_to_passwordListFragment)
             // 複製して編集
             R.id.action_copy -> {
                 // 入力画面に遷移
@@ -182,7 +187,7 @@ class ReferencePasswordFragment : Fragment() {
                 findNavController().navigate(ReferencePasswordFragmentDirections.actionReferencePasswordFragmentToInputPasswordFragment(editData = passwordEditData))
             }
 
-            else -> findNavController().navigate(R.id.action_referencePasswordFragment_to_passwordListFragment)
+            else -> findNavController().navigate(ReferencePasswordFragmentDirections.actionReferencePasswordFragmentToPasswordListFragment())
         }
         return super.onOptionsItemSelected(item)
     }

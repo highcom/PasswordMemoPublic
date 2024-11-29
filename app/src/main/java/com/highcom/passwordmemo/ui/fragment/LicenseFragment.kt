@@ -6,11 +6,10 @@ import android.view.ViewGroup
 import com.highcom.passwordmemo.R
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
+import com.highcom.passwordmemo.PasswordMemoDrawerActivity
 import com.highcom.passwordmemo.databinding.FragmentLicenseBinding
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,7 +48,13 @@ class LicenseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().title = getString(R.string.license)
         // ActionBarに戻るボタンを設定
-        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val activity = requireActivity()
+        if (activity is PasswordMemoDrawerActivity) {
+            activity.drawerMenuDisabled()
+            activity.toggle.setToolbarNavigationClickListener {
+                findNavController().navigate(LicenseFragmentDirections.actionLicenseFragmentToSettingFragment())
+            }
+        }
 
         // バックグラウンドでは画面の中身が見えないようにする
         if (loginDataManager.displayBackgroundSwitchEnable) {
@@ -61,14 +66,5 @@ class LicenseFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         binding.licenseView.setBackgroundColor(loginDataManager.backgroundColor)
-    }
-
-    @Suppress("DEPRECATION")
-    @Deprecated("Deprecated in Java")
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> findNavController().navigate(LicenseFragmentDirections.actionLicenseFragmentToSettingFragment())
-        }
-        return super.onOptionsItemSelected(item)
     }
 }
