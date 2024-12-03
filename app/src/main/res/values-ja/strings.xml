@@ -24,6 +24,7 @@
     <string name="review_dialig_rate_later">後で応援をする</string>
     <string name="review_dialig_rate_cancel">応援しない</string>
 
+    <string name="logout">ログアウト</string>
     <string name="drawer_open">メニューを開く</string>
     <string name="drawer_close">メニューを閉じる</string>
     <string name="list_title">すべて</string>
@@ -54,7 +55,7 @@
     <string name="sort_default">○ 並べ替え(標準)</string>
     <string name="sort_title">○ 並べ替え(タイトル)</string>
     <string name="sort_update">○ 並べ替え(更新日)</string>
-    <string name="select_group">グループ選択</string>
+    <string name="select_group">グループ編集</string>
     <string name="setting_menu">設定</string>
 
     <string name="back">戻る</string>
@@ -198,7 +199,5 @@
     <string name="operation_group_edit">グループ編集</string>
     <string name="operation_group_edit_instruction">右上のボタンを選択する事で、編集モードに切り替わります。</string>
     <string name="operation_group_edit_disp_instruction">編集モードに切り替わると、グループの追加や編集が可能になります。</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
 </resources>

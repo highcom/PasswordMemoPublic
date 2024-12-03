@@ -324,15 +324,23 @@ class PasswordListAdapter(
     }
 
     companion object {
+        /** IDソート */
         const val SORT_ID = "id"
+        /** タイトルソート */
         const val SORT_TITLE = "title"
+        /** 更新日付ソート */
         const val SORT_INPUTDATE = "inputdate"
-        // private Context context;
+        /** アダプタの種別が通常のアイテム */
         private const val TYPE_ITEM = 1
+        /** アダプタの種別がフッター */
         private const val TYPE_FOOTER = 2
+        /** テキストサイズが小の場合の高さ */
         private const val ROW_LAYOUT_HEIGHT_SMALL = 40f
+        /** テキストサイズが中の場合の高さ */
         private const val ROW_LAYOUT_HEIGHT_MEDIUM = 45f
+        /** テキストサイズが大の場合の高さ */
         private const val ROW_LAYOUT_HEIGHT_LARGE = 53f
+        /** テキストサイズが特大の場合の高さ */
         private const val ROW_LAYOUT_HEIGHT_EXTRA_LARGE = 60f
     }
 }

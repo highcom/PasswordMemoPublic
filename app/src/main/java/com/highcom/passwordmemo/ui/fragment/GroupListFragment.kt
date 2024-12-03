@@ -93,7 +93,7 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
         adContainerView = binding.adViewGroupFrame
         adBanner = AdBanner(this, adContainerView)
         adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_4)) }
-        requireActivity().title = getString(R.string.group_title) + getString(R.string.group_title_select)
+        requireActivity().title = getString(R.string.group_title) + getString(R.string.group_title_edit)
         // ActionBarに戻るボタンを設定
         val activity = requireActivity()
         if (activity is PasswordMemoDrawerActivity) {

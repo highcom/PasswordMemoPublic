@@ -42,7 +42,7 @@ class GroupListAdapter(
     /** 表示テキストサイズ */
     var textSize = 15f
     /** 編集モードかどうか */
-    var editEnable = false
+    var editEnable = true
 
     /**
      * グループ一覧表示用アダプタのリスナー

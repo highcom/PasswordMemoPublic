@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.TypedValue
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
@@ -38,6 +39,7 @@ import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import com.highcom.passwordmemo.domain.AdBanner
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import com.highcom.passwordmemo.PasswordMemoDrawerActivity
+import com.highcom.passwordmemo.ui.list.DrawerGroupListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.recruit_mp.android.rmp_appirater.RmpAppirater
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -68,6 +70,8 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     var recyclerView: RecyclerView? = null
     /** パスワード一覧用アダプタ */
     var adapter: PasswordListAdapter? = null
+    /** ドロワーのグループ一覧用アダプタ */
+    private var drawerAdapter: DrawerGroupListAdapter? = null
     /** 操作メニュー */
     private var menu: Menu? = null
     /** 現在洗濯中のメニュー */
@@ -107,7 +111,15 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_1)) }
         // ドロワーを操作可能にする
         val activity = requireActivity()
-        if (activity is PasswordMemoDrawerActivity) activity.drawerMenuEnabled()
+        if (activity is PasswordMemoDrawerActivity) {
+            activity.drawerMenuEnabled()
+            activity.logoutButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, loginDataManager.textSize)
+            activity.logoutButton.setOnClickListener {
+                // 編集状態は解除する
+                adapter?.editEnable = false
+                findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToLoginFragment())
+            }
+        }
 
         // レビュー評価依頼のダイアログに表示する内容を設定
         val options = RmpAppirater.Options(
@@ -318,13 +330,6 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            // TODO:ドロワーメニューのログアウトボタンに移行する
-            // 戻るボタン
-            android.R.id.home -> {
-                // 編集状態は解除する
-                adapter?.editEnable = false
-                findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToLoginFragment())
-            }
             // 編集モード
             R.id.edit_mode -> {
                 // 編集状態の変更
@@ -411,12 +416,39 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         var isSelectGroupExist = false
         lifecycleScope.launchWhenStarted {
             groupListViewModel.groupList.collect { list ->
+                // グループ名称一覧と選択グループ名の設定
+                val nameList = ArrayList<String>()
                 for (entity in list) {
+                    nameList.add(entity.name)
                     if (entity.groupId == loginDataManager.selectGroup) {
                         selectGroupName = entity.name
                         isSelectGroupExist = true
                     }
                 }
+
+                // ドロワーのグループ一覧を設定
+                drawerAdapter = DrawerGroupListAdapter(requireContext(), nameList)
+                drawerAdapter?.textSize = loginDataManager.textSize
+                val drawerActivity = requireActivity()
+                if (drawerActivity is PasswordMemoDrawerActivity) {
+                    drawerActivity.drawerGroupList.adapter = drawerAdapter
+                    drawerActivity.drawerGroupList.setOnItemClickListener { _, _, position, _ ->
+                        // 選択されたグループを設定
+                        selectGroupName = list[position].name
+                        isSelectGroupExist = true
+                        loginDataManager.setSelectGroup(list[position].groupId)
+                        passwordListViewModel.setSelectGroup(loginDataManager.selectGroup)
+                        // タイトルに選択しているグループ名を設定
+                        requireActivity().title = when (loginDataManager.sortKey) {
+                            PasswordListAdapter.SORT_ID -> getString(R.string.sort_name_default) + "：" + selectGroupName
+                            PasswordListAdapter.SORT_TITLE -> getString(R.string.sort_name_title) + "：" + selectGroupName
+                            PasswordListAdapter.SORT_INPUTDATE -> getString(R.string.sort_name_update) + "：" + selectGroupName
+                            else -> getString(R.string.sort_name_default) + "：" + selectGroupName
+                        }
+                        drawerActivity.drawerLayout.closeDrawers()
+                    }
+                }
+
                 // 選択していたグループが存在しなくなった場合には「すべて」にリセットする
                 if (!isSelectGroupExist) {
                     loginDataManager.setSelectGroup(1L)
@@ -444,6 +476,11 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         // テキストサイズ設定に変更があった場合には再描画する
         if (adapter?.textSize != loginDataManager.textSize) {
             adapter?.textSize = loginDataManager.textSize
+            needRefresh = true
+        }
+        // テキストサイズ設定に変更があった場合にはドロワーも再描画する
+        if (drawerAdapter?.textSize != loginDataManager.textSize) {
+            drawerAdapter?.textSize = loginDataManager.textSize
             needRefresh = true
         }
         if (needRefresh) reflesh()
@@ -486,7 +523,8 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
      */
     @SuppressLint("NotifyDataSetChanged")
     fun reflesh() {
-        adapter!!.notifyDataSetChanged()
+        adapter?.notifyDataSetChanged()
+        drawerAdapter?.notifyDataSetChanged()
         // フィルタしている場合はフィルタデータの一覧も更新する
         setSearchWordFilter()
     }

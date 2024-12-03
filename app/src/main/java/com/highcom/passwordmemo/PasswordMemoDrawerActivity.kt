@@ -1,11 +1,14 @@
 package com.highcom.passwordmemo
 
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Button
+import android.widget.ListView
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -28,13 +31,17 @@ class PasswordMemoDrawerActivity : AppCompatActivity() {
     @Inject
     lateinit var loginDataManager: LoginDataManager
     /** ナビゲーションドロワー */
-    private lateinit var drawerLayout: DrawerLayout
+    lateinit var drawerLayout: DrawerLayout
     /** ツールバー */
     private lateinit var toolBar: Toolbar
     /** ドロワー制御トグル */
     lateinit var toggle: ActionBarDrawerToggle
+    /** ログアウトボタン */
+    lateinit var logoutButton: Button
+    /** グループ一覧 */
+    lateinit var drawerGroupList: ListView
 
-    @SuppressLint("ResourceType")
+    @SuppressLint("ResourceType", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -52,6 +59,17 @@ class PasswordMemoDrawerActivity : AppCompatActivity() {
             R.string.drawer_open, R.string.drawer_close)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
+        // ログアウトボタン
+        logoutButton = binding.navHeader.logoutButton
+        // ヘッダータイトルにバージョン番号を追加
+        try {
+            val info = packageManager.getPackageInfo(packageName, PackageManager.GET_META_DATA)
+            binding.navHeader.drawerTitle.text = getString(R.string.app_name) + " " + info.versionName
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+        // グループ一覧
+        drawerGroupList = binding.groupListViewInsideNav
 
         // Firebaseの設定
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
