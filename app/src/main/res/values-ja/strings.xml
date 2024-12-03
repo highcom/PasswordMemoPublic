@@ -194,10 +194,10 @@
     <string name="operation_sort_instruction">右上のメニューボタンから、編集モード切替を選択することで編集モードになります。</string>
     <string name="operation_sort_disp_instruction">ハンドルアイコンを長押ししてからドラッグする事で好きな位置に移動できます。</string>
     <string name="operation_group">グループ選択</string>
-    <string name="operation_group_instruction">右上のメニューボタンから、グループ選択を選ぶことでグループ選択画面に遷移します。</string>
-    <string name="operation_group_disp_instruction">一覧に表示されているグループを選択する事でグループが切り替わります。</string>
+    <string name="operation_group_instruction">左上のバーガーメニューを選択することで、ドロワー画面が開きます。</string>
+    <string name="operation_group_disp_instruction">ドロワー画面に表示されているグループ一覧から選択する事でグループが切り替わります。</string>
     <string name="operation_group_edit">グループ編集</string>
-    <string name="operation_group_edit_instruction">右上のボタンを選択する事で、編集モードに切り替わります。</string>
-    <string name="operation_group_edit_disp_instruction">編集モードに切り替わると、グループの追加や編集が可能になります。</string>
+    <string name="operation_group_edit_instruction">右上のメニューボタンから、グループ編集を選択することでグループ編集画面に遷移します。</string>
+    <string name="operation_group_edit_disp_instruction">グループ編集画面からグループの追加や編集が可能になります。</string>
     <string name="nav_header_desc">Navigation header</string>
 </resources>

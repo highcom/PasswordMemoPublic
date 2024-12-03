@@ -194,10 +194,10 @@
     <string name="operation_sort_instruction">Select the edit mode switch of the menu button on the upper right to switch to edit mode.</string>
     <string name="operation_sort_disp_instruction">You can move it to the desired position by long-pressing the handle icon and then dragging it.</string>
     <string name="operation_group">Select group</string>
-    <string name="operation_group_instruction">Tap the group selection on the top right menu button to move to the group selection screen.</string>
-    <string name="operation_group_disp_instruction">Groups can be switched by selecting the group displayed in the list.</string>
+    <string name="operation_group_instruction">Selecting the burger menu on the top left will open the drawer screen.</string>
+    <string name="operation_group_disp_instruction">Groups can be switched by selecting from the group list displayed on the drawer screen.</string>
     <string name="operation_group_edit">Edit group</string>
-    <string name="operation_group_edit_instruction">By selecting the upper right button, you can switch to edit mode.</string>
-    <string name="operation_group_edit_disp_instruction">Switching to edit mode allows groups to be added or edited.</string>
+    <string name="operation_group_edit_instruction">Select edit group from the menu button on the upper right to move to the group edit screen.</string>
+    <string name="operation_group_edit_disp_instruction">Groups can be added or edited from the group edit screen.</string>
     <string name="nav_header_desc">Navigation header</string>
 </resources>

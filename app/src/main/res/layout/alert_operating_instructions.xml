@@ -206,7 +206,7 @@
             android:adjustViewBounds="true"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="8dp"
-            android:src="@drawable/operation_group_list" />
+            android:src="@drawable/operation_group_select_drawer" />
 
         <TextView
             android:layout_width="match_parent"
@@ -233,7 +233,7 @@
             android:adjustViewBounds="true"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="8dp"
-            android:src="@drawable/operation_group_mode" />
+            android:src="@drawable/operation_group_edit_select" />
 
         <TextView
             android:layout_width="match_parent"
