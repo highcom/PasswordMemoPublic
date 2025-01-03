@@ -39,10 +39,12 @@ import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import com.highcom.passwordmemo.domain.AdBanner
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import com.highcom.passwordmemo.PasswordMemoDrawerActivity
+import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.ui.list.DrawerGroupListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.recruit_mp.android.rmp_appirater.RmpAppirater
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
@@ -415,6 +417,12 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         selectGroupName = getString(R.string.list_title)
         var isSelectGroupExist = false
         lifecycleScope.launchWhenStarted {
+            val initGroupList = groupListViewModel.groupList.first()
+            // グループデータがない場合はデフォルトデータとして「すべて」を必ず追加」
+            if (initGroupList.isEmpty()) {
+                groupListViewModel.insert(GroupEntity(1, 1, getString(R.string.list_title)))
+            }
+            // グループデータから各種設定
             groupListViewModel.groupList.collect { list ->
                 // グループ名称一覧と選択グループ名の設定
                 val nameList = ArrayList<String>()
