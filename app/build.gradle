@@ -6,6 +6,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs.kotlin'
 apply plugin: 'kotlin-parcelize'
 apply plugin: 'com.google.dagger.hilt.android'
+apply plugin: 'org.jetbrains.dokka'
 
 android {
     compileSdkVersion 34
@@ -46,6 +47,16 @@ android {
     buildFeatures {
         viewBinding true
         dataBinding true
+    }
+}
+
+dokkaHtml.configure {
+    outputDirectory.set(new File("${buildDir}/dokkaHtml"))
+    dokkaSourceSets {
+        configureEach {
+            // Moduleやパッケージに対するドキュメントを作成する際に指定する
+            includes.from("ModuleDoc.md", "PackageDoc.md")
+        }
     }
 }
 
