@@ -1,12 +1,15 @@
 package com.highcom.passwordmemo.ui.list
 
 import android.content.Context
+import android.os.Build
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +17,7 @@ import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.databinding.RowFooterBinding
 import com.highcom.passwordmemo.databinding.RowGroupBinding
+import com.highcom.passwordmemo.domain.SelectColorUtil
 import com.highcom.passwordmemo.domain.TextSizeUtil
 
 /**
@@ -206,12 +210,36 @@ class GroupListAdapter(
                         holder.binding.groupEntity?.groupId
                     )
                 }
-                // 変数モードではない状態でタップされた場合は選択されたとみなす
+                // 編集モードではない状態でタップされた場合は選択されたとみなす
                 holder.binding.folderIcon.setOnClickListener { view: View ->
-                    if (!editEnable) {
-                        holder.orgGroupName = holder.binding.groupName.text.toString()
-                        adapterListener.onGroupNameClicked(view, holder.binding.groupEntity?.groupId)
-                    }
+                    // 安全色を設定
+                    val colors = arrayListOf(
+                        ColorItem(view.context.getString(R.string.safe_color_none), ContextCompat.getColor(view.context, R.color.clear)),
+                        ColorItem(view.context.getString(R.string.safe_color_red), ContextCompat.getColor(view.context, R.color.safe_red)),
+                        ColorItem(view.context.getString(R.string.safe_color_yellow_red), ContextCompat.getColor(view.context, R.color.safe_yellow_red)),
+                        ColorItem(view.context.getString(R.string.safe_color_yellow), ContextCompat.getColor(view.context, R.color.safe_yellow)),
+                        ColorItem(view.context.getString(R.string.safe_color_green), ContextCompat.getColor(view.context, R.color.safe_green)),
+                        ColorItem(view.context.getString(R.string.safe_color_blue), ContextCompat.getColor(view.context, R.color.safe_blue)),
+                        ColorItem(view.context.getString(R.string.safe_color_purple), ContextCompat.getColor(view.context, R.color.safe_purple))
+                    )
+                    val selectColorUtil = SelectColorUtil(colors, object : SelectColorUtil.SelectColorListener {
+                        /**
+                         * 色選択処理
+                         *
+                         * @param color 選択色
+                         */
+                        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+                        override fun onSelectColorClicked(color: Int) {
+                            val drawable = ContextCompat.getDrawable(view.context, R.drawable.ic_folder)?.mutate()
+                            if (color == ContextCompat.getColor(view.context, R.color.clear)) {
+                                drawable?.setTintList(null)
+                            } else {
+                                drawable?.setTint(color)
+                            }
+                            holder.binding.folderIcon.setImageDrawable(drawable)
+                        }
+                    })
+                    selectColorUtil.createSelectColorDialog(view.context)
                 }
                 // グループ名称を選択された場合はイベントを発生
                 holder.binding.groupName.setOnClickListener { view: View ->
