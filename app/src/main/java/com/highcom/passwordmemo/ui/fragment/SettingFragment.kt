@@ -9,7 +9,6 @@ import android.os.Handler
 import android.util.TypedValue
 import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -18,6 +17,7 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -26,7 +26,7 @@ import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.databinding.FragmentSettingBinding
 import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
 import com.highcom.passwordmemo.ui.viewmodel.SettingViewModel
-import com.highcom.passwordmemo.domain.BackgroundColorUtil
+import com.highcom.passwordmemo.domain.SelectColorUtil
 import com.highcom.passwordmemo.domain.TextSizeUtil
 import com.highcom.passwordmemo.domain.file.BackupDbFile
 import com.highcom.passwordmemo.domain.file.InputExternalFile
@@ -34,6 +34,7 @@ import com.highcom.passwordmemo.domain.file.OutputExternalFile
 import com.highcom.passwordmemo.domain.file.RestoreDbFile
 import com.highcom.passwordmemo.domain.file.SelectInputOutputFileDialog
 import com.highcom.passwordmemo.domain.login.LoginDataManager
+import com.highcom.passwordmemo.ui.list.ColorItem
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -45,7 +46,7 @@ import javax.inject.Inject
  *
  */
 @AndroidEntryPoint
-class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
+class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
     TextSizeUtil.TextSizeListener, SelectInputOutputFileDialog.InputOutputFileDialogListener,
     RestoreDbFile.RestoreDbFileListener, EditMasterPasswordDialogFragment.EditMasterPasswordListener {
     /** 設定画面のbinding */
@@ -371,8 +372,19 @@ class SettingFragment : Fragment(), BackgroundColorUtil.BackgroundColorListener,
      *
      */
     private fun colorSelectDialog() {
-        val backgroundColorUtil = BackgroundColorUtil(requireContext(), this)
-        backgroundColorUtil.createBackgroundColorDialog(requireActivity())
+        // 背景色を設定
+        val colors = arrayListOf(
+            ColorItem(getString(R.string.color_white), ContextCompat.getColor(requireContext(), R.color.white)),
+            ColorItem(getString(R.string.color_lightgray), ContextCompat.getColor(requireContext(), R.color.lightgray)),
+            ColorItem(getString(R.string.color_lightcyan), ContextCompat.getColor(requireContext(), R.color.lightcyan)),
+            ColorItem(getString(R.string.color_lavender), ContextCompat.getColor(requireContext(), R.color.lavender)),
+            ColorItem(getString(R.string.color_bisque), ContextCompat.getColor(requireContext(), R.color.bisque)),
+            ColorItem(getString(R.string.color_pink), ContextCompat.getColor(requireContext(), R.color.pink)),
+            ColorItem(getString(R.string.color_palegoldenrod), ContextCompat.getColor(requireContext(), R.color.palegoldenrod)),
+            ColorItem(getString(R.string.color_palegreen), ContextCompat.getColor(requireContext(), R.color.palegreen))
+        )
+        val selectColorUtil = SelectColorUtil(colors, this)
+        selectColorUtil.createSelectColorDialog(requireContext())
     }
 
     /**

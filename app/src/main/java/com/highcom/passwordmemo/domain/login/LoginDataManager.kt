@@ -5,9 +5,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.annotation.ColorInt
+import androidx.core.content.ContextCompat
 import com.highcom.passwordmemo.R
-import com.highcom.passwordmemo.domain.BackgroundColorUtil
+import com.highcom.passwordmemo.domain.SelectColorUtil
 import com.highcom.passwordmemo.domain.TextSizeUtil
+import com.highcom.passwordmemo.ui.list.ColorItem
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -224,11 +226,21 @@ class LoginDataManager @Inject constructor(application: Application) {
      *
      * @param context コンテキスト
      */
-    @Suppress("DEPRECATION")
     private fun checkBackgroundColor(context: Context) {
-        val backgroundColorUtil = BackgroundColorUtil(context, null)
-        if (!backgroundColorUtil.isColorExists(sharedPref.getInt("backgroundColor", 0))) {
-            sharedPref.edit().putInt("backgroundColor", context.resources.getColor(R.color.white))
+        // 背景色を設定
+        val colors = arrayListOf(
+            ColorItem(context.getString(R.string.color_white), ContextCompat.getColor(context, R.color.white)),
+            ColorItem(context.getString(R.string.color_lightgray), ContextCompat.getColor(context, R.color.lightgray)),
+            ColorItem(context.getString(R.string.color_lightcyan), ContextCompat.getColor(context, R.color.lightcyan)),
+            ColorItem(context.getString(R.string.color_lavender), ContextCompat.getColor(context, R.color.lavender)),
+            ColorItem(context.getString(R.string.color_bisque), ContextCompat.getColor(context, R.color.bisque)),
+            ColorItem(context.getString(R.string.color_pink), ContextCompat.getColor(context, R.color.pink)),
+            ColorItem(context.getString(R.string.color_palegoldenrod), ContextCompat.getColor(context, R.color.palegoldenrod)),
+            ColorItem(context.getString(R.string.color_palegreen), ContextCompat.getColor(context, R.color.palegreen))
+        )
+        val selectColorUtil = SelectColorUtil(colors, null)
+        if (!selectColorUtil.isColorExists(sharedPref.getInt("backgroundColor", 0))) {
+            sharedPref.edit().putInt("backgroundColor", ContextCompat.getColor(context, R.color.white))
                 .apply()
         }
     }

@@ -2,12 +2,15 @@ package com.highcom.passwordmemo.ui.list
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
@@ -15,6 +18,7 @@ import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.databinding.RowPasswordBinding
 import com.highcom.passwordmemo.databinding.RowFooterBinding
+import com.highcom.passwordmemo.domain.SelectColorUtil
 import com.highcom.passwordmemo.domain.TextSizeUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import java.util.Locale
@@ -190,6 +194,7 @@ class PasswordListAdapter(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is RowPasswordViewHolder -> {
@@ -213,8 +218,33 @@ class PasswordListAdapter(
                 holder.binding.memoView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize - 3)
                 // アイテムクリック時ののイベントを追加
                 holder.binding.roundKeyIcon.setOnClickListener { view ->
-                    val parentView = view.parent as View
-                    parentView.callOnClick()
+                    // 安全色を設定
+                    val colors = arrayListOf(
+                        ColorItem(view.context.getString(R.string.safe_color_none), ContextCompat.getColor(view.context, R.color.clear)),
+                        ColorItem(view.context.getString(R.string.safe_color_red), ContextCompat.getColor(view.context, R.color.safe_red)),
+                        ColorItem(view.context.getString(R.string.safe_color_yellow_red), ContextCompat.getColor(view.context, R.color.safe_yellow_red)),
+                        ColorItem(view.context.getString(R.string.safe_color_yellow), ContextCompat.getColor(view.context, R.color.safe_yellow)),
+                        ColorItem(view.context.getString(R.string.safe_color_green), ContextCompat.getColor(view.context, R.color.safe_green)),
+                        ColorItem(view.context.getString(R.string.safe_color_blue), ContextCompat.getColor(view.context, R.color.safe_blue)),
+                        ColorItem(view.context.getString(R.string.safe_color_purple), ContextCompat.getColor(view.context, R.color.safe_purple))
+                    )
+                    val selectColorUtil = SelectColorUtil(colors, object : SelectColorUtil.SelectColorListener {
+                        /**
+                         * 色選択処理
+                         *
+                         * @param color 選択色
+                         */
+                        override fun onSelectColorClicked(color: Int) {
+                            val drawable = ContextCompat.getDrawable(view.context, R.drawable.ic_round_key)?.mutate()
+                            if (color == ContextCompat.getColor(view.context, R.color.clear)) {
+                                drawable?.setTintList(null)
+                            } else {
+                                drawable?.setTint(color)
+                            }
+                            holder.binding.roundKeyIcon.setImageDrawable(drawable)
+                        }
+                    })
+                    selectColorUtil.createSelectColorDialog(view.context)
                 }
                 holder.binding.rowLinearLayout.setOnClickListener {
                     holder.binding.passwordEntity?.let { adapterListener.onAdapterClicked(it) }

@@ -23,4 +23,11 @@
     <color name="pink">#ffc0cb</color>
     <color name="palegoldenrod">#eee8aa</color>
     <color name="palegreen">#98fb98</color>
+
+    <color name="safe_red">#ff4b00</color>
+    <color name="safe_yellow_red">#f6aa00</color>
+    <color name="safe_yellow">#f2e700</color>
+    <color name="safe_green">#00b06b</color>
+    <color name="safe_blue">#1971ff</color>
+    <color name="safe_purple">#990099</color>
 </resources>

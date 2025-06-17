@@ -6,23 +6,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import com.highcom.passwordmemo.databinding.RowBackgroundColorBinding
+import com.highcom.passwordmemo.databinding.RowColorBinding
 
 /**
- * 背景色一覧表示用アダプタ
+ * 色一覧表示用アダプタ
  *
  * @property mResource リソースID
- * @property mItems 背景色一覧データ
+ * @property mItems 色一覧データ
  * @constructor
- * 背景色一覧表示用アダプタコンストラクタ
+ * 色一覧表示用アダプタコンストラクタ
  *
  * @param context コンテキスト
  */
-class BackgroundColorAdapter(
+class ColorAdapter(
     context: Context,
     private val mResource: Int,
-    private val mItems: List<BackgroundColorItem>
-) : ArrayAdapter<BackgroundColorItem?>(context, mResource, mItems) {
+    private val mItems: List<ColorItem>
+) : ArrayAdapter<ColorItem?>(context, mResource, mItems) {
     private val mInflater: LayoutInflater
 
     init {
@@ -31,16 +31,16 @@ class BackgroundColorAdapter(
 
     @SuppressLint("ViewHolder")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val binding = RowBackgroundColorBinding.inflate(mInflater)
+        val binding = RowColorBinding.inflate(mInflater)
         val view: View = convertView ?: binding.root
 
         // リストビューに表示する要素を取得
         val item = mItems[position]
 
-        // 背景色と名前を設定
-        val title = binding.backgroundColorName
+        // 色と名前を設定
+        val title = binding.colorName
         title.text = item.colorName
-        val linearLayout = binding.backgroundColorRow
+        val linearLayout = binding.colorName
         item.colorCode?.let { linearLayout.setBackgroundColor(it) }
         return view
     }

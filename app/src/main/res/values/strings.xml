@@ -173,6 +173,14 @@
     <string name="color_palegoldenrod">Light yellow</string>
     <string name="color_palegreen">Pale green</string>
 
+    <string name="safe_color_none">None</string>
+    <string name="safe_color_red">Red</string>
+    <string name="safe_color_yellow_red">Yellow red</string>
+    <string name="safe_color_yellow">Yellow</string>
+    <string name="safe_color_green">Green</string>
+    <string name="safe_color_blue">Blue</string>
+    <string name="safe_color_purple">Purple</string>
+
     <string name="size_small">S</string>
     <string name="size_medium">M</string>
     <string name="size_large">L</string>

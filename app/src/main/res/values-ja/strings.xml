@@ -173,6 +173,14 @@
     <string name="color_palegoldenrod">ライトイエロー</string>
     <string name="color_palegreen">ペールグリーン</string>
 
+    <string name="safe_color_none">デフォルト</string>
+    <string name="safe_color_red">レッド</string>
+    <string name="safe_color_yellow_red">イエローレッド</string>
+    <string name="safe_color_yellow">イエロー</string>
+    <string name="safe_color_green">グリーン</string>
+    <string name="safe_color_blue">ブルー</string>
+    <string name="safe_color_purple">パープル</string>
+
     <string name="size_small">小</string>
     <string name="size_medium">中</string>
     <string name="size_large">大</string>
