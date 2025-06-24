@@ -155,7 +155,7 @@
     <string name="csv_input_processing">CSV取込み中</string>
     <string name="csv_input_confirm_message">すべでのデータは上書きされます。実行しますか？</string>
     <string name="csv_input_complete_message">CSVファイルを取込みました。</string>
-    <string name="csv_input_failed_header_message">ヘッダ行が正しく設定されていないため取込みを中止しました。\n「TITLE,ACCOUNT,PASSWORD,URL,MEMO,INPUTDATE」が設定されている必要があります。</string>
+    <string name="csv_input_failed_header_message">ヘッダ行が正しく設定されていないため取込みを中止しました。\n「TITLE,ACCOUNT,PASSWORD,URL,MEMO,INPUTDATE,GCOLOR,PCOLOR」が設定されている必要があります。</string>
     <string name="csv_input_failed_counts_message">データ行が不正なため取込みを中止しました。30000件を超えるデータは取込みできません。</string>
     <string name="csv_input_failed_body_message">データが不正なため取込みを中止しました。列数を確認してください。\n行数：</string>
     <string name="csv_input_failed_message">CSVファイル取込に失敗しました</string>

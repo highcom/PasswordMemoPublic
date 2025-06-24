@@ -155,7 +155,7 @@
     <string name="csv_input_processing">CSV importing</string>
     <string name="csv_input_confirm_message">All data will be overwritten. Do you want to run it?</string>
     <string name="csv_input_complete_message">CSV file input completed.</string>
-    <string name="csv_input_failed_header_message">Import was canceled because the header line was not set correctly.\nTITLE, ACCOUNT, PASSWORD, URL, MEMO, INPUT DATE must be set.</string>
+    <string name="csv_input_failed_header_message">Import was canceled because the header line was not set correctly.\nTITLE, ACCOUNT, PASSWORD, URL, MEMO, INPUT DATE, GCOLOR, PCOLOR must be set.</string>
     <string name="csv_input_failed_counts_message">Import was canceled because the data line is invalid. It is not possible to import more than 30000 data.</string>
     <string name="csv_input_failed_body_message">Import was canceled because the data is invalid. Check the number of columns in the data.\nLine :</string>
     <string name="csv_input_failed_message">CSV file input failed.</string>

@@ -146,25 +146,34 @@ class InputExternalFile(private val activity: Activity,
             groupList?.add(GroupEntity(
                 groupId = 1L,
                 groupOrder = 1,
-                name = activity.getString(R.string.list_title)
+                name = activity.getString(R.string.list_title),
+                color = 0
             ))
             id = HEADER_RECORD
             while (reader.readLine().also { line = it ?: "" } != null) {
                 val result = line.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                 // カラム数が合っていなかった場合終了
-                if (result.size != COLUMN_COUNT_6 && result.size != COLUMN_COUNT_7) return false
+                if (result.size != COLUMN_COUNT_6 && result.size != COLUMN_COUNT_7 && result.size != COLUMN_COUNT_9) return false
                 // 入力最大レコード数を30000件とする
                 if (id > MAX_RECORD) return false
                 // ヘッダが正しく設定されているか
-                if (!isHeaderCorrect && result[0] == "TITLE" && result[1] == "ACCOUNT" && result[2] == "PASSWORD" && result[3] == "URL" && result[4] == "MEMO" && result[5] == "INPUTDATE") {
+                if (!isHeaderCorrect && result.size == COLUMN_COUNT_6 &&
+                    result[0] == "TITLE" && result[1] == "ACCOUNT" && result[2] == "PASSWORD" && result[3] == "URL" && result[4] == "MEMO" && result[5] == "INPUTDATE") {
                     // バージョン2系の場合
                     isHeaderCorrect = true
                     columnCount = COLUMN_COUNT_6
                     continue
-                } else if (!isHeaderCorrect && result[0] == "TITLE" && result[1] == "ACCOUNT" && result[2] == "PASSWORD" && result[3] == "URL" && result[4] == "GROUP" && result[5] == "MEMO" && result[6] == "INPUTDATE") {
-                    // バージョン3系の場合
+                } else if (!isHeaderCorrect && result.size == COLUMN_COUNT_7 &&
+                    result[0] == "TITLE" && result[1] == "ACCOUNT" && result[2] == "PASSWORD" && result[3] == "URL" && result[4] == "GROUP" && result[5] == "MEMO" && result[6] == "INPUTDATE") {
+                    // バージョン3系4系の場合
                     isHeaderCorrect = true
                     columnCount = COLUMN_COUNT_7
+                    continue
+                } else if (!isHeaderCorrect && result.size == COLUMN_COUNT_9 &&
+                    result[0] == "TITLE" && result[1] == "ACCOUNT" && result[2] == "PASSWORD" && result[3] == "URL" && result[4] == "GROUP" && result[5] == "MEMO" && result[6] == "INPUTDATE" && result[7] == "GCOLOR" && result[8] == "PCOLOR") {
+                    // バージョン5系の場合
+                    isHeaderCorrect = true
+                    columnCount = COLUMN_COUNT_9
                     continue
                 }
                 if (isHeaderCorrect && columnCount == COLUMN_COUNT_6) {
@@ -176,7 +185,8 @@ class InputExternalFile(private val activity: Activity,
                         url = result[3],
                         groupId = 1,
                         memo = result[4],
-                        inputDate = result[5]
+                        inputDate = result[5],
+                        color = 0
                     )
                     passwordList?.add(passwordEntity)
                 } else if (isHeaderCorrect && columnCount == COLUMN_COUNT_7) {
@@ -193,7 +203,8 @@ class InputExternalFile(private val activity: Activity,
                             val groupEntity = GroupEntity(
                                 groupId = it.plus(1).toLong(),
                                 groupOrder = it.plus(1),
-                                name = result[4]
+                                name = result[4],
+                                color = 0
                             )
                             groupList?.add(groupEntity)
                         }
@@ -206,7 +217,40 @@ class InputExternalFile(private val activity: Activity,
                         url = result[3],
                         groupId = groupId,
                         memo = result[5].replace("  ", "\n"),
-                        inputDate = result[6]
+                        inputDate = result[6],
+                        color = 0
+                    )
+                    passwordList?.add(passwordEntity)
+                } else if (isHeaderCorrect && columnCount == COLUMN_COUNT_9) {
+                    var groupId = 0L
+                    for (entity in groupList!!) {
+                        if (entity.name == result[4]) {
+                            groupId = entity.groupId
+                        }
+                    }
+                    // 登録されているグループ名と一致するものが無かったら追加登録
+                    if (groupId == 0L) {
+                        groupList?.size?.let {
+                            groupId = it.plus(1).toLong()
+                            val groupEntity = GroupEntity(
+                                groupId = it.plus(1).toLong(),
+                                groupOrder = it.plus(1),
+                                name = result[4],
+                                color = result[7].toInt(),
+                            )
+                            groupList?.add(groupEntity)
+                        }
+                    }
+                    val passwordEntity = PasswordEntity(
+                        id = id,
+                        title = result[0],
+                        account = result[1],
+                        password = result[2],
+                        url = result[3],
+                        groupId = groupId,
+                        memo = result[5].replace("  ", "\n"),
+                        inputDate = result[6],
+                        color = result[8].toInt()
                     )
                     passwordList?.add(passwordEntity)
                 }
@@ -328,5 +372,7 @@ class InputExternalFile(private val activity: Activity,
         private const val COLUMN_COUNT_6 = 6
         /** カラム数が7 */
         private const val COLUMN_COUNT_7 = 7
+        /** カラム数が8 */
+        private const val COLUMN_COUNT_9 = 9
     }
 }

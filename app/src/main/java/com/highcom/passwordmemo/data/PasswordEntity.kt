@@ -27,4 +27,5 @@ data class PasswordEntity(
     @ColumnInfo(name = "group_id", defaultValue = "1") var groupId: Long,
     @ColumnInfo(name = "memo", defaultValue = "") var memo: String,
     @ColumnInfo(name = "inputdate", defaultValue = "") var inputDate: String,
+    @ColumnInfo(name = "color", defaultValue = "0") var color: Int,
 )

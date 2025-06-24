@@ -60,6 +60,9 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     }
 }
 
+/**
+ * SQLCipherのv3系からv4系へのマイグレーション
+ */
 val MIGRATION_3_4 = object : Migration(3, 4) {
     @SuppressLint("Range")
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -134,10 +137,73 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
 }
 
 /**
+ * 色設定カラムの追加によるマイグレーション
+ */
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    @SuppressLint("Range")
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.beginTransaction()
+        try {
+            // 新しいテーブルを一時テーブルとして構築(passworddata)
+            database.execSQL("""
+                CREATE TABLE passworddata_tmp(
+                    id INTEGER PRIMARY KEY NOT NULL,
+                    title TEXT NOT NULL DEFAULT '',
+                    account TEXT NOT NULL DEFAULT '',
+                    password TEXT NOT NULL DEFAULT '',
+                    url TEXT NOT NULL DEFAULT '',
+                    group_id INTEGER NOT NULL DEFAULT 1,
+                    memo TEXT NOT NULL DEFAULT '',
+                    inputdate TEXT NOT NULL DEFAULT '',
+                    color INTEGER NOT NULL DEFAULT 0
+                )
+                """.trimIndent()
+            )
+
+            // 旧テーブルのデータを全て一時テーブルに追加
+            database.execSQL("""
+                INSERT OR IGNORE INTO passworddata_tmp (id,title,account,password,url,group_id,memo,inputdate)
+                SELECT id,title,account,password,url,group_id,memo,inputdate FROM passworddata
+                """.trimIndent()
+            )
+            // 旧テーブルを削除
+            database.execSQL("DROP TABLE passworddata")
+            // 新テーブルをリネーム
+            database.execSQL("ALTER TABLE passworddata_tmp RENAME TO passworddata")
+
+            // 新しいテーブルを一時テーブルとして構築(groupdata)
+            database.execSQL("""
+                CREATE TABLE groupdata_tmp(
+                    group_id INTEGER PRIMARY KEY NOT NULL,
+                    group_order INTEGER NOT NULL,
+                    name TEXT NOT NULL DEFAULT '',
+                    color INTEGER NOT NULL DEFAULT 0
+                )
+                """.trimIndent()
+            )
+            // 旧テーブルのデータを全て一時テーブルに追加
+            database.execSQL("""
+                INSERT INTO groupdata_tmp (group_id,group_order,name)
+                SELECT group_id,group_order,name FROM groupdata
+                """.trimIndent()
+            )
+            // 旧テーブルを削除
+            database.execSQL("DROP TABLE groupdata")
+            // 新テーブルをリネーム
+            database.execSQL("ALTER TABLE groupdata_tmp RENAME TO groupdata")
+
+            database.setTransactionSuccessful()
+        } finally {
+            database.endTransaction()
+        }
+    }
+}
+
+/**
  * パスワードメモRoomデータベース生成
  *
  */
-@Database(entities = [PasswordEntity::class, GroupEntity::class], version = 4, exportSchema = false)
+@Database(entities = [PasswordEntity::class, GroupEntity::class], version = 5, exportSchema = false)
 abstract class PasswordMemoRoomDatabase : RoomDatabase() {
     /**
      * パスワードデータアクセスオブジェクト

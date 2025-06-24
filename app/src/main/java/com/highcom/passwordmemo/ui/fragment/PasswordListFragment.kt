@@ -420,14 +420,12 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
             val initGroupList = groupListViewModel.groupList.first()
             // グループデータがない場合はデフォルトデータとして「すべて」を必ず追加」
             if (initGroupList.isEmpty()) {
-                groupListViewModel.insert(GroupEntity(1, 1, getString(R.string.list_title)))
+                groupListViewModel.insert(GroupEntity(1, 1, getString(R.string.list_title), 0))
             }
             // グループデータから各種設定
             groupListViewModel.groupList.collect { list ->
-                // グループ名称一覧と選択グループ名の設定
-                val nameList = ArrayList<String>()
+                // 選択グループ名の設定
                 for (entity in list) {
-                    nameList.add(entity.name)
                     if (entity.groupId == loginDataManager.selectGroup) {
                         selectGroupName = entity.name
                         isSelectGroupExist = true
@@ -435,7 +433,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                 }
 
                 // ドロワーのグループ一覧を設定
-                drawerAdapter = DrawerGroupListAdapter(requireContext(), nameList)
+                drawerAdapter = DrawerGroupListAdapter(requireContext(), list)
                 drawerAdapter?.textSize = loginDataManager.textSize
                 val drawerActivity = requireActivity()
                 if (drawerActivity is PasswordMemoDrawerActivity) {
@@ -564,6 +562,15 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         )
         // 入力画面に遷移
         findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToReferencePasswordFragment(editData = passwordEditData))
+    }
+
+    /**
+     * パスワード一覧の項目変更時の処理
+     *
+     * @param passwordEntity 変更対象パスワードデータ
+     */
+    override fun onAdapterChanged(passwordEntity: PasswordEntity) {
+        passwordListViewModel.update(passwordEntity)
     }
 
     /**

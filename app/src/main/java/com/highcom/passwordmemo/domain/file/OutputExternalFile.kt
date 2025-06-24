@@ -71,7 +71,7 @@ class OutputExternalFile(private val context: Context,
             outputStream = context.contentResolver.openOutputStream(uri!!)
             //Write the name of the table and the name of the columns (comma separated values) in the .csv file.
             val header =
-                "TITLE,ACCOUNT,PASSWORD,URL,GROUP,MEMO,INPUTDATE" + System.getProperty("line.separator")
+                "TITLE,ACCOUNT,PASSWORD,URL,GROUP,MEMO,INPUTDATE,GCOLOR,PCOLOR" + System.getProperty("line.separator")
             withContext(Dispatchers.IO) {
                 outputStream!!.write(header.toByteArray())
             }
@@ -82,16 +82,19 @@ class OutputExternalFile(private val context: Context,
                 val url = passwordEntity.url
                 val groupId = passwordEntity.groupId
                 var group = context.getString(R.string.list_title)
+                val memo = passwordEntity.memo.replace("\n", "  ")
+                val inputdate = passwordEntity.inputDate
+                var groupColor = 0
+                val passwordColor = passwordEntity.color
                 for (groupEntity in groupList) {
                     if (groupId == groupEntity.groupId) {
                         group = groupEntity.name
+                        groupColor = groupEntity.color
                         break
                     }
                 }
-                val memo = passwordEntity.memo.replace("\n", "  ")
-                val inputdate = passwordEntity.inputDate
                 val record =
-                    "$title,$account,$password,$url,$group,$memo,$inputdate" + System.getProperty(
+                    "$title,$account,$password,$url,$group,$memo,$inputdate,$groupColor,$passwordColor" + System.getProperty(
                         "line.separator"
                     )
                 withContext(Dispatchers.IO) {

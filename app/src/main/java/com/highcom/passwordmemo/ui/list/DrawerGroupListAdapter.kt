@@ -6,6 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import androidx.core.content.ContextCompat
+import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.databinding.RowDrawerGroupBinding
 import com.highcom.passwordmemo.domain.TextSizeUtil
 
@@ -17,7 +20,7 @@ import com.highcom.passwordmemo.domain.TextSizeUtil
  */
 class DrawerGroupListAdapter(
     private val context: Context,
-    private val items: List<String>
+    private val items: List<GroupEntity>
 ) : BaseAdapter() {
     /** レイアウト高さ設定マップデータ */
     private val layoutHeightMap: Map<Int, Float>
@@ -61,8 +64,16 @@ class DrawerGroupListAdapter(
             // 再利用
             RowDrawerGroupBinding.bind(convertView)
         }
+        // 設定されたカラーにする
+        val drawable = ContextCompat.getDrawable(binding.root.context, R.drawable.ic_folder)?.mutate()
+        if (items[position].color == 0) {
+            drawable?.setTintList(null)
+        } else {
+            items[position].color.let { drawable?.setTint(it) }
+        }
+        binding.drawerImageIcon.setImageDrawable(drawable)
         // グループ名称を設定
-        binding.drawerTitle.text = items[position]
+        binding.drawerTitle.text = items[position].name
         // リストの高さと文字サイズを設定
         val layoutHeight = layoutHeightMap[textSize.toInt()]
         if (layoutHeight != null) {

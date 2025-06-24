@@ -165,7 +165,8 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
                     url = passwordEditData.url,
                     groupId = selectGroupId ?: 1,
                     memo = passwordEditData.memo,
-                    inputDate = nowDate
+                    inputDate = nowDate,
+                    color = 0
                 )
                 if (passwordEditData.edit) {
                     passwordListViewModel.update(passwordEntity)

@@ -17,4 +17,5 @@ data class GroupEntity(
     @ColumnInfo(name = "group_id") var groupId: Long,
     @ColumnInfo(name = "group_order") var groupOrder: Int,
     @ColumnInfo(name = "name", defaultValue = "") var name: String,
+    @ColumnInfo(name = "color", defaultValue = "0") var color: Int,
 )

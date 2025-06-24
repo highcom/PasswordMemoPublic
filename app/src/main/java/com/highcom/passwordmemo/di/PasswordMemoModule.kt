@@ -6,6 +6,7 @@ import androidx.room.Room
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.MIGRATION_2_3
 import com.highcom.passwordmemo.data.MIGRATION_3_4
+import com.highcom.passwordmemo.data.MIGRATION_4_5
 import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
 import dagger.Module
 import dagger.Provides
@@ -39,7 +40,7 @@ object PasswordMemoModule {
         "PasswordMemoDB"
     ).allowMainThreadQueries()
         .fallbackToDestructiveMigration()
-        .addMigrations(MIGRATION_2_3, MIGRATION_3_4)
+        .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
         .openHelperFactory(SupportFactory(SQLiteDatabase.getBytes(context.getString(R.string.db_secret_key).toCharArray()), object : SQLiteDatabaseHook {
             override fun preKey(database: SQLiteDatabase?) {}
 

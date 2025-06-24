@@ -135,7 +135,7 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
             groupListViewModel.groupList.collect { list ->
                 // グループデータがない場合はデフォルトデータとして「すべて」を必ず追加」
                 if (list.isEmpty()) {
-                    groupListViewModel.insert(GroupEntity(1, 1, getString(R.string.list_title)))
+                    groupListViewModel.insert(GroupEntity(1, 1, getString(R.string.list_title), 0))
                 }
                 adapter?.groupList = list
                 adapter?.notifyDataSetChanged()
@@ -155,7 +155,7 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
         recyclerView!!.addItemDecoration(itemDecoration)
         groupFab = binding.groupFab
         groupFab?.setOnClickListener {
-            groupListViewModel.insert(GroupEntity(0, (adapter?.groupList?.size ?: 0) + 1, ""))
+            groupListViewModel.insert(GroupEntity(0, (adapter?.groupList?.size ?: 0) + 1, "", 0))
         }
         if (adapter?.editEnable == false) groupFab?.visibility = View.GONE
         val scale = resources.displayMetrics.density
@@ -327,6 +327,15 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
             }
             return
         }
+        groupListViewModel.update(groupEntity)
+    }
+
+    /**
+     * グループ一覧のアダプターが変更された場合の処理
+     *
+     * @param groupEntity 変更対象グループデータ
+     */
+    override fun onAdapterChanged(groupEntity: GroupEntity) {
         groupListViewModel.update(groupEntity)
     }
 

@@ -129,7 +129,7 @@ class LoginViewModel @Inject constructor(private val repository: PasswordMemoRep
                 // 設定されているマスターパスワードを削除する
                 loginDataManager.clearAllData()
                 // パスワードデータとグループデータを削除して初期グループを作成する
-                reset(GroupEntity(1, 1, context.getString(R.string.list_title)))
+                reset(GroupEntity(1, 1, context.getString(R.string.list_title), 0))
                 // すべてのデータを削除したことを表示
                 val ts = Toast.makeText(
                     context,

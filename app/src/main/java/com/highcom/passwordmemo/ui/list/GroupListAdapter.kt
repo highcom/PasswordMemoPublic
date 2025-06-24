@@ -67,6 +67,13 @@ class GroupListAdapter(
          * @param groupEntity グループデータ
          */
         fun onGroupNameOutOfFocused(view: View, groupEntity: GroupEntity)
+
+        /**
+         * グループ一覧アダプタが変更されたイベント
+         *
+         * @param groupEntity 変更対象グループデータ
+         */
+        fun onAdapterChanged(groupEntity: GroupEntity)
     }
 
     /**
@@ -191,6 +198,7 @@ class GroupListAdapter(
      * @param holder ビューホルダー
      * @param position 表示位置
      */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is RowGroupViewHolder -> {
@@ -210,11 +218,19 @@ class GroupListAdapter(
                         holder.binding.groupEntity?.groupId
                     )
                 }
+                // 設定されたカラーにする
+                val drawable = ContextCompat.getDrawable(holder.binding.root.context, R.drawable.ic_folder)?.mutate()
+                if (holder.binding.groupEntity?.color == 0) {
+                    drawable?.setTintList(null)
+                } else {
+                    holder.binding.groupEntity?.color?.let { drawable?.setTint(it) }
+                }
+                holder.binding.folderIcon.setImageDrawable(drawable)
                 // 編集モードではない状態でタップされた場合は選択されたとみなす
                 holder.binding.folderIcon.setOnClickListener { view: View ->
                     // 安全色を設定
                     val colors = arrayListOf(
-                        ColorItem(view.context.getString(R.string.safe_color_none), ContextCompat.getColor(view.context, R.color.clear)),
+                        ColorItem(view.context.getString(R.string.safe_color_none), 0),
                         ColorItem(view.context.getString(R.string.safe_color_red), ContextCompat.getColor(view.context, R.color.safe_red)),
                         ColorItem(view.context.getString(R.string.safe_color_yellow_red), ContextCompat.getColor(view.context, R.color.safe_yellow_red)),
                         ColorItem(view.context.getString(R.string.safe_color_yellow), ContextCompat.getColor(view.context, R.color.safe_yellow)),
@@ -228,15 +244,22 @@ class GroupListAdapter(
                          *
                          * @param color 選択色
                          */
+                        @Suppress("NAME_SHADOWING")
                         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
                         override fun onSelectColorClicked(color: Int) {
                             val drawable = ContextCompat.getDrawable(view.context, R.drawable.ic_folder)?.mutate()
-                            if (color == ContextCompat.getColor(view.context, R.color.clear)) {
+                            if (color == 0) {
                                 drawable?.setTintList(null)
                             } else {
                                 drawable?.setTint(color)
                             }
+                            // 設定されたカラーを反映
                             holder.binding.folderIcon.setImageDrawable(drawable)
+                            // 設定されたカラーを保存する
+                            holder.binding.groupEntity?.let {
+                                it.color = color
+                                adapterListener.onAdapterChanged(it)
+                            }
                         }
                     })
                     selectColorUtil.createSelectColorDialog(view.context)

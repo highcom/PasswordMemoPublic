@@ -68,6 +68,13 @@ class PasswordListAdapter(
          * @param passwordEntity 選択対象パスワードデータ
          */
         fun onAdapterClicked(passwordEntity: PasswordEntity)
+
+        /**
+         * パスワードデータ変更イベント
+         *
+         * @param passwordEntity 変更対象パスワードデータ
+         */
+        fun onAdapterChanged(passwordEntity: PasswordEntity)
     }
 
     /**
@@ -216,11 +223,19 @@ class PasswordListAdapter(
                     holder.binding.memoView.visibility = View.GONE
                 }
                 holder.binding.memoView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSize - 3)
+                // 設定されたカラーにする
+                val drawable = ContextCompat.getDrawable(holder.binding.root.context, R.drawable.ic_round_key)?.mutate()
+                if (holder.binding.passwordEntity?.color == 0) {
+                    drawable?.setTintList(null)
+                } else {
+                    holder.binding.passwordEntity?.color?.let { drawable?.setTint(it) }
+                }
+                holder.binding.roundKeyIcon.setImageDrawable(drawable)
                 // アイテムクリック時ののイベントを追加
                 holder.binding.roundKeyIcon.setOnClickListener { view ->
                     // 安全色を設定
                     val colors = arrayListOf(
-                        ColorItem(view.context.getString(R.string.safe_color_none), ContextCompat.getColor(view.context, R.color.clear)),
+                        ColorItem(view.context.getString(R.string.safe_color_none), 0),
                         ColorItem(view.context.getString(R.string.safe_color_red), ContextCompat.getColor(view.context, R.color.safe_red)),
                         ColorItem(view.context.getString(R.string.safe_color_yellow_red), ContextCompat.getColor(view.context, R.color.safe_yellow_red)),
                         ColorItem(view.context.getString(R.string.safe_color_yellow), ContextCompat.getColor(view.context, R.color.safe_yellow)),
@@ -236,12 +251,18 @@ class PasswordListAdapter(
                          */
                         override fun onSelectColorClicked(color: Int) {
                             val drawable = ContextCompat.getDrawable(view.context, R.drawable.ic_round_key)?.mutate()
-                            if (color == ContextCompat.getColor(view.context, R.color.clear)) {
+                            if (color == 0) {
                                 drawable?.setTintList(null)
                             } else {
                                 drawable?.setTint(color)
                             }
+                            // 設定されたカラーを反映
                             holder.binding.roundKeyIcon.setImageDrawable(drawable)
+                            // 設定されたカラーを保存する
+                            holder.binding.passwordEntity?.let {
+                                it.color = color
+                                adapterListener.onAdapterChanged(it)
+                            }
                         }
                     })
                     selectColorUtil.createSelectColorDialog(view.context)
