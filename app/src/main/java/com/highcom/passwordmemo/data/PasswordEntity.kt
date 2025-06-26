@@ -15,6 +15,7 @@ import androidx.room.PrimaryKey
  * @property groupId グループID
  * @property memo メモ
  * @property inputDate 更新日付
+ * @property color 色設定
  */
 @Entity(tableName = "passworddata")
 data class PasswordEntity(

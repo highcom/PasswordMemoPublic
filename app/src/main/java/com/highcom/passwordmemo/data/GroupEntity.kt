@@ -10,6 +10,7 @@ import androidx.room.PrimaryKey
  * @property groupId グループID
  * @property groupOrder 並び順
  * @property name グループ名
+ * @property color 色設定
  */
 @Entity(tableName = "groupdata")
 data class GroupEntity(

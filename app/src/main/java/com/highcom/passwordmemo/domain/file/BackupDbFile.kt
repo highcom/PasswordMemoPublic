@@ -7,18 +7,32 @@ import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
 import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.InputStream
 import java.io.OutputStream
+import java.lang.NullPointerException
 
 /**
  * DBファイルのバックアップ処理クラス
  *
  * @property context コンテキスト
  */
-class BackupDbFile(private val context: Context) {
+class BackupDbFile (private val context: Context, private val db: PasswordMemoRoomDatabase, private val listener: BackupDbFileListener) {
+    /**
+     * DBファイルバックアップ処理完了通知リスナークラス
+     *
+     */
+    interface BackupDbFileListener {
+        /**
+         * DBファイルバックアップ処理完了通知処理
+         *
+         */
+        fun backupComplete()
+    }
+
     /**
      * DBファイルバックアップ先フォルダ確認ダイアログ表示処理
      *
@@ -48,6 +62,9 @@ class BackupDbFile(private val context: Context) {
     private fun backupDatabase(uri: Uri?): Boolean {
         var outputStream: OutputStream? = null
         try {
+            // バックアップをする前にDBを閉じる
+            db.close()
+            // DBバックアップの実施
             val path = context.getDatabasePath("PasswordMemoDB").path
             val file = File(path)
             val inputStream: InputStream = FileInputStream(file)
@@ -68,6 +85,7 @@ class BackupDbFile(private val context: Context) {
                     context.startActivity(intent)
                 }
                 .setNegativeButton(R.string.end, null)
+                .setOnDismissListener { listener.backupComplete() }
                 .show()
             return false
         } catch (exc: Exception) {
@@ -77,6 +95,7 @@ class BackupDbFile(private val context: Context) {
                 Toast.LENGTH_SHORT
             )
             ts.show()
+            listener.backupComplete()
             return false
         } finally {
             if (outputStream != null) {
@@ -90,10 +109,12 @@ class BackupDbFile(private val context: Context) {
         AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.backup_db))
             .setMessage(
-                context.getString(R.string.db_backup_complete_message) + System.getProperty("line.separator") + uri!!.path!!
-                    .replace(":", "/")
+                uri?.path?.replace(":", "/")
+                        + System.getProperty("line.separator")
+                        + context.getString(R.string.db_backup_complete_message)
             )
             .setPositiveButton(R.string.ok, null)
+            .setOnDismissListener { listener.backupComplete() }
             .show()
         return true
     }

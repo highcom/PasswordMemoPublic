@@ -23,6 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.highcom.passwordmemo.PasswordMemoDrawerActivity
 import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
 import com.highcom.passwordmemo.databinding.FragmentSettingBinding
 import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
 import com.highcom.passwordmemo.ui.viewmodel.SettingViewModel
@@ -48,7 +49,11 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
     TextSizeUtil.TextSizeListener, SelectInputOutputFileDialog.InputOutputFileDialogListener,
-    RestoreDbFile.RestoreDbFileListener, EditMasterPasswordDialogFragment.EditMasterPasswordListener {
+    RestoreDbFile.RestoreDbFileListener, BackupDbFile.BackupDbFileListener,
+    EditMasterPasswordDialogFragment.EditMasterPasswordListener {
+    /** パスワードメモRoomデータベース */
+    @Inject
+    lateinit var db: PasswordMemoRoomDatabase
     /** 設定画面のbinding */
     private lateinit var binding: FragmentSettingBinding
     /** ログインデータ管理 */
@@ -348,7 +353,7 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
                 }
                 // DBバックアップ
                 BACKUP_DB -> {
-                    val backupDbFile = BackupDbFile(requireContext())
+                    val backupDbFile = BackupDbFile(requireContext(), db, this)
                     backupDbFile.backupSelectFolder(uri)
                 }
                 // CSV入力
@@ -474,6 +479,22 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
      *
      */
     override fun restoreComplete() {
+        restartActivity()
+    }
+
+    /**
+     * DBバックアップ完了時処理
+     *
+     */
+    override fun backupComplete() {
+        restartActivity()
+    }
+
+    /**
+     * アプリ再起動処理
+     *
+     */
+    private fun restartActivity() {
         // 起動しているActivityをすべて削除し、新しいタスクでActivityを起動する
         // Hilt用モジュールがActivityRetainedComponentなので、データベースとリポジトリも再読み込みされる
         val intent = Intent(requireContext(), PasswordMemoDrawerActivity::class.java)
