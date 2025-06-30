@@ -250,14 +250,14 @@ class PasswordListAdapter(
                          * @param color 選択色
                          */
                         override fun onSelectColorClicked(color: Int) {
-                            val drawable = ContextCompat.getDrawable(view.context, R.drawable.ic_round_key)?.mutate()
+                            val inputDrawable = ContextCompat.getDrawable(view.context, R.drawable.ic_round_key)?.mutate()
                             if (color == 0) {
-                                drawable?.setTintList(null)
+                                inputDrawable?.setTintList(null)
                             } else {
-                                drawable?.setTint(color)
+                                inputDrawable?.setTint(color)
                             }
                             // 設定されたカラーを反映
-                            holder.binding.roundKeyIcon.setImageDrawable(drawable)
+                            holder.binding.roundKeyIcon.setImageDrawable(inputDrawable)
                             // 設定されたカラーを保存する
                             holder.binding.passwordEntity?.let {
                                 it.color = color

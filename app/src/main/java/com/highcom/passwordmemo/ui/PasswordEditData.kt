@@ -15,6 +15,7 @@ import kotlinx.parcelize.Parcelize
  * @property groupId グループID
  * @property memo メモ
  * @property inputDate 更新日付
+ * @property color 選択色
  */
 @Parcelize
 data class PasswordEditData(
@@ -27,4 +28,5 @@ data class PasswordEditData(
     var groupId: Long = 1,
     var memo: String = "",
     var inputDate: String = "",
+    var color: Int = 0,
 ) : Parcelable

@@ -1,6 +1,7 @@
 package com.highcom.passwordmemo.ui.fragment
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
 import androidx.fragment.app.Fragment
@@ -14,6 +15,8 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.FrameLayout
 import android.widget.Spinner
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -28,7 +31,9 @@ import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import com.highcom.passwordmemo.domain.AdBanner
+import com.highcom.passwordmemo.domain.SelectColorUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
+import com.highcom.passwordmemo.ui.list.ColorItem
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -83,6 +88,7 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         adContainerView = binding.adViewFrameInput
@@ -114,6 +120,48 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
             }
 
             override fun onNothingSelected(adapterView: AdapterView<*>?) {}
+        }
+
+        // 設定されたカラーにする
+        val drawable = ContextCompat.getDrawable(binding.root.context, R.drawable.ic_round_key)?.mutate()
+        if (passwordEditData.color == 0) {
+            drawable?.setTintList(null)
+        } else {
+            drawable?.setTint(passwordEditData.color)
+        }
+        binding.inputRoundKeyIcon.setImageDrawable(drawable)
+        // アイテムクリック時ののイベントを追加
+        binding.inputRoundKeyIcon.setOnClickListener { iconView ->
+            // 安全色を設定
+            val colors = arrayListOf(
+                ColorItem(iconView.context.getString(R.string.safe_color_none), 0),
+                ColorItem(iconView.context.getString(R.string.safe_color_red), ContextCompat.getColor(iconView.context, R.color.safe_red)),
+                ColorItem(iconView.context.getString(R.string.safe_color_yellow_red), ContextCompat.getColor(iconView.context, R.color.safe_yellow_red)),
+                ColorItem(iconView.context.getString(R.string.safe_color_yellow), ContextCompat.getColor(iconView.context, R.color.safe_yellow)),
+                ColorItem(iconView.context.getString(R.string.safe_color_green), ContextCompat.getColor(iconView.context, R.color.safe_green)),
+                ColorItem(iconView.context.getString(R.string.safe_color_blue), ContextCompat.getColor(iconView.context, R.color.safe_blue)),
+                ColorItem(iconView.context.getString(R.string.safe_color_purple), ContextCompat.getColor(iconView.context, R.color.safe_purple))
+            )
+            val selectColorUtil = SelectColorUtil(colors, object : SelectColorUtil.SelectColorListener {
+                /**
+                 * 色選択処理
+                 *
+                 * @param color 選択色
+                 */
+                override fun onSelectColorClicked(color: Int) {
+                    val inputDrawable = ContextCompat.getDrawable(iconView.context, R.drawable.ic_round_key)?.mutate()
+                    if (color == 0) {
+                        inputDrawable?.setTintList(null)
+                    } else {
+                        inputDrawable?.setTint(color)
+                    }
+                    // 設定されたカラーを反映
+                    binding.inputRoundKeyIcon.setImageDrawable(inputDrawable)
+                    // 設定されたカラーを保存する
+                    passwordEditData.color = color
+                }
+            })
+            selectColorUtil.createSelectColorDialog(iconView.context)
         }
 
         selectGroupNames = ArrayList()
@@ -166,7 +214,7 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
                     groupId = selectGroupId ?: 1,
                     memo = passwordEditData.memo,
                     inputDate = nowDate,
-                    color = 0
+                    color = passwordEditData.color
                 )
                 if (passwordEditData.edit) {
                     passwordListViewModel.update(passwordEntity)
@@ -228,6 +276,7 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
      * @param size 指定テキストサイズ
      */
     private fun setTextSize(size: Float) {
+        binding.colorView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
         binding.titleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
         binding.editTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.accountView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)

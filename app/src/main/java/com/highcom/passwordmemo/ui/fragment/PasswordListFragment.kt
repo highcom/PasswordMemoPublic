@@ -250,7 +250,8 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                                     password =  entity?.password ?: "",
                                     url = entity?.url ?: "",
                                     groupId = entity?.groupId ?: 1,
-                                    memo = entity?.memo ?: ""
+                                    memo = entity?.memo ?: "",
+                                    color = entity?.color ?: 0
                                 )
                                 findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToInputPasswordFragment(editData = passwordEditData))
                             }
@@ -272,7 +273,8 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                                     password =  entity?.password ?: "",
                                     url = entity?.url ?: "",
                                     groupId = entity?.groupId ?: 1,
-                                    memo = entity?.memo ?: ""
+                                    memo = entity?.memo ?: "",
+                                    color = entity?.color ?: 0
                                 )
                                 findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToInputPasswordFragment(editData = passwordEditData))
                             }
@@ -558,7 +560,8 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
             password =  passwordEntity.password,
             url = passwordEntity.url,
             groupId = passwordEntity.groupId,
-            memo = passwordEntity.memo
+            memo = passwordEntity.memo,
+            color = passwordEntity.color
         )
         // 入力画面に遷移
         findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToReferencePasswordFragment(editData = passwordEditData))
