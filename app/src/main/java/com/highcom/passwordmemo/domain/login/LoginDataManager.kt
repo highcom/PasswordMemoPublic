@@ -10,6 +10,7 @@ import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.domain.SelectColorUtil
 import com.highcom.passwordmemo.domain.TextSizeUtil
 import com.highcom.passwordmemo.ui.list.ColorItem
+import com.highcom.passwordmemo.ui.list.ColorList
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -221,24 +222,14 @@ class LoginDataManager @Inject constructor(application: Application) {
     }
 
     /**
-     * 設計されて背景色の確認処理
+     * 設定されて背景色の確認処理
      * * 設定されている背景色が無効値だった場合に初期値を設定する
      *
      * @param context コンテキスト
      */
     private fun checkBackgroundColor(context: Context) {
         // 背景色を設定
-        val colors = arrayListOf(
-            ColorItem(context.getString(R.string.color_white), ContextCompat.getColor(context, R.color.white)),
-            ColorItem(context.getString(R.string.color_lightgray), ContextCompat.getColor(context, R.color.lightgray)),
-            ColorItem(context.getString(R.string.color_lightcyan), ContextCompat.getColor(context, R.color.lightcyan)),
-            ColorItem(context.getString(R.string.color_lavender), ContextCompat.getColor(context, R.color.lavender)),
-            ColorItem(context.getString(R.string.color_bisque), ContextCompat.getColor(context, R.color.bisque)),
-            ColorItem(context.getString(R.string.color_pink), ContextCompat.getColor(context, R.color.pink)),
-            ColorItem(context.getString(R.string.color_palegoldenrod), ContextCompat.getColor(context, R.color.palegoldenrod)),
-            ColorItem(context.getString(R.string.color_palegreen), ContextCompat.getColor(context, R.color.palegreen))
-        )
-        val selectColorUtil = SelectColorUtil(colors, null)
+        val selectColorUtil = SelectColorUtil(ColorList.backgroundColors, null)
         if (!selectColorUtil.isColorExists(sharedPref.getInt("backgroundColor", 0))) {
             sharedPref.edit().putInt("backgroundColor", ContextCompat.getColor(context, R.color.white))
                 .apply()

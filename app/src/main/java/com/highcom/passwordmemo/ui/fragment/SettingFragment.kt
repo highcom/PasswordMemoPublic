@@ -36,6 +36,7 @@ import com.highcom.passwordmemo.domain.file.RestoreDbFile
 import com.highcom.passwordmemo.domain.file.SelectInputOutputFileDialog
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import com.highcom.passwordmemo.ui.list.ColorItem
+import com.highcom.passwordmemo.ui.list.ColorList
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -378,17 +379,7 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
      */
     private fun colorSelectDialog() {
         // 背景色を設定
-        val colors = arrayListOf(
-            ColorItem(getString(R.string.color_white), ContextCompat.getColor(requireContext(), R.color.white)),
-            ColorItem(getString(R.string.color_lightgray), ContextCompat.getColor(requireContext(), R.color.lightgray)),
-            ColorItem(getString(R.string.color_lightcyan), ContextCompat.getColor(requireContext(), R.color.lightcyan)),
-            ColorItem(getString(R.string.color_lavender), ContextCompat.getColor(requireContext(), R.color.lavender)),
-            ColorItem(getString(R.string.color_bisque), ContextCompat.getColor(requireContext(), R.color.bisque)),
-            ColorItem(getString(R.string.color_pink), ContextCompat.getColor(requireContext(), R.color.pink)),
-            ColorItem(getString(R.string.color_palegoldenrod), ContextCompat.getColor(requireContext(), R.color.palegoldenrod)),
-            ColorItem(getString(R.string.color_palegreen), ContextCompat.getColor(requireContext(), R.color.palegreen))
-        )
-        val selectColorUtil = SelectColorUtil(colors, this)
+        val selectColorUtil = SelectColorUtil(ColorList.backgroundColors, this)
         selectColorUtil.createSelectColorDialog(requireContext())
     }
 

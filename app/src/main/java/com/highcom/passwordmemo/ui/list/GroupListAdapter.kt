@@ -229,16 +229,7 @@ class GroupListAdapter(
                 // 編集モードではない状態でタップされた場合は選択されたとみなす
                 holder.binding.folderIcon.setOnClickListener { view: View ->
                     // 安全色を設定
-                    val colors = arrayListOf(
-                        ColorItem(view.context.getString(R.string.safe_color_none), 0),
-                        ColorItem(view.context.getString(R.string.safe_color_red), ContextCompat.getColor(view.context, R.color.safe_red)),
-                        ColorItem(view.context.getString(R.string.safe_color_yellow_red), ContextCompat.getColor(view.context, R.color.safe_yellow_red)),
-                        ColorItem(view.context.getString(R.string.safe_color_yellow), ContextCompat.getColor(view.context, R.color.safe_yellow)),
-                        ColorItem(view.context.getString(R.string.safe_color_green), ContextCompat.getColor(view.context, R.color.safe_green)),
-                        ColorItem(view.context.getString(R.string.safe_color_blue), ContextCompat.getColor(view.context, R.color.safe_blue)),
-                        ColorItem(view.context.getString(R.string.safe_color_purple), ContextCompat.getColor(view.context, R.color.safe_purple))
-                    )
-                    val selectColorUtil = SelectColorUtil(colors, object : SelectColorUtil.SelectColorListener {
+                    val selectColorUtil = SelectColorUtil(ColorList.safeColors, object : SelectColorUtil.SelectColorListener {
                         /**
                          * 色選択処理
                          *

@@ -11,8 +11,12 @@ import dagger.hilt.android.HiltAndroidApp
  */
 @HiltAndroidApp
 class PasswordMemoApplication : Application() {
+    companion object {
+        lateinit var instance: PasswordMemoApplication
+    }
     override fun onCreate() {
         super.onCreate()
         ProcessLifecycleOwner.get().lifecycle.addObserver(PasswordMemoLifecycle())
+        instance = this
     }
 }

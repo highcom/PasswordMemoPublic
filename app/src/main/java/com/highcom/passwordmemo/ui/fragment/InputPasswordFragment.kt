@@ -34,6 +34,7 @@ import com.highcom.passwordmemo.domain.AdBanner
 import com.highcom.passwordmemo.domain.SelectColorUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import com.highcom.passwordmemo.ui.list.ColorItem
+import com.highcom.passwordmemo.ui.list.ColorList
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -133,16 +134,7 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
         // アイテムクリック時ののイベントを追加
         binding.inputRoundKeyIcon.setOnClickListener { iconView ->
             // 安全色を設定
-            val colors = arrayListOf(
-                ColorItem(iconView.context.getString(R.string.safe_color_none), 0),
-                ColorItem(iconView.context.getString(R.string.safe_color_red), ContextCompat.getColor(iconView.context, R.color.safe_red)),
-                ColorItem(iconView.context.getString(R.string.safe_color_yellow_red), ContextCompat.getColor(iconView.context, R.color.safe_yellow_red)),
-                ColorItem(iconView.context.getString(R.string.safe_color_yellow), ContextCompat.getColor(iconView.context, R.color.safe_yellow)),
-                ColorItem(iconView.context.getString(R.string.safe_color_green), ContextCompat.getColor(iconView.context, R.color.safe_green)),
-                ColorItem(iconView.context.getString(R.string.safe_color_blue), ContextCompat.getColor(iconView.context, R.color.safe_blue)),
-                ColorItem(iconView.context.getString(R.string.safe_color_purple), ContextCompat.getColor(iconView.context, R.color.safe_purple))
-            )
-            val selectColorUtil = SelectColorUtil(colors, object : SelectColorUtil.SelectColorListener {
+            val selectColorUtil = SelectColorUtil(ColorList.safeColors, object : SelectColorUtil.SelectColorListener {
                 /**
                  * 色選択処理
                  *
