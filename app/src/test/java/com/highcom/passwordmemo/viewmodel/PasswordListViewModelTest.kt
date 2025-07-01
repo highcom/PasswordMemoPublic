@@ -66,8 +66,8 @@ class PasswordListViewModelTest {
         // モックデータを準備
         val groupId = 1L
         val expectedPasswords = listOf(
-            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = groupId, memo = "a", inputDate = "20241111"),
-            PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = groupId, memo = "b", inputDate = "20241111"),
+            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = groupId, memo = "a", inputDate = "20241111", color = 0),
+            PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = groupId, memo = "b", inputDate = "20241111", color = 0),
         )
         val mockFlow: Flow<List<PasswordEntity>> = flow { emit(expectedPasswords) }
 
@@ -94,7 +94,7 @@ class PasswordListViewModelTest {
      */
     @Test
     fun insert_password_called_success() = runTest {
-        val passwordEntity = PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111")
+        val passwordEntity = PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111", color = 0)
 
         viewModel.insert(passwordEntity)
         // 子ルーチンの処理を待つ
@@ -110,8 +110,8 @@ class PasswordListViewModelTest {
     @Test
     fun insert_passwords_called_success() = runTest {
         val testPasswords = listOf(
-            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111"),
-            PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111"),
+            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111", color = 0),
+            PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111", color = 0),
         )
 
         viewModel.insert(testPasswords)
@@ -127,7 +127,7 @@ class PasswordListViewModelTest {
      */
     @Test
     fun update_password_called_success() = runTest {
-        val passwordEntity = PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111")
+        val passwordEntity = PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111", color = 0)
 
         viewModel.update(passwordEntity)
         // 子ルーチンの処理を待つ
@@ -143,8 +143,8 @@ class PasswordListViewModelTest {
     @Test
     fun update_passwords_called_success() = runTest {
         val testPasswords = listOf(
-            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111"),
-            PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111"),
+            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111", color = 0),
+            PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111", color = 0),
         )
 
         viewModel.update(testPasswords)

@@ -61,8 +61,8 @@ class GroupListViewModelTest {
     @Test
     fun groupList_emits_data_correctly() = runTest {
         val testGroupList = listOf(
-            GroupEntity(groupId = 1, groupOrder = 1, name = "Group A"),
-            GroupEntity(groupId = 2, groupOrder = 2, name = "Group B")
+            GroupEntity(groupId = 1, groupOrder = 1, name = "Group A", color = 0),
+            GroupEntity(groupId = 2, groupOrder = 2, name = "Group B", color = 0)
         )
         every { repository.groupList } returns flowOf(testGroupList)
 
@@ -81,7 +81,7 @@ class GroupListViewModelTest {
      */
     @Test
     fun insert_group_called_success() = runTest {
-        val testGroup = GroupEntity(groupId = 1, groupOrder = 1, name = "Test Group")
+        val testGroup = GroupEntity(groupId = 1, groupOrder = 1, name = "Test Group", color = 0)
 
         viewModel.insert(testGroup)
         // 子ルーチンの処理を待つ
@@ -97,8 +97,8 @@ class GroupListViewModelTest {
     @Test
     fun insert_groups_called_success() = runTest {
         val testGroups = listOf(
-            GroupEntity(groupId = 1, groupOrder = 1, name = "Group 1"),
-            GroupEntity(groupId = 2, groupOrder = 2, name = "Group 2")
+            GroupEntity(groupId = 1, groupOrder = 1, name = "Group 1", color = 0),
+            GroupEntity(groupId = 2, groupOrder = 2, name = "Group 2", color = 0)
         )
 
         viewModel.insert(testGroups)
@@ -114,7 +114,7 @@ class GroupListViewModelTest {
      */
     @Test
     fun update_group_called_success() = runTest {
-        val testGroup = GroupEntity(groupId = 1, groupOrder = 1, name = "Updated Group")
+        val testGroup = GroupEntity(groupId = 1, groupOrder = 1, name = "Updated Group", color = 0)
 
         viewModel.update(testGroup)
         // 子ルーチンの処理を待つ
@@ -130,8 +130,8 @@ class GroupListViewModelTest {
     @Test
     fun update_groups_called_success() = runTest {
         val testGroups = listOf(
-            GroupEntity(groupId = 1, groupOrder = 1, name = "Updated Group 1"),
-            GroupEntity(groupId = 2, groupOrder = 2, name = "Updated Group 2")
+            GroupEntity(groupId = 1, groupOrder = 1, name = "Updated Group 1", color = 0),
+            GroupEntity(groupId = 2, groupOrder = 2, name = "Updated Group 2", color = 0)
         )
 
         viewModel.update(testGroups)

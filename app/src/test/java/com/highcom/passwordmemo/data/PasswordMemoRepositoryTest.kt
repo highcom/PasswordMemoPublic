@@ -32,8 +32,8 @@ class PasswordMemoRepositoryTest {
     @Test
     fun groupList_emits_data_correctly() = runTest {
         val expectedGroupList = listOf(
-            GroupEntity(groupId = 1, groupOrder = 1, name = "Group A"),
-            GroupEntity(groupId = 2, groupOrder = 2, name = "Group B")
+            GroupEntity(groupId = 1, groupOrder = 1, name = "Group A", color = 0),
+            GroupEntity(groupId = 2, groupOrder = 2, name = "Group B", color = 0)
         )
         every { groupDao.getGroupList() } returns flowOf(expectedGroupList)
         repository = PasswordMemoRepository(passwordDao, groupDao)
@@ -53,8 +53,8 @@ class PasswordMemoRepositoryTest {
     @Test
     fun getPasswordList_emits_all_passwords() = runTest {
         val expectedPasswords = listOf(
-            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111"),
-            PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111"),
+            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111", color = 0),
+            PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111", color = 0),
         )
         every { passwordDao.getPasswordList() } returns flowOf(expectedPasswords)
         repository = PasswordMemoRepository(passwordDao, groupDao)
@@ -74,7 +74,7 @@ class PasswordMemoRepositoryTest {
     @Test
     fun getPasswordList_filtered_passwords() = runTest {
         val groupId = 2L
-        val expectedPasswords = listOf(PasswordEntity(id = 3, title = "c", account = "c", password = "c", url = "test", groupId = 2, memo = "c", inputDate = "20241111"))
+        val expectedPasswords = listOf(PasswordEntity(id = 3, title = "c", account = "c", password = "c", url = "test", groupId = 2, memo = "c", inputDate = "20241111", color = 0))
         every { passwordDao.getSelectGroupPasswordList(groupId) } returns flowOf(expectedPasswords)
         repository = PasswordMemoRepository(passwordDao, groupDao)
 
@@ -92,7 +92,7 @@ class PasswordMemoRepositoryTest {
      */
     @Test
     fun insertPassword_called_success() = runTest {
-        val password = PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111")
+        val password = PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111", color = 0)
         coEvery { passwordDao.insertPassword(password) } just Runs
 
         repository.insertPassword(password)
@@ -107,8 +107,8 @@ class PasswordMemoRepositoryTest {
     @Test
     fun insertPasswords_called_success() = runTest {
         val expectedPasswords = listOf(
-            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111"),
-            PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111"),
+            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111", color = 0),
+            PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111", color = 0),
         )
         coEvery { passwordDao.insertPasswords(expectedPasswords) } just Runs
 
@@ -123,7 +123,7 @@ class PasswordMemoRepositoryTest {
      */
     @Test
     fun updatePassword_called_success() = runTest {
-        val password = PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111")
+        val password = PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111", color = 0)
         coEvery { passwordDao.updatePassword(password) } just Runs
 
         repository.updatePassword(password)
@@ -138,8 +138,8 @@ class PasswordMemoRepositoryTest {
     @Test
     fun updatePasswords_called_success() = runTest {
         val expectedPasswords = listOf(
-            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111"),
-            PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111"),
+            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111", color = 0),
+            PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111", color = 0),
         )
         coEvery { passwordDao.updatePasswords(expectedPasswords) } just Runs
 
@@ -168,7 +168,6 @@ class PasswordMemoRepositoryTest {
      */
     @Test
     fun deleteAllPassword_called_success() = runTest {
-        val passwordId = 1L
         coEvery { passwordDao.deleteAllPassword() } just Runs
 
         repository.deleteAllPassword()
@@ -196,7 +195,7 @@ class PasswordMemoRepositoryTest {
      */
     @Test
     fun insertGroup_called_success() = runTest {
-        val group = GroupEntity(groupId = 1, groupOrder = 1, name = "Test Group")
+        val group = GroupEntity(groupId = 1, groupOrder = 1, name = "Test Group", color = 0)
         coEvery { groupDao.insertGroup(group) } just Runs
 
         repository.insertGroup(group)
@@ -211,8 +210,8 @@ class PasswordMemoRepositoryTest {
     @Test
     fun insertGroups_called_success() = runTest {
         val expectedGroups = listOf(
-            GroupEntity(groupId = 1, groupOrder = 1, name = "Test Group"),
-            GroupEntity(groupId = 1, groupOrder = 2, name = "Test Group2")
+            GroupEntity(groupId = 1, groupOrder = 1, name = "Test Group", color = 0),
+            GroupEntity(groupId = 1, groupOrder = 2, name = "Test Group2", color = 0)
         )
         coEvery { groupDao.insertGroups(expectedGroups) } just Runs
 
@@ -227,7 +226,7 @@ class PasswordMemoRepositoryTest {
      */
     @Test
     fun updateGroup_called_success() = runTest {
-        val group = GroupEntity(groupId = 1, groupOrder = 1, name = "Test Group")
+        val group = GroupEntity(groupId = 1, groupOrder = 1, name = "Test Group", color = 0)
         coEvery { groupDao.updateGroup(group) } just Runs
 
         repository.updateGroup(group)
@@ -242,8 +241,8 @@ class PasswordMemoRepositoryTest {
     @Test
     fun updateGroups_called_success() = runTest {
         val expectedGroups = listOf(
-            GroupEntity(groupId = 1, groupOrder = 1, name = "Test Group"),
-            GroupEntity(groupId = 1, groupOrder = 2, name = "Test Group2")
+            GroupEntity(groupId = 1, groupOrder = 1, name = "Test Group", color = 0),
+            GroupEntity(groupId = 1, groupOrder = 2, name = "Test Group2", color = 0)
         )
         coEvery { groupDao.updateGroups(expectedGroups) } just Runs
 

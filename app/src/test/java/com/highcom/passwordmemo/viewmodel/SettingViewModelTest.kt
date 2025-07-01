@@ -60,8 +60,8 @@ class SettingViewModelTest {
     @Test
     fun passwordList_emits_data_correctly() = runTest {
         val testPasswords = listOf(
-            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111"),
-            PasswordEntity(id = 1, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111"),
+            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111", color = 0),
+            PasswordEntity(id = 1, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111", color = 0),
         )
         every { repository.getPasswordList(any()) } returns flowOf(testPasswords)
 
@@ -81,8 +81,8 @@ class SettingViewModelTest {
     @Test
     fun groupList_emits_data_correctly() = runTest {
         val testGroups = listOf(
-            GroupEntity(groupId = 1, groupOrder = 1, name = "Group A"),
-            GroupEntity(groupId = 2, groupOrder = 2, name = "Group B")
+            GroupEntity(groupId = 1, groupOrder = 1, name = "Group A", color = 0),
+            GroupEntity(groupId = 2, groupOrder = 2, name = "Group B", color = 0)
         )
         every { repository.groupList } returns flowOf(testGroups)
 
@@ -102,8 +102,8 @@ class SettingViewModelTest {
     @Test
     fun reInsertPassword_called_success() = runTest {
         val testPasswords = listOf(
-            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111"),
-            PasswordEntity(id = 1, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111"),
+            PasswordEntity(id = 1, title = "a", account = "a", password = "a", url = "test", groupId = 1, memo = "a", inputDate = "20241111", color = 0),
+            PasswordEntity(id = 1, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111", color = 0),
         )
         coEvery { repository.deleteAllPassword() } returns Unit
         coEvery { repository.insertPasswords(any()) } returns Unit
@@ -123,8 +123,8 @@ class SettingViewModelTest {
     @Test
     fun reInsertGroup_called_success() = runTest {
         val testGroups = listOf(
-            GroupEntity(groupId = 1, groupOrder = 1, name = "Group A"),
-            GroupEntity(groupId = 2, groupOrder = 2, name = "Group B")
+            GroupEntity(groupId = 1, groupOrder = 1, name = "Group A", color = 0),
+            GroupEntity(groupId = 2, groupOrder = 2, name = "Group B", color = 0)
         )
         coEvery { repository.deleteAllGroup() } returns Unit
         coEvery { repository.insertGroups(any()) } returns Unit
