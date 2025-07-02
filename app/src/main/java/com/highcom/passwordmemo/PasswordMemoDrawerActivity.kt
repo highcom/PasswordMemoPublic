@@ -70,6 +70,8 @@ class PasswordMemoDrawerActivity : AppCompatActivity() {
         }
         // グループ一覧
         drawerGroupList = binding.groupListViewInsideNav
+        // 背景色を設定する
+        binding.drawerListView.setBackgroundColor(loginDataManager.backgroundColor)
 
         // Firebaseの設定
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
@@ -83,6 +85,15 @@ class PasswordMemoDrawerActivity : AppCompatActivity() {
                 )
             ).build()
         )
+    }
+
+    /**
+     * ドロワーの背景色を設定する
+     *
+     * @param color 設定する背景色
+     */
+    fun setBackgroundColor(color: Int) {
+        binding.drawerListView.setBackgroundColor(color)
     }
 
     /**

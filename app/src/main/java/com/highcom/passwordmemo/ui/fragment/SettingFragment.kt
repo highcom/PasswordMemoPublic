@@ -415,7 +415,13 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
      */
     @SuppressLint("ResourceType")
     override fun onSelectColorClicked(color: Int) {
+        // 設定画面の背景色を設定
         binding.settingView.setBackgroundColor(color)
+        // ドロワー画面の背景色を設定
+        val activity = requireActivity()
+        if (activity is PasswordMemoDrawerActivity) {
+            activity.setBackgroundColor(color)
+        }
         loginDataManager.setBackgroundColor(color)
     }
 
