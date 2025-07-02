@@ -286,6 +286,8 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         // フローティングボタンからの新規追加処理
         binding.fab.setOnClickListener {
             val passwordEditData = PasswordEditData()
+            // 選択されているグループIDを設定
+            passwordEditData.groupId = loginDataManager.selectGroup
             findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToInputPasswordFragment(editData = passwordEditData))
         }
 
