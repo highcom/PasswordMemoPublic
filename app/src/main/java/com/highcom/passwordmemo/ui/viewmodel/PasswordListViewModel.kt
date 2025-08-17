@@ -1,5 +1,6 @@
 package com.highcom.passwordmemo.ui.viewmodel
 
+import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.highcom.passwordmemo.data.PasswordEntity
@@ -21,6 +22,8 @@ import javax.inject.Inject
 class PasswordListViewModel @Inject constructor(private val repository: PasswordMemoRepository) : ViewModel() {
     /** 洗濯中のグループID */
     private val _groupIdFlow = MutableStateFlow(1L)
+    /** スクロール位置保存用 */
+    var recyclerViewState: Parcelable? = null
     /** パスワード一覧 */
     @ExperimentalCoroutinesApi
     val passwordList: Flow<List<PasswordEntity>> = _groupIdFlow.flatMapLatest { id ->

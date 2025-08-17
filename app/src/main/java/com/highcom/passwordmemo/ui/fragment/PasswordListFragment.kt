@@ -21,6 +21,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -83,7 +84,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     /** 検索文字列 */
     var seachViewWord: String? = null
     /** パスワード一覧ビューモデル */
-    private val passwordListViewModel: PasswordListViewModel by viewModels()
+    private val passwordListViewModel: PasswordListViewModel by hiltNavGraphViewModels(R.id.passwordmemo_nav_graph)
     /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels()
 
@@ -190,6 +191,12 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                 adapter?.setList(list)
                 adapter?.sortPasswordList(loginDataManager.sortKey)
                 reflesh()
+
+                // データ更新後にスクロール位置を復元
+                passwordListViewModel.recyclerViewState?.let { state ->
+                    recyclerView?.layoutManager?.onRestoreInstanceState(state)
+                    passwordListViewModel.recyclerViewState = null // 一度復元したらクリア
+                }
             }
         }
 
@@ -473,6 +480,12 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                 }
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // スクロール位置を保存
+        passwordListViewModel.recyclerViewState = recyclerView?.layoutManager?.onSaveInstanceState()
     }
 
     override fun onResume() {
