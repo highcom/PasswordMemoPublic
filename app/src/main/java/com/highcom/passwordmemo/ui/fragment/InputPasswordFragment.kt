@@ -54,7 +54,8 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
     /** パスワード編集データ */
     lateinit var passwordEditData: PasswordEditData
     /** バナー広告処理 */
-    private var adBanner: AdBanner? = null
+    @Inject
+    lateinit var adBanner: AdBanner
     /** 広告コンテナ */
     private var adContainerView: FrameLayout? = null
     /** ログインデータ管理 */
@@ -93,8 +94,7 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         adContainerView = binding.adViewFrameInput
-        adBanner = AdBanner(this, adContainerView)
-        adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_3)) }
+        adContainerView?.post { adBanner.loadBanner(this, adContainerView, getString(R.string.admob_unit_id_3)) }
         // ActionBarに戻るボタンを設定
         val activity = requireActivity()
         if (activity is PasswordMemoDrawerActivity) {

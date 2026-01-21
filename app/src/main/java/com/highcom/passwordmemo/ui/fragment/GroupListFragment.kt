@@ -55,7 +55,8 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
     @Inject
     lateinit var loginDataManager: LoginDataManager
     /** バナー広告処理 */
-    private var adBanner: AdBanner? = null
+    @Inject
+    lateinit var adBanner: AdBanner
     /** 広告用コンテナ */
     private var adContainerView: FrameLayout? = null
     /** グループ一覧用リサイクラービュー */
@@ -91,8 +92,7 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         adContainerView = binding.adViewGroupFrame
-        adBanner = AdBanner(this, adContainerView)
-        adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_4)) }
+        adContainerView?.post { adBanner.loadBanner(this, adContainerView, getString(R.string.admob_unit_id_4)) }
         requireActivity().title = getString(R.string.group_title) + getString(R.string.group_title_edit)
         // ActionBarに戻るボタンを設定
         val activity = requireActivity()

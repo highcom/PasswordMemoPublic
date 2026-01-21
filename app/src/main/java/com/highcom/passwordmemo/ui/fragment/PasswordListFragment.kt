@@ -66,7 +66,8 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     /** スワイプボタン表示用通知ヘルパー */
     private var simpleCallbackHelper: SimpleCallbackHelper? = null
     /** バナー広告処理 */
-    private var adBanner: AdBanner? = null
+    @Inject
+    lateinit var adBanner: AdBanner
     /** 広告コンテナ */
     private var adContainerView: FrameLayout? = null
     /** パスワード一覧表示用リサイクラービュー */
@@ -110,8 +111,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         adContainerView = binding.adViewFrame
-        adBanner = AdBanner(this, adContainerView)
-        adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_1)) }
+        adContainerView?.post { adBanner.loadBanner(this, adContainerView, getString(R.string.admob_unit_id_1)) }
         // ドロワーを操作可能にする
         val activity = requireActivity()
         if (activity is PasswordMemoDrawerActivity) {

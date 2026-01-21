@@ -53,7 +53,8 @@ class ReferencePasswordFragment : Fragment() {
     @Inject
     lateinit var loginDataManager: LoginDataManager
     /** バナー広告処理 */
-    private var adBanner: AdBanner? = null
+    @Inject
+    lateinit var adBanner: AdBanner
     /** 広告コンテナ */
     private var adContainerView: FrameLayout? = null
     /** グループ一覧ビューモデル */
@@ -81,8 +82,7 @@ class ReferencePasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         adContainerView = binding.adViewFrameReference
-        adBanner = AdBanner(this, adContainerView)
-        adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_2)) }
+        adContainerView?.post { adBanner.loadBanner(this, adContainerView, getString(R.string.admob_unit_id_2)) }
 
         // ActionBarに戻るボタンを設定
         val activity = requireActivity()
