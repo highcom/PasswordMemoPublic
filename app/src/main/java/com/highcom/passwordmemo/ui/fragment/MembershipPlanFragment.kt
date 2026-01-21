@@ -5,7 +5,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import com.google.android.material.snackbar.Snackbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.highcom.passwordmemo.PasswordMemoDrawerActivity
@@ -75,7 +75,7 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
             if (!purchaseManager.hasActiveSubscription()) {
                 billingManager.purchaseProduct(requireActivity(), BillingManager.PRODUCT_MONTHLY_SUBSCRIPTION)
             } else {
-                showToast(getString(R.string.already_purchased))
+                showSnackBar(getString(R.string.already_purchased))
             }
         }
 
@@ -84,7 +84,7 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
             if (!purchaseManager.hasActiveSubscription()) {
                 billingManager.purchaseProduct(requireActivity(), BillingManager.PRODUCT_HALF_YEAR_SUBSCRIPTION)
             } else {
-                showToast(getString(R.string.already_purchased))
+                showSnackBar(getString(R.string.already_purchased))
             }
         }
 
@@ -93,7 +93,7 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
             if (!purchaseManager.hasActiveSubscription()) {
                 billingManager.purchaseProduct(requireActivity(), BillingManager.PRODUCT_YEARLY_SUBSCRIPTION)
             } else {
-                showToast(getString(R.string.already_purchased))
+                showSnackBar(getString(R.string.already_purchased))
             }
         }
 
@@ -102,7 +102,7 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
             if (!purchaseManager.isProductPurchased(BillingManager.PRODUCT_REMOVE_ADS)) {
                 billingManager.purchaseProduct(requireActivity(), BillingManager.PRODUCT_REMOVE_ADS)
             } else {
-                showToast(getString(R.string.already_purchased))
+                showSnackBar(getString(R.string.already_purchased))
             }
         }
 
@@ -151,10 +151,10 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
     }
 
     /**
-     * Toastを表示
+     * SnackBarを表示
      */
-    private fun showToast(message: String) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    private fun showSnackBar(message: String) {
+        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
     }
 
     /**
@@ -189,7 +189,7 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
     override fun onPurchaseSuccess(productId: String) {
         purchaseManager.setProductPurchased(productId, true)
         updateButtonStates()
-        showToast(getString(R.string.purchase_success))
+        showSnackBar(getString(R.string.purchase_success))
 
         // 広告非表示状態になった場合はActivityを再作成して広告を非表示にする
         if (purchaseManager.isAdsRemoved()) {
@@ -198,7 +198,7 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
     }
 
     override fun onPurchaseFailed(errorMessage: String) {
-        showToast(getString(R.string.purchase_failed))
+        showSnackBar(getString(R.string.purchase_failed))
     }
 
     override fun onRestoreSuccess(productIds: List<String>) {
@@ -206,7 +206,7 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
             purchaseManager.setProductPurchased(productId, true)
         }
         updateButtonStates()
-        showToast(getString(R.string.restore_success))
+        showSnackBar(getString(R.string.restore_success))
 
         // 広告非表示状態になった場合はActivityを再作成して広告を非表示にする
         if (purchaseManager.isAdsRemoved()) {
@@ -215,11 +215,11 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
     }
 
     override fun onRestoreFailed(errorMessage: String) {
-        showToast(getString(R.string.restore_failed))
+        showSnackBar(getString(R.string.restore_failed))
     }
 
     override fun onBillingUnavailable() {
-        showToast(getString(R.string.billing_unavailable))
+        showSnackBar(getString(R.string.billing_unavailable))
     }
 
     /**
