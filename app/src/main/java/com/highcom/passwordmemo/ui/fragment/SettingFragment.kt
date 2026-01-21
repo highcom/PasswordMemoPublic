@@ -34,6 +34,7 @@ import com.highcom.passwordmemo.domain.file.InputExternalFile
 import com.highcom.passwordmemo.domain.file.OutputExternalFile
 import com.highcom.passwordmemo.domain.file.RestoreDbFile
 import com.highcom.passwordmemo.domain.file.SelectInputOutputFileDialog
+import com.highcom.passwordmemo.domain.DarkModeUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import com.highcom.passwordmemo.ui.list.ColorItem
 import com.highcom.passwordmemo.ui.list.ColorList
@@ -67,6 +68,10 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
     private var copyClipboardSpinner: Spinner? = null
     /** クリップボードコピー設定名 */
     private var copyClipboardNames: ArrayList<String?>? = null
+    /** ダークモード設定用スピナー */
+    private var darkModeSpinner: Spinner? = null
+    /** ダークモード設定名 */
+    private var darkModeNames: ArrayList<String?>? = null
     /** 設定ビューモデル */
     private val settingViewModel: SettingViewModel by viewModels()
 
@@ -171,6 +176,27 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
         copyClipboardSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, i: Int, l: Long) {
                 loginDataManager.setCopyClipboard(i)
+            }
+
+            override fun onNothingSelected(adapterView: AdapterView<*>?) {}
+        }
+
+        // ダークモードスピナー処理
+        darkModeSpinner = binding.darkModeSpinner
+        darkModeNames = ArrayList()
+        darkModeNames?.add(getString(R.string.dark_mode_off))
+        darkModeNames?.add(getString(R.string.dark_mode_on))
+        darkModeNames?.add(getString(R.string.dark_mode_auto))
+        val darkModeAdapter =
+            SetTextSizeAdapter(requireContext(), darkModeNames, loginDataManager.textSize.toInt())
+        darkModeSpinner?.adapter = darkModeAdapter
+        darkModeSpinner?.setSelection(loginDataManager.darkMode)
+        darkModeSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, i: Int, l: Long) {
+                loginDataManager.setDarkMode(i)
+                // ダークモード設定が変更された場合、アプリを再起動して反映
+                DarkModeUtil.applyDarkMode(requireContext(), i)
+                restartPasswordMemoActivity()
             }
 
             override fun onNothingSelected(adapterView: AdapterView<*>?) {}
@@ -461,6 +487,10 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
         binding.colorSelectButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
         binding.textMasterPasswordView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.masterPasswordSetButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.textDarkModeView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        val darkModeAdapter = SetTextSizeAdapter(requireContext(), darkModeNames, size.toInt())
+        darkModeSpinner?.adapter = darkModeAdapter
+        darkModeSpinner?.setSelection(loginDataManager.darkMode)
         binding.textOperationInstructionView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.operationInstructionButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
         binding.textRateView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)

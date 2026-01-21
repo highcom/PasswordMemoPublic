@@ -13,6 +13,7 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.highcom.passwordmemo.databinding.ActivityPasswordMemoDrawerBinding
+import com.highcom.passwordmemo.domain.DarkModeUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -45,7 +46,16 @@ class PasswordMemoDrawerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setTheme(R.style.AppTheme)
+        // ダークモード設定を適用
+        DarkModeUtil.applyDarkMode(this, loginDataManager.darkMode)
+
+        // テーマを設定（ダークモード設定に基づいて適切なテーマを選択）
+        val themeResId = if (DarkModeUtil.isDarkModeEnabled(this, loginDataManager.darkMode)) {
+            R.style.AppTheme_Dark
+        } else {
+            R.style.AppTheme
+        }
+        setTheme(themeResId)
         binding = ActivityPasswordMemoDrawerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
