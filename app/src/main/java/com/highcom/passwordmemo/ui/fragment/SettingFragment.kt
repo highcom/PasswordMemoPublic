@@ -426,9 +426,9 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
     @SuppressLint("InflateParams")
     private fun operationInstructionDialog() {
         val themeResId = if (DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
-            androidx.appcompat.R.style.Theme_AppCompat_Dialog
+            android.R.style.Theme_DeviceDefault_Dialog
         } else {
-            androidx.appcompat.R.style.Theme_AppCompat_Light_Dialog
+            android.R.style.Theme_DeviceDefault_Light_Dialog
         }
         val alertDialog = AlertDialog.Builder(requireContext(), themeResId)
             .setTitle(R.string.operation_instruction)
@@ -439,12 +439,21 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
         // タイトル部分の色をダークモードに対応させる
         alertDialog.setOnShowListener {
             try {
-                val titleView = alertDialog.findViewById<TextView>(androidx.appcompat.R.id.alertTitle)
-                titleView?.setTextColor(if (DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
-                    resources.getColor(android.R.color.white, null)
-                } else {
-                    resources.getColor(android.R.color.black, null)
-                })
+                // AlertDialogのタイトル部分の背景色を設定
+                val titleView = alertDialog.findViewById<TextView>(android.R.id.title)
+                if (titleView != null) {
+                    titleView.setTextColor(if (DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
+                        resources.getColor(android.R.color.white, null)
+                    } else {
+                        resources.getColor(android.R.color.black, null)
+                    })
+                    // タイトル部分の背景色も設定
+                    titleView.setBackgroundColor(if (DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
+                        resources.getColor(android.R.color.black, null)
+                    } else {
+                        resources.getColor(android.R.color.white, null)
+                    })
+                }
             } catch (e: Exception) {
                 // タイトルが見つからない場合は無視
             }
