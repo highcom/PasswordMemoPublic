@@ -32,7 +32,6 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 android:textSize="10sp"
-                android:textColor="@android:color/black"
                 android:text=""
                 tools:ignore="SmallSp" />
 
@@ -44,7 +43,6 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="16dp"
                 android:textSize="15sp"
-                android:textColor="@android:color/black"
                 android:text="@{loginViewModel.naviMessage}" />
 
             <com.google.android.material.textfield.TextInputLayout

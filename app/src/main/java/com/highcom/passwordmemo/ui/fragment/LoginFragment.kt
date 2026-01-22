@@ -22,6 +22,7 @@ import androidx.navigation.fragment.findNavController
 import com.highcom.passwordmemo.PasswordMemoDrawerActivity
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.ui.viewmodel.LoginViewModel
+import com.highcom.passwordmemo.domain.DarkModeUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import kotlinx.coroutines.launch
 import com.highcom.passwordmemo.databinding.FragmentLoginBinding
@@ -107,8 +108,10 @@ class LoginFragment : Fragment() {
 
         // 戻るボタンを無効化
         (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        // 背景色を設定する
-        binding.loginFragmentView.setBackgroundColor(loginDataManager.backgroundColor)
+        // 背景色を設定する（ダークモード時はテーマの色を優先）
+        if (!DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
+            binding.loginFragmentView.setBackgroundColor(loginDataManager.backgroundColor)
+        }
         // 入力内容は一旦クリアする
         binding.editMasterPassword.editableText?.clear()
         // テキストサイズを設定する

@@ -80,8 +80,17 @@ class PasswordMemoDrawerActivity : AppCompatActivity() {
         }
         // グループ一覧
         drawerGroupList = binding.groupListViewInsideNav
-        // 背景色を設定する
-        binding.drawerListView.setBackgroundColor(loginDataManager.backgroundColor)
+        // 背景色を設定する（ダークモード時はテーマの色を優先）
+        if (!DarkModeUtil.isDarkModeEnabled(this, loginDataManager.darkMode)) {
+            binding.drawerListView.setBackgroundColor(loginDataManager.backgroundColor)
+            // ナビゲーションヘッダーの背景色も設定（ライトモード時は青色）
+            binding.navHeader.root.setBackgroundColor(resources.getColor(R.color.blue, null))
+        } else {
+            // ダークモード時はテーマの背景色を設定
+            binding.drawerListView.setBackgroundColor(resources.getColor(android.R.color.black, null))
+            // ナビゲーションヘッダーの背景色もダークモード用に設定
+            binding.navHeader.root.setBackgroundColor(resources.getColor(R.color.blue, null))
+        }
 
         // Firebaseの設定
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
@@ -103,7 +112,15 @@ class PasswordMemoDrawerActivity : AppCompatActivity() {
      * @param color 設定する背景色
      */
     fun setBackgroundColor(color: Int) {
-        binding.drawerListView.setBackgroundColor(color)
+        // ダークモード時はテーマの色を優先
+        if (!DarkModeUtil.isDarkModeEnabled(this, loginDataManager.darkMode)) {
+            binding.drawerListView.setBackgroundColor(color)
+        } else {
+            // ダークモード時はテーマの背景色を設定
+            binding.drawerListView.setBackgroundColor(resources.getColor(android.R.color.black, null))
+        }
+        // ナビゲーションヘッダーの背景色は常に青色を維持
+        binding.navHeader.root.setBackgroundColor(resources.getColor(R.color.blue, null))
     }
 
     /**

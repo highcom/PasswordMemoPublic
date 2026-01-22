@@ -32,6 +32,7 @@ import com.highcom.passwordmemo.databinding.FragmentReferencePasswordBinding
 import com.highcom.passwordmemo.ui.PasswordEditData
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.domain.AdBanner
+import com.highcom.passwordmemo.domain.DarkModeUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -196,8 +197,10 @@ class ReferencePasswordFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        // 背景色を設定する
-        binding.referencePasswordView.setBackgroundColor(loginDataManager.backgroundColor)
+        // 背景色を設定する（ダークモード時はテーマの色を優先）
+        if (!DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
+            binding.referencePasswordView.setBackgroundColor(loginDataManager.backgroundColor)
+        }
         // テキストサイズを設定する
         setTextSize(loginDataManager.textSize)
     }

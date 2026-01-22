@@ -21,7 +21,6 @@
         android:id="@+id/drawer_title"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textColor="@android:color/black"
         android:singleLine="true"
         android:textSize="14dp"
         android:layout_marginEnd="10dp"

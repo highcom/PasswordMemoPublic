@@ -36,6 +36,7 @@ import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper
 import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper.SimpleCallbackListener
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.domain.AdBanner
+import com.highcom.passwordmemo.domain.DarkModeUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -208,10 +209,10 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
     @SuppressLint("ResourceType")
     override fun onStart() {
         super.onStart()
-        // 背景色を設定する
-        binding.groupListFragmentView.setBackgroundColor(
-            loginDataManager.backgroundColor
-        )
+        // 背景色を設定する（ダークモード時はテーマの色を優先）
+        if (!DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
+            binding.groupListFragmentView.setBackgroundColor(loginDataManager.backgroundColor)
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")

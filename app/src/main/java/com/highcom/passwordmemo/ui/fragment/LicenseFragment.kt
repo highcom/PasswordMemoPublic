@@ -11,6 +11,7 @@ import android.view.WindowManager
 import androidx.navigation.fragment.findNavController
 import com.highcom.passwordmemo.PasswordMemoDrawerActivity
 import com.highcom.passwordmemo.databinding.FragmentLicenseBinding
+import com.highcom.passwordmemo.domain.DarkModeUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -65,6 +66,9 @@ class LicenseFragment : Fragment() {
     @SuppressLint("ResourceType")
     override fun onStart() {
         super.onStart()
-        binding.licenseView.setBackgroundColor(loginDataManager.backgroundColor)
+        // 背景色を設定する（ダークモード時はテーマの色を優先）
+        if (!DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
+            binding.licenseView.setBackgroundColor(loginDataManager.backgroundColor)
+        }
     }
 }

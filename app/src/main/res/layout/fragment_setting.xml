@@ -24,7 +24,6 @@
             android:text="@string/data_deletion_enable"
             android:textSize="15dp"
             android:checked="false"
-            android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -60,7 +59,6 @@
             android:text="@string/login_biometrics_enable"
             android:textSize="15dp"
             android:checked="true"
-            android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/delete_text_view"
@@ -96,7 +94,6 @@
             android:text="@string/display_background_enable"
             android:textSize="15dp"
             android:checked="false"
-            android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_biometric_login"
@@ -132,7 +129,6 @@
             android:text="@string/memo_visible_enable"
             android:textSize="15dp"
             android:checked="false"
-            android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_display_background"
@@ -168,7 +164,6 @@
             android:text="@string/password_visible_enable"
             android:textSize="15dp"
             android:checked="false"
-            android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_text_visible"
@@ -203,7 +198,6 @@
             android:text="@string/text_size"
             android:textSize="15dp"
             android:layout_weight="1"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/text_size_spinner" />
 
@@ -249,7 +243,6 @@
             android:text="@string/copy_clipboard"
             android:textSize="15dp"
             android:layout_weight="1"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/copy_clipboard_spinner" />
 
@@ -294,7 +287,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/db_input_output"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/db_backup_button" />
 
@@ -338,7 +330,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/csv_input_output"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/csv_output_button" />
 
@@ -382,7 +373,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/select_color"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/color_select_button" />
 
@@ -426,7 +416,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/change_master_password"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/master_password_set_button" />
 
@@ -470,7 +459,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/dark_mode"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/dark_mode_spinner" />
 
@@ -524,7 +512,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/operation_instruction"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/operation_instruction_button" />
 
@@ -569,7 +556,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/rate"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/rate_button" />
 
@@ -623,7 +609,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/license"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/license_button" />
 
@@ -668,7 +653,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/privacy_policy"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/privacy_policy_button" />
 
