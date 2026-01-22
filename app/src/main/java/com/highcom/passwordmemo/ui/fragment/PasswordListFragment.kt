@@ -424,6 +424,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     @SuppressLint("ResourceType")
     override fun onStart() {
         super.onStart()
+
         // 背景色を設定する（ダークモード時はテーマの色を優先）
         if (!DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
             binding.passwordListFragmentView.setBackgroundColor(loginDataManager.backgroundColor)

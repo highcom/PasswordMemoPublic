@@ -63,6 +63,12 @@ class PasswordMemoDrawerActivity : AppCompatActivity() {
         // Drawer Layoutの設定
         drawerLayout = binding.drawerLayout
         toolBar = binding.appBarPasswordMemoDrawer.toolbar
+        // ToolbarのpopupThemeを設定（ダークモード対応）
+        toolBar.popupTheme = if (DarkModeUtil.isDarkModeEnabled(this, loginDataManager.darkMode)) {
+            R.style.AppTheme_Dark_PopupOverlay
+        } else {
+            R.style.AppTheme_PopupOverlay
+        }
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         toggle = ActionBarDrawerToggle(this, drawerLayout,
             binding.appBarPasswordMemoDrawer.toolbar,

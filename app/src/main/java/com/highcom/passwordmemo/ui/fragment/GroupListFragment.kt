@@ -209,6 +209,7 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
     @SuppressLint("ResourceType")
     override fun onStart() {
         super.onStart()
+
         // 背景色を設定する（ダークモード時はテーマの色を優先）
         if (!DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
             binding.groupListFragmentView.setBackgroundColor(loginDataManager.backgroundColor)

@@ -224,6 +224,7 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
     @SuppressLint("ResourceType")
     override fun onStart() {
         super.onStart()
+
         // 背景色を設定する（ダークモード時はテーマの色を優先）
         if (!DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
             binding.inputPasswordView.setBackgroundColor(loginDataManager.backgroundColor)
