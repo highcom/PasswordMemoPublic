@@ -18,6 +18,7 @@ import android.widget.Spinner
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -61,6 +62,8 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
     /** ログインデータ管理 */
     @Inject
     lateinit var loginDataManager: LoginDataManager
+    /** 課金ビューモデル */
+    private val billingViewModel: com.highcom.passwordmemo.ui.viewmodel.BillingViewModel by activityViewModels()
     /** グループ選択スピナー */
     private var selectGroupSpinner: Spinner? = null
     /** グループ名称一覧 */
@@ -93,6 +96,10 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // BillingViewModelの初期化
+        billingViewModel.initializeBillingManager()
+
         adContainerView = binding.adViewFrameInput
         adContainerView?.post { adBanner.loadBanner(this, adContainerView, getString(R.string.admob_unit_id_3)) }
         // ActionBarに戻るボタンを設定

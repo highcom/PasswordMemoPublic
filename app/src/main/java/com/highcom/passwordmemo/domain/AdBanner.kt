@@ -3,10 +3,15 @@ package com.highcom.passwordmemo.domain
 import android.util.DisplayMetrics
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.highcom.passwordmemo.domain.billing.PurchaseManager
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -17,6 +22,10 @@ import javax.inject.Inject
 class AdBanner @Inject constructor(
     private val purchaseManager: PurchaseManager
 ) {
+    private var currentAdView: AdView? = null
+    private var currentFragment: Fragment? = null
+    private var currentAdContainerView: FrameLayout? = null
+    private var currentUnitId: String? = null
     /** 広告ビュー */
     private var mAdView: AdView? = null
 
@@ -28,23 +37,54 @@ class AdBanner @Inject constructor(
      * @param unitId 広告ユニットID
      */
     fun loadBanner(fragment: Fragment, adContainerView: FrameLayout?, unitId: String) {
-        // 広告が非表示設定の場合は広告を表示しない
-        if (purchaseManager.isAdsRemoved()) {
-            adContainerView?.removeAllViews()
-            return
+        // 現在の情報を保存
+        currentFragment = fragment
+        currentAdContainerView = adContainerView
+        currentUnitId = unitId
+
+        // 広告状態の変更を監視
+        if (fragment is LifecycleOwner) {
+            fragment.lifecycleScope.launch {
+                fragment.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    purchaseManager.adsRemovedFlow.collect { adsRemoved ->
+                        updateAdVisibility(adsRemoved)
+                    }
+                }
+            }
         }
 
-        // Create an ad request.
-        mAdView = AdView(fragment.requireContext())
-        mAdView?.adUnitId = unitId
-        adContainerView?.removeAllViews()
-        adContainerView?.addView(mAdView)
-        val adSize = adSize(fragment, adContainerView)
-        mAdView?.setAdSize(adSize)
-        val adRequest = AdRequest.Builder().build()
+        // 初期表示
+        updateAdVisibility(purchaseManager.isAdsRemoved())
+    }
 
-        // Start loading the ad in the background.
-        mAdView?.loadAd(adRequest)
+    /**
+     * 広告の表示・非表示を更新
+     */
+    private fun updateAdVisibility(adsRemoved: Boolean) {
+        val fragment = currentFragment ?: return
+        val adContainerView = currentAdContainerView ?: return
+        val unitId = currentUnitId ?: return
+
+        if (adsRemoved) {
+            // 広告を非表示
+            adContainerView.removeAllViews()
+            currentAdView?.destroy()
+            currentAdView = null
+            mAdView?.destroy()
+            mAdView = null
+        } else {
+            // 広告を表示
+            if (currentAdView == null) {
+                currentAdView = AdView(fragment.requireContext())
+                currentAdView?.adUnitId = unitId
+                adContainerView.removeAllViews()
+                adContainerView.addView(currentAdView)
+                val adSize = adSize(fragment, adContainerView)
+                currentAdView?.setAdSize(adSize)
+                val adRequest = AdRequest.Builder().build()
+                currentAdView?.loadAd(adRequest)
+            }
+        }
     }
 
     /** 広告サイズ設定 */

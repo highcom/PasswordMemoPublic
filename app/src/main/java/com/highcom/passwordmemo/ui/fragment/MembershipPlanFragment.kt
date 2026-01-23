@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.snackbar.Snackbar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.highcom.passwordmemo.PasswordMemoDrawerActivity
 import com.highcom.passwordmemo.R
@@ -14,7 +16,9 @@ import com.highcom.passwordmemo.databinding.FragmentMembershipPlanBinding
 import com.highcom.passwordmemo.domain.billing.BillingManager
 import com.highcom.passwordmemo.domain.billing.PurchaseManager
 import com.highcom.passwordmemo.domain.login.LoginDataManager
+import com.highcom.passwordmemo.ui.viewmodel.BillingViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -28,8 +32,8 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
     /** ログインデータ管理 */
     @Inject
     lateinit var loginDataManager: LoginDataManager
-    /** 課金マネージャー */
-    private lateinit var billingManager: BillingManager
+    /** 課金ビューモデル */
+    private val billingViewModel: BillingViewModel by activityViewModels()
     /** 購入状態管理マネージャー */
     @Inject
     lateinit var purchaseManager: PurchaseManager
@@ -67,13 +71,27 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
             loginDataManager.backgroundColor
         )
 
-        // BillingManagerの初期化
-        billingManager = BillingManager(requireContext(), this)
+        // BillingViewModelの初期化
+        billingViewModel.initializeBillingManager()
+
+        // 購入状態の変更を監視（定期購入または広告非表示の変更）
+        lifecycleScope.launch {
+            billingViewModel.adsRemovedFlow.collect { adsRemoved ->
+                updateButtonStates()
+            }
+        }
+
+        // 広告非表示ボタンの個別状態を監視
+        lifecycleScope.launch {
+            purchaseManager.removeAdsPurchasedFlow.collect { purchased ->
+                updateRemoveAdsButton(purchased)
+            }
+        }
 
         // 月額プランボタン処理
         binding.monthlySubscriptionButton.setOnClickListener {
-            if (!purchaseManager.hasActiveSubscription()) {
-                billingManager.purchaseProduct(requireActivity(), BillingManager.PRODUCT_MONTHLY_SUBSCRIPTION)
+            if (!billingViewModel.hasActiveSubscription()) {
+                billingViewModel.purchaseProduct(requireActivity(), BillingManager.PRODUCT_MONTHLY_SUBSCRIPTION)
             } else {
                 showSnackBar(getString(R.string.already_purchased))
             }
@@ -81,8 +99,8 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
 
         // 半年プランボタン処理
         binding.halfYearSubscriptionButton.setOnClickListener {
-            if (!purchaseManager.hasActiveSubscription()) {
-                billingManager.purchaseProduct(requireActivity(), BillingManager.PRODUCT_HALF_YEAR_SUBSCRIPTION)
+            if (!billingViewModel.hasActiveSubscription()) {
+                billingViewModel.purchaseProduct(requireActivity(), BillingManager.PRODUCT_HALF_YEAR_SUBSCRIPTION)
             } else {
                 showSnackBar(getString(R.string.already_purchased))
             }
@@ -90,8 +108,8 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
 
         // 年額プランボタン処理
         binding.yearlySubscriptionButton.setOnClickListener {
-            if (!purchaseManager.hasActiveSubscription()) {
-                billingManager.purchaseProduct(requireActivity(), BillingManager.PRODUCT_YEARLY_SUBSCRIPTION)
+            if (!billingViewModel.hasActiveSubscription()) {
+                billingViewModel.purchaseProduct(requireActivity(), BillingManager.PRODUCT_YEARLY_SUBSCRIPTION)
             } else {
                 showSnackBar(getString(R.string.already_purchased))
             }
@@ -99,8 +117,8 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
 
         // 広告非表示買い切りボタン処理
         binding.removeAdsButton.setOnClickListener {
-            if (!purchaseManager.isProductPurchased(BillingManager.PRODUCT_REMOVE_ADS)) {
-                billingManager.purchaseProduct(requireActivity(), BillingManager.PRODUCT_REMOVE_ADS)
+            if (!billingViewModel.isProductPurchased(BillingManager.PRODUCT_REMOVE_ADS)) {
+                billingViewModel.purchaseProduct(requireActivity(), BillingManager.PRODUCT_REMOVE_ADS)
             } else {
                 showSnackBar(getString(R.string.already_purchased))
             }
@@ -108,7 +126,7 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
 
         // 購入復元ボタン処理
         binding.restorePurchaseButton.setOnClickListener {
-            billingManager.restorePurchases()
+            billingViewModel.restorePurchases()
         }
 
         // ボタンの初期状態を設定
@@ -118,36 +136,59 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
         setTextSize(loginDataManager.textSize)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        billingManager.destroy()
+
+    /**
+     * 月額プラン購入ボタンの状態を更新
+     */
+    private fun updateMonthlySubscriptionButton(purchased: Boolean) {
+        val hasActiveSubscription = billingViewModel.hasActiveSubscription()
+        binding.monthlySubscriptionButton.apply {
+            isEnabled = !hasActiveSubscription
+            text = if (hasActiveSubscription) getString(R.string.already_purchased) else getString(R.string.purchase)
+        }
     }
 
     /**
-     * ボタンの状態を更新
+     * 半年プラン購入ボタンの状態を更新
+     */
+    private fun updateHalfYearSubscriptionButton(purchased: Boolean) {
+        val hasActiveSubscription = billingViewModel.hasActiveSubscription()
+        binding.halfYearSubscriptionButton.apply {
+            isEnabled = !hasActiveSubscription
+            text = if (hasActiveSubscription) getString(R.string.already_purchased) else getString(R.string.purchase)
+        }
+    }
+
+    /**
+     * 年額プラン購入ボタンの状態を更新
+     */
+    private fun updateYearlySubscriptionButton(purchased: Boolean) {
+        val hasActiveSubscription = billingViewModel.hasActiveSubscription()
+        binding.yearlySubscriptionButton.apply {
+            isEnabled = !hasActiveSubscription
+            text = if (hasActiveSubscription) getString(R.string.already_purchased) else getString(R.string.purchase)
+        }
+    }
+
+    /**
+     * 広告非表示ボタンの状態を更新
+     */
+    private fun updateRemoveAdsButton(purchased: Boolean) {
+        binding.removeAdsButton.apply {
+            isEnabled = !purchased
+            text = if (purchased) getString(R.string.already_purchased) else getString(R.string.purchase)
+        }
+    }
+
+    /**
+     * ボタンの状態を更新（全体）
      */
     private fun updateButtonStates() {
-        val hasSubscription = purchaseManager.hasActiveSubscription()
-        val hasRemoveAds = purchaseManager.isProductPurchased(BillingManager.PRODUCT_REMOVE_ADS)
-
-        // サブスクリプションボタンはサブスクリプションがない場合のみ有効
-        binding.monthlySubscriptionButton.isEnabled = !hasSubscription
-        binding.halfYearSubscriptionButton.isEnabled = !hasSubscription
-        binding.yearlySubscriptionButton.isEnabled = !hasSubscription
-
-        // 広告非表示ボタンは未購入の場合のみ有効
-        binding.removeAdsButton.isEnabled = !hasRemoveAds
-
-        // 購入済みのボタンのテキストを変更
-        if (hasSubscription) {
-            binding.monthlySubscriptionButton.text = getString(R.string.already_purchased)
-            binding.halfYearSubscriptionButton.text = getString(R.string.already_purchased)
-            binding.yearlySubscriptionButton.text = getString(R.string.already_purchased)
-        }
-
-        if (hasRemoveAds) {
-            binding.removeAdsButton.text = getString(R.string.already_purchased)
-        }
+        val hasActiveSubscription = billingViewModel.hasActiveSubscription()
+        updateMonthlySubscriptionButton(hasActiveSubscription)
+        updateHalfYearSubscriptionButton(hasActiveSubscription)
+        updateYearlySubscriptionButton(hasActiveSubscription)
+        updateRemoveAdsButton(purchaseManager.isProductPurchased(BillingManager.PRODUCT_REMOVE_ADS))
     }
 
     /**

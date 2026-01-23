@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.highcom.passwordmemo.domain.billing.BillingManager.Companion.ALL_PRODUCT_IDS
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,6 +27,23 @@ class PurchaseManager @Inject constructor(
 
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
+    // 広告表示状態のFlow
+    private val _adsRemovedFlow = MutableStateFlow(isAdsRemoved())
+    val adsRemovedFlow: StateFlow<Boolean> = _adsRemovedFlow.asStateFlow()
+
+    // 各製品の購入状態Flow
+    private val _monthlySubscriptionPurchasedFlow = MutableStateFlow(isProductPurchased(BillingManager.PRODUCT_MONTHLY_SUBSCRIPTION))
+    val monthlySubscriptionPurchasedFlow: StateFlow<Boolean> = _monthlySubscriptionPurchasedFlow.asStateFlow()
+
+    private val _halfYearSubscriptionPurchasedFlow = MutableStateFlow(isProductPurchased(BillingManager.PRODUCT_HALF_YEAR_SUBSCRIPTION))
+    val halfYearSubscriptionPurchasedFlow: StateFlow<Boolean> = _halfYearSubscriptionPurchasedFlow.asStateFlow()
+
+    private val _yearlySubscriptionPurchasedFlow = MutableStateFlow(isProductPurchased(BillingManager.PRODUCT_YEARLY_SUBSCRIPTION))
+    val yearlySubscriptionPurchasedFlow: StateFlow<Boolean> = _yearlySubscriptionPurchasedFlow.asStateFlow()
+
+    private val _removeAdsPurchasedFlow = MutableStateFlow(isProductPurchased(BillingManager.PRODUCT_REMOVE_ADS))
+    val removeAdsPurchasedFlow: StateFlow<Boolean> = _removeAdsPurchasedFlow.asStateFlow()
+
     /**
      * 製品の購入状態を設定
      */
@@ -31,9 +51,23 @@ class PurchaseManager @Inject constructor(
         prefs.edit().putBoolean("$KEY_PURCHASE_PREFIX$productId", purchased).apply()
 
         // 広告非表示状態の更新
+        val newAdsRemovedState = isAdsRemoved()
         if (purchased && (BillingManager.SUBSCRIPTION_PRODUCT_IDS.contains(productId) ||
                           productId == BillingManager.PRODUCT_REMOVE_ADS)) {
             setAdsRemoved(true)
+            _adsRemovedFlow.value = true
+        } else if (!purchased && BillingManager.SUBSCRIPTION_PRODUCT_IDS.contains(productId)) {
+            // サブスクリプションがキャンセルされた場合
+            val currentAdsRemoved = isAdsRemoved()
+            _adsRemovedFlow.value = currentAdsRemoved
+        }
+
+        // 各製品のFlowを更新
+        when (productId) {
+            BillingManager.PRODUCT_MONTHLY_SUBSCRIPTION -> _monthlySubscriptionPurchasedFlow.value = purchased
+            BillingManager.PRODUCT_HALF_YEAR_SUBSCRIPTION -> _halfYearSubscriptionPurchasedFlow.value = purchased
+            BillingManager.PRODUCT_YEARLY_SUBSCRIPTION -> _yearlySubscriptionPurchasedFlow.value = purchased
+            BillingManager.PRODUCT_REMOVE_ADS -> _removeAdsPurchasedFlow.value = purchased
         }
     }
 

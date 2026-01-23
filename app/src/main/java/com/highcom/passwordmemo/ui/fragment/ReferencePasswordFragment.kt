@@ -21,6 +21,7 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -59,6 +60,8 @@ class ReferencePasswordFragment : Fragment() {
     private var adContainerView: FrameLayout? = null
     /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels()
+    /** 課金ビューモデル */
+    private val billingViewModel: com.highcom.passwordmemo.ui.viewmodel.BillingViewModel by activityViewModels()
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,6 +84,10 @@ class ReferencePasswordFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // BillingViewModelの初期化
+        billingViewModel.initializeBillingManager()
+
         adContainerView = binding.adViewFrameReference
         adContainerView?.post { adBanner.loadBanner(this, adContainerView, getString(R.string.admob_unit_id_2)) }
 

@@ -22,6 +22,8 @@ class BillingManager(
     private val purchaseListener: PurchaseListener
 ) : PurchasesUpdatedListener, BillingClientStateListener {
 
+    private var purchaseManager: PurchaseManager? = null
+
     interface PurchaseListener {
         fun onPurchaseSuccess(productId: String)
         fun onPurchaseFailed(errorMessage: String)
@@ -93,6 +95,11 @@ class BillingManager(
                 Log.d(TAG, "Billing setup successful")
                 isBillingClientReady = true
                 queryPurchases()
+
+                // PurchaseManagerが設定されている場合は購入状態を確認
+                purchaseManager?.let { pm ->
+                    checkSubscriptionStatus(pm)
+                }
             }
             BillingResponseCode.BILLING_UNAVAILABLE -> {
                 Log.e(TAG, "Billing unavailable")
@@ -326,6 +333,57 @@ class BillingManager(
     fun isProductPurchased(productId: String): Boolean {
         // TODO: SharedPreferencesなどで購入状態を管理する必要がある
         return false
+    }
+
+    /**
+     * PurchaseManagerを設定
+     */
+    fun setPurchaseManager(purchaseManager: PurchaseManager) {
+        this.purchaseManager = purchaseManager
+    }
+
+    /**
+     * 定期購入の状態を確認してPurchaseManagerを更新
+     */
+    fun checkSubscriptionStatus(purchaseManager: PurchaseManager) {
+        if (!isBillingClientReady) return
+
+        // サブスクリプションの購入履歴を照会
+        billingClient.queryPurchasesAsync(
+            QueryPurchasesParams.newBuilder()
+                .setProductType(ProductType.SUBS)
+                .build()
+        ) { billingResult, purchases ->
+            if (billingResult.responseCode == BillingResponseCode.OK) {
+                // 現在の有効なサブスクリプションを確認
+                val activeSubscriptions = purchases.filter { purchase ->
+                    purchase.purchaseState == Purchase.PurchaseState.PURCHASED
+                }.map { it.products[0] }
+
+                // PurchaseManagerを更新
+                SUBSCRIPTION_PRODUCT_IDS.forEach { productId ->
+                    val isPurchased = activeSubscriptions.contains(productId)
+                    purchaseManager.setProductPurchased(productId, isPurchased)
+                }
+
+                // 買い切り製品も確認
+                billingClient.queryPurchasesAsync(
+                    QueryPurchasesParams.newBuilder()
+                        .setProductType(ProductType.INAPP)
+                        .build()
+                ) { inAppBillingResult, inAppPurchases ->
+                    if (inAppBillingResult.responseCode == BillingResponseCode.OK) {
+                        ONE_TIME_PRODUCT_IDS.forEach { productId ->
+                            val isPurchased = inAppPurchases.any { purchase ->
+                                purchase.purchaseState == Purchase.PurchaseState.PURCHASED &&
+                                purchase.products.contains(productId)
+                            }
+                            purchaseManager.setProductPurchased(productId, isPurchased)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**

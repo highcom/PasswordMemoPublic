@@ -20,6 +20,7 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.lifecycleScope
@@ -88,6 +89,8 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     private val passwordListViewModel: PasswordListViewModel by hiltNavGraphViewModels(R.id.passwordmemo_nav_graph)
     /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels()
+    /** 課金ビューモデル */
+    private val billingViewModel: com.highcom.passwordmemo.ui.viewmodel.BillingViewModel by activityViewModels()
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,6 +113,10 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // BillingViewModelの初期化
+        billingViewModel.initializeBillingManager()
+
         adContainerView = binding.adViewFrame
         adContainerView?.post { adBanner.loadBanner(this, adContainerView, getString(R.string.admob_unit_id_1)) }
         // ドロワーを操作可能にする

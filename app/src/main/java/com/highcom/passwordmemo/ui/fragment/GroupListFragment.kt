@@ -19,6 +19,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -54,6 +55,8 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
     /** ログインデータ管理 */
     @Inject
     lateinit var loginDataManager: LoginDataManager
+    /** 課金ビューモデル */
+    private val billingViewModel: com.highcom.passwordmemo.ui.viewmodel.BillingViewModel by activityViewModels()
     /** バナー広告処理 */
     @Inject
     lateinit var adBanner: AdBanner
@@ -91,6 +94,10 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // BillingViewModelの初期化
+        billingViewModel.initializeBillingManager()
+
         adContainerView = binding.adViewGroupFrame
         adContainerView?.post { adBanner.loadBanner(this, adContainerView, getString(R.string.admob_unit_id_4)) }
         requireActivity().title = getString(R.string.group_title) + getString(R.string.group_title_edit)
