@@ -195,9 +195,20 @@ class BillingManager(
             if (billingResult.responseCode == BillingResponseCode.OK) {
                 val productDetails = productDetailsList?.firstOrNull()
                 productDetails?.let {
-                    val productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
+                    val productDetailsParamsBuilder = BillingFlowParams.ProductDetailsParams.newBuilder()
                         .setProductDetails(it)
-                        .build()
+
+                    // サブスクリプションの場合、offerTokenを設定
+                    if (SUBSCRIPTION_PRODUCT_IDS.contains(productId)) {
+                        val subscriptionOfferDetails = it.subscriptionOfferDetails
+                        if (!subscriptionOfferDetails.isNullOrEmpty()) {
+                            val firstOffer = subscriptionOfferDetails[0]
+                            val offerToken = firstOffer.offerToken
+                            productDetailsParamsBuilder.setOfferToken(offerToken)
+                        }
+                    }
+
+                    val productDetailsParams = productDetailsParamsBuilder.build()
 
                     val billingFlowParams = BillingFlowParams.newBuilder()
                         .setProductDetailsParamsList(listOf(productDetailsParams))
