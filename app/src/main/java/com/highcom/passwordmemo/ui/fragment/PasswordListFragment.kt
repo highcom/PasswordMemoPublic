@@ -43,6 +43,7 @@ import com.highcom.passwordmemo.domain.login.LoginDataManager
 import com.highcom.passwordmemo.PasswordMemoDrawerActivity
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.ui.list.DrawerGroupListAdapter
+import com.highcom.passwordmemo.ui.viewmodel.BillingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.recruit_mp.android.rmp_appirater.RmpAppirater
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -90,7 +91,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels()
     /** 課金ビューモデル */
-    private val billingViewModel: com.highcom.passwordmemo.ui.viewmodel.BillingViewModel by activityViewModels()
+    private val billingViewModel: BillingViewModel by activityViewModels()
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -561,7 +562,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        adBanner?.destroy()
+        adBanner.destroy()
     }
 
     /**

@@ -36,6 +36,7 @@ import com.highcom.passwordmemo.domain.SelectColorUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import com.highcom.passwordmemo.ui.list.ColorItem
 import com.highcom.passwordmemo.ui.list.ColorList
+import com.highcom.passwordmemo.ui.viewmodel.BillingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -63,7 +64,7 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
     @Inject
     lateinit var loginDataManager: LoginDataManager
     /** 課金ビューモデル */
-    private val billingViewModel: com.highcom.passwordmemo.ui.viewmodel.BillingViewModel by activityViewModels()
+    private val billingViewModel: BillingViewModel by activityViewModels()
     /** グループ選択スピナー */
     private var selectGroupSpinner: Spinner? = null
     /** グループ名称一覧 */
@@ -93,7 +94,6 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
         return binding.root
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -266,7 +266,7 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
 
     override fun onDestroyView() {
         super.onDestroyView()
-        adBanner?.destroy()
+        adBanner.destroy()
     }
 
     /**

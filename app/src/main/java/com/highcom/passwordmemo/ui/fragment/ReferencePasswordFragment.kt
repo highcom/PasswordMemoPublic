@@ -34,6 +34,7 @@ import com.highcom.passwordmemo.ui.PasswordEditData
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.domain.AdBanner
 import com.highcom.passwordmemo.domain.login.LoginDataManager
+import com.highcom.passwordmemo.ui.viewmodel.BillingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -61,7 +62,7 @@ class ReferencePasswordFragment : Fragment() {
     /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels()
     /** 課金ビューモデル */
-    private val billingViewModel: com.highcom.passwordmemo.ui.viewmodel.BillingViewModel by activityViewModels()
+    private val billingViewModel: BillingViewModel by activityViewModels()
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {

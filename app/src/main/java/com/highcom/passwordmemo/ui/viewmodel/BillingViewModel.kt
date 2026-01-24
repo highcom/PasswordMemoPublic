@@ -13,6 +13,17 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
+ * 購入イベントの種類
+ */
+sealed class PurchaseEvent {
+    data class PurchaseSuccess(val productId: String) : PurchaseEvent()
+    data class PurchaseFailed(val errorMessage: String) : PurchaseEvent()
+    data class RestoreSuccess(val productIds: List<String>) : PurchaseEvent()
+    data class RestoreFailed(val errorMessage: String) : PurchaseEvent()
+    object BillingUnavailable : PurchaseEvent()
+}
+
+/**
  * 課金関連のビューモデル
  */
 @HiltViewModel
@@ -28,6 +39,10 @@ class BillingViewModel @Inject constructor(
     private val _adsRemovedFlow = MutableSharedFlow<Boolean>(replay = 1)
     val adsRemovedFlow: SharedFlow<Boolean> = _adsRemovedFlow.asSharedFlow()
 
+    // 購入イベントのFlow
+    private val _purchaseEventFlow = MutableSharedFlow<PurchaseEvent>()
+    val purchaseEventFlow: SharedFlow<PurchaseEvent> = _purchaseEventFlow.asSharedFlow()
+
     // BillingManagerの初期化
     fun initializeBillingManager() {
         if (!::billingManager.isInitialized) {
@@ -37,10 +52,15 @@ class BillingViewModel @Inject constructor(
                 override fun onPurchaseSuccess(productId: String) {
                     purchaseManager.setProductPurchased(productId, true)
                     updateAdsRemovedFlow()
+                    viewModelScope.launch {
+                        _purchaseEventFlow.emit(PurchaseEvent.PurchaseSuccess(productId))
+                    }
                 }
 
                 override fun onPurchaseFailed(errorMessage: String) {
-                    // エラーハンドリングはFragmentで行う
+                    viewModelScope.launch {
+                        _purchaseEventFlow.emit(PurchaseEvent.PurchaseFailed(errorMessage))
+                    }
                 }
 
                 override fun onRestoreSuccess(productIds: List<String>) {
@@ -48,14 +68,21 @@ class BillingViewModel @Inject constructor(
                         purchaseManager.setProductPurchased(productId, true)
                     }
                     updateAdsRemovedFlow()
+                    viewModelScope.launch {
+                        _purchaseEventFlow.emit(PurchaseEvent.RestoreSuccess(productIds))
+                    }
                 }
 
                 override fun onRestoreFailed(errorMessage: String) {
-                    // エラーハンドリングはFragmentで行う
+                    viewModelScope.launch {
+                        _purchaseEventFlow.emit(PurchaseEvent.RestoreFailed(errorMessage))
+                    }
                 }
 
                 override fun onBillingUnavailable() {
-                    // エラーハンドリングはFragmentで行う
+                    viewModelScope.launch {
+                        _purchaseEventFlow.emit(PurchaseEvent.BillingUnavailable)
+                    }
                 }
             })
 

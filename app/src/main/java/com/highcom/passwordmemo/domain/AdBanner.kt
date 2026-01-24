@@ -43,12 +43,10 @@ class AdBanner @Inject constructor(
         currentUnitId = unitId
 
         // 広告状態の変更を監視
-        if (fragment is LifecycleOwner) {
-            fragment.lifecycleScope.launch {
-                fragment.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    purchaseManager.adsRemovedFlow.collect { adsRemoved ->
-                        updateAdVisibility(adsRemoved)
-                    }
+        fragment.lifecycleScope.launch {
+            fragment.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                purchaseManager.adsRemovedFlow.collect { adsRemoved ->
+                    updateAdVisibility(adsRemoved)
                 }
             }
         }

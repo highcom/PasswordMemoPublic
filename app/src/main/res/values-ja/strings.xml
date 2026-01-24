@@ -229,5 +229,5 @@
     <string name="restore_success">購入が復元されました</string>
     <string name="restore_failed">購入の復元に失敗しました</string>
     <string name="billing_unavailable">課金サービスが利用できません</string>
-    <string name="already_purchased">既に購入済みです</string>
+    <string name="already_purchased">購入済み</string>
 </resources>

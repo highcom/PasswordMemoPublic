@@ -17,6 +17,7 @@ import com.highcom.passwordmemo.domain.billing.BillingManager
 import com.highcom.passwordmemo.domain.billing.PurchaseManager
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import com.highcom.passwordmemo.ui.viewmodel.BillingViewModel
+import com.highcom.passwordmemo.ui.viewmodel.PurchaseEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,7 +27,7 @@ import javax.inject.Inject
  *
  */
 @AndroidEntryPoint
-class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
+class MembershipPlanFragment : Fragment() {
     /** 有料会員プラン画面のbinding */
     private lateinit var binding: FragmentMembershipPlanBinding
     /** ログインデータ管理 */
@@ -74,17 +75,17 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
         // BillingViewModelの初期化
         billingViewModel.initializeBillingManager()
 
-        // 購入状態の変更を監視（定期購入または広告非表示の変更）
-        lifecycleScope.launch {
-            billingViewModel.adsRemovedFlow.collect { adsRemoved ->
-                updateButtonStates()
-            }
-        }
-
         // 広告非表示ボタンの個別状態を監視
         lifecycleScope.launch {
             purchaseManager.removeAdsPurchasedFlow.collect { purchased ->
                 updateRemoveAdsButton(purchased)
+            }
+        }
+
+        // 購入イベントを監視
+        lifecycleScope.launch {
+            billingViewModel.purchaseEventFlow.collect { event ->
+                handlePurchaseEvent(event)
             }
         }
 
@@ -225,51 +226,28 @@ class MembershipPlanFragment : Fragment(), BillingManager.PurchaseListener {
         binding.restorePurchaseButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
     }
 
-    // BillingManager.PurchaseListener implementation
-
-    override fun onPurchaseSuccess(productId: String) {
-        purchaseManager.setProductPurchased(productId, true)
-        updateButtonStates()
-        showSnackBar(getString(R.string.purchase_success))
-
-        // 広告非表示状態になった場合はActivityを再作成して広告を非表示にする
-        if (purchaseManager.isAdsRemoved()) {
-            restartActivity()
-        }
-    }
-
-    override fun onPurchaseFailed(errorMessage: String) {
-        showSnackBar(getString(R.string.purchase_failed))
-    }
-
-    override fun onRestoreSuccess(productIds: List<String>) {
-        productIds.forEach { productId ->
-            purchaseManager.setProductPurchased(productId, true)
-        }
-        updateButtonStates()
-        showSnackBar(getString(R.string.restore_success))
-
-        // 広告非表示状態になった場合はActivityを再作成して広告を非表示にする
-        if (purchaseManager.isAdsRemoved()) {
-            restartActivity()
-        }
-    }
-
-    override fun onRestoreFailed(errorMessage: String) {
-        showSnackBar(getString(R.string.restore_failed))
-    }
-
-    override fun onBillingUnavailable() {
-        showSnackBar(getString(R.string.billing_unavailable))
-    }
-
     /**
-     * アプリ再起動処理
+     * 購入イベントを処理
      */
-    private fun restartActivity() {
-        // 購入状態が変更された場合、Activityを再作成して広告の状態を更新する
-        val intent = requireActivity().intent
-        requireActivity().finish()
-        requireActivity().startActivity(intent)
+    private fun handlePurchaseEvent(event: PurchaseEvent) {
+        when (event) {
+            is PurchaseEvent.PurchaseSuccess -> {
+                updateButtonStates()
+                showSnackBar(getString(R.string.purchase_success))
+            }
+            is PurchaseEvent.PurchaseFailed -> {
+                showSnackBar(getString(R.string.purchase_failed))
+            }
+            is PurchaseEvent.RestoreSuccess -> {
+                updateButtonStates()
+                showSnackBar(getString(R.string.restore_success))
+            }
+            is PurchaseEvent.RestoreFailed -> {
+                showSnackBar(getString(R.string.restore_failed))
+            }
+            is PurchaseEvent.BillingUnavailable -> {
+                showSnackBar(getString(R.string.billing_unavailable))
+            }
+        }
     }
 }

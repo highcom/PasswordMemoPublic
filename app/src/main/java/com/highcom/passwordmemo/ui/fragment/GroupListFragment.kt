@@ -38,6 +38,7 @@ import com.highcom.passwordmemo.ui.list.SimpleCallbackHelper.SimpleCallbackListe
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.domain.AdBanner
 import com.highcom.passwordmemo.domain.login.LoginDataManager
+import com.highcom.passwordmemo.ui.viewmodel.BillingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -56,7 +57,7 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
     @Inject
     lateinit var loginDataManager: LoginDataManager
     /** 課金ビューモデル */
-    private val billingViewModel: com.highcom.passwordmemo.ui.viewmodel.BillingViewModel by activityViewModels()
+    private val billingViewModel: BillingViewModel by activityViewModels()
     /** バナー広告処理 */
     @Inject
     lateinit var adBanner: AdBanner
