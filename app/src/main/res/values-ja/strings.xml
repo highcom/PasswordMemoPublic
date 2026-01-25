@@ -100,6 +100,7 @@
     <string name="csv_input_output">CSVファイル入出力</string>
     <string name="csv_input_output_message">データ取込/出力をCSVファイルで実行</string>
     <string name="select_input_output">選択</string>
+    <string name="select_input_output_paid">選択(有料)</string>
     <string name="csv_output">CSVファイル出力</string>
     <string name="csv_output_message">パスワードデータをCSVファイルに出力します</string>
     <string name="select_color">背景色</string>

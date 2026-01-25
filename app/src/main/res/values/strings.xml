@@ -100,6 +100,7 @@
     <string name="csv_input_output">Input/Output CSV file</string>
     <string name="csv_input_output_message">Input / Output password data to CSV file</string>
     <string name="select_input_output">Select</string>
+    <string name="select_input_output_paid">Select (Paid)</string>
     <string name="csv_output">Output CSV file</string>
     <string name="csv_output_message">Output password data to CSV file</string>
     <string name="select_color">Background color</string>
