@@ -51,6 +51,7 @@ import kotlinx.coroutines.flow.first
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
+import com.highcom.passwordmemo.ui.util.LimitCheckUtil
 
 /**
  * パスワード一覧画面フラグメント
@@ -291,7 +292,10 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                                     memo = entity?.memo ?: "",
                                     color = entity?.color ?: 0
                                 )
-                                findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToInputPasswordFragment(editData = passwordEditData))
+                                // 上限チェックをして問題なければ遷移
+                                LimitCheckUtil.checkAndNavigate(this@PasswordListFragment, billingViewModel) {
+                                    findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToInputPasswordFragment(editData = passwordEditData))
+                                }
                             }
                         }
                     ))
@@ -303,7 +307,10 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
             val passwordEditData = PasswordEditData()
             // 選択されているグループIDを設定
             passwordEditData.groupId = loginDataManager.selectGroup
-            findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToInputPasswordFragment(editData = passwordEditData))
+            // 新規作成時も上限チェックを行う
+            LimitCheckUtil.checkAndNavigate(this@PasswordListFragment, billingViewModel) {
+                findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToInputPasswordFragment(editData = passwordEditData))
+            }
         }
 
         // 渡されたデータを取得する
@@ -330,11 +337,12 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         // 検索窓の動作を設定する
         val searchMenuItem = menu.findItem(R.id.menu_search_view)
         val searchView = searchMenuItem.actionView as SearchView?
-        val searchAutoComplete =
-            searchView!!.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text)
-        searchAutoComplete.setHintTextColor(Color.rgb(0xff, 0xff, 0xff))
-        searchAutoComplete.hint = getString(R.string.search_text_message)
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        // Use platform AutoCompleteTextView instead of SearchView.SearchAutoComplete to avoid
+        // library group access restrictions when referencing the inner class.
+        val searchAutoComplete = searchView?.findViewById<android.widget.AutoCompleteTextView>(androidx.appcompat.R.id.search_src_text)
+        searchAutoComplete?.setHintTextColor(Color.rgb(0xff, 0xff, 0xff))
+        searchAutoComplete?.hint = getString(R.string.search_text_message)
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 return false
             }

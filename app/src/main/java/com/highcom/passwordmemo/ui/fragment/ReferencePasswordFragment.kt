@@ -31,10 +31,11 @@ import com.highcom.passwordmemo.PasswordMemoDrawerActivity
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.databinding.FragmentReferencePasswordBinding
 import com.highcom.passwordmemo.ui.PasswordEditData
+import com.highcom.passwordmemo.ui.util.LimitCheckUtil
+import com.highcom.passwordmemo.ui.viewmodel.BillingViewModel
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.domain.AdBanner
 import com.highcom.passwordmemo.domain.login.LoginDataManager
-import com.highcom.passwordmemo.ui.viewmodel.BillingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -182,11 +183,14 @@ class ReferencePasswordFragment : Fragment() {
         when (item.itemId) {
             // 複製して編集
             R.id.action_copy -> {
-                // 入力画面に遷移
-                passwordEditData.edit = false
-                passwordEditData.id = 0
-                passwordEditData.title += " " + getString(R.string.copy_title)
-                findNavController().navigate(ReferencePasswordFragmentDirections.actionReferencePasswordFragmentToInputPasswordFragment(editData = passwordEditData))
+                // 複製して編集は上限チェック
+                val editData = passwordEditData.copy()
+                editData.edit = false
+                editData.id = 0
+                editData.title += " " + getString(R.string.copy_title)
+                LimitCheckUtil.checkAndNavigate(this, billingViewModel) {
+                    findNavController().navigate(ReferencePasswordFragmentDirections.actionReferencePasswordFragmentToInputPasswordFragment(editData = editData))
+                }
             }
             // 編集
             R.id.action_edit -> {

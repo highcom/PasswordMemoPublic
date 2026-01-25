@@ -100,6 +100,7 @@
     <string name="csv_input_output">Input/Output CSV file</string>
     <string name="csv_input_output_message">Input / Output password data to CSV file</string>
     <string name="select_input_output">Select</string>
+    <string name="select_input_output_paid">Select (Paid)</string>
     <string name="csv_output">Output CSV file</string>
     <string name="csv_output_message">Output password data to CSV file</string>
     <string name="select_color">Background color</string>
@@ -230,4 +231,8 @@
     <string name="restore_failed">Purchase restore failed</string>
     <string name="billing_unavailable">Billing service is unavailable</string>
     <string name="already_purchased">purchased</string>
+
+    <!-- Registration limit dialog -->
+    <string name="registration_limit_title">Registration limit reached</string>
+    <string name="registration_limit_message">You have reached the maximum number of items that can be added for free. \n\nTo remove this restriction and add more entries, please purchase a paid membership.</string>
 </resources>

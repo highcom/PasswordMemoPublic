@@ -17,8 +17,8 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.highcom.passwordmemo.PasswordMemoDrawerActivity
@@ -26,7 +26,9 @@ import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
 import com.highcom.passwordmemo.databinding.FragmentSettingBinding
 import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
+import com.highcom.passwordmemo.ui.list.ColorList
 import com.highcom.passwordmemo.ui.viewmodel.SettingViewModel
+import com.highcom.passwordmemo.ui.viewmodel.BillingViewModel
 import com.highcom.passwordmemo.domain.SelectColorUtil
 import com.highcom.passwordmemo.domain.TextSizeUtil
 import com.highcom.passwordmemo.domain.file.BackupDbFile
@@ -35,8 +37,6 @@ import com.highcom.passwordmemo.domain.file.OutputExternalFile
 import com.highcom.passwordmemo.domain.file.RestoreDbFile
 import com.highcom.passwordmemo.domain.file.SelectInputOutputFileDialog
 import com.highcom.passwordmemo.domain.login.LoginDataManager
-import com.highcom.passwordmemo.ui.list.ColorItem
-import com.highcom.passwordmemo.ui.list.ColorList
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -69,6 +69,8 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
     private var copyClipboardNames: ArrayList<String?>? = null
     /** 設定ビューモデル */
     private val settingViewModel: SettingViewModel by viewModels()
+    /** 課金ビューモデル */
+    private val billingViewModel: BillingViewModel by activityViewModels()
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -180,7 +182,18 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
         binding.dbBackupButton.setOnClickListener { confirmSelectOperation(SelectInputOutputFileDialog.Operation.DB_RESTORE_BACKUP) }
 
         // CSV出力ボタン処理
-        binding.csvOutputButton.setOnClickListener { confirmSelectOperation(SelectInputOutputFileDialog.Operation.CSV_INPUT_OUTPUT) }
+        // BillingViewModel 初期化
+        billingViewModel.initializeBillingManager()
+
+        // 非会員の場合はCSV入出力ボタンを無効化してリソースからラベルを取得する
+        if (!billingViewModel.hasActiveSubscription()) {
+            binding.csvOutputButton.text = getString(R.string.select_input_output_paid)
+            binding.csvOutputButton.isEnabled = false
+        } else {
+            binding.csvOutputButton.text = getString(R.string.select_input_output)
+            binding.csvOutputButton.isEnabled = true
+            binding.csvOutputButton.setOnClickListener { confirmSelectOperation(SelectInputOutputFileDialog.Operation.CSV_INPUT_OUTPUT) }
+        }
 
         // 背景色ボタン処理
         binding.colorSelectButton.setOnClickListener { colorSelectDialog() }
