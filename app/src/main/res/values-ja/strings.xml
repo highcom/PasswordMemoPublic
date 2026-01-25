@@ -230,4 +230,7 @@
     <string name="restore_failed">購入の復元に失敗しました</string>
     <string name="billing_unavailable">課金サービスが利用できません</string>
     <string name="already_purchased">購入済み</string>
+    <!-- Registration limit dialog (Japanese) -->
+    <string name="registration_limit_title">登録件数の上限です</string>
+    <string name="registration_limit_message">無料で追加登録できる件数の上限に達しました。\n\n制限を解除して追加登録するために有料会員への課金が必要です。</string>
 </resources>

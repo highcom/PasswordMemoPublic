@@ -39,8 +39,8 @@ object LimitCheckUtil {
             // 上限に達しているかつ未加入の場合はダイアログを表示
             val ctx = fragment.requireContext()
             val dialog = AlertDialog.Builder(ctx)
-                .setTitle(R.string.membership_plan)
-                .setMessage(getLimitMessage(ctx, count))
+                .setTitle(R.string.registration_limit_title)
+                .setMessage(ctx.getString(R.string.registration_limit_message))
                 .setPositiveButton(R.string.membership_plan) { _, _ ->
                     // どのフラグメントからでも遷移できるよう、宛先 ID で直接遷移する
                     val navOptions = NavOptions.Builder()
@@ -55,10 +55,5 @@ object LimitCheckUtil {
                 .create()
             dialog.show()
         }
-    }
-
-    private fun getLimitMessage(fragmentContext: android.content.Context, count: Int): String {
-        // シンプルなメッセージ
-        return fragmentContext.getString(R.string.membership_plan_message) + "\n\n" + "${count}/$LIMIT"
     }
 }
