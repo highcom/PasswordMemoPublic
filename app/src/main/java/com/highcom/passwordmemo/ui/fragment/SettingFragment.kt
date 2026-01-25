@@ -211,6 +211,11 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
             startActivity(intent)
         }
 
+        // 有料会員プラン処理
+        binding.membershipPlanButton.setOnClickListener {
+            findNavController().navigate(SettingFragmentDirections.actionSettingFragmentToMembershipPlanFragment())
+        }
+
         // テキストサイズを設定する
         setTextSize(loginDataManager.textSize)
     }
@@ -469,6 +474,8 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
         binding.licenseButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
         binding.textPrivacyPolicyView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.privacyPolicyButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.textMembershipPlanView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.membershipPlanButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
     }
 
     /**

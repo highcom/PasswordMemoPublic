@@ -21,6 +21,7 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -33,6 +34,7 @@ import com.highcom.passwordmemo.ui.PasswordEditData
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.domain.AdBanner
 import com.highcom.passwordmemo.domain.login.LoginDataManager
+import com.highcom.passwordmemo.ui.viewmodel.BillingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -53,11 +55,14 @@ class ReferencePasswordFragment : Fragment() {
     @Inject
     lateinit var loginDataManager: LoginDataManager
     /** バナー広告処理 */
-    private var adBanner: AdBanner? = null
+    @Inject
+    lateinit var adBanner: AdBanner
     /** 広告コンテナ */
     private var adContainerView: FrameLayout? = null
     /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels()
+    /** 課金ビューモデル */
+    private val billingViewModel: BillingViewModel by activityViewModels()
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,9 +85,12 @@ class ReferencePasswordFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // BillingViewModelの初期化
+        billingViewModel.initializeBillingManager()
+
         adContainerView = binding.adViewFrameReference
-        adBanner = AdBanner(this, adContainerView)
-        adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_2)) }
+        adContainerView?.post { adBanner.loadBanner(this, adContainerView, getString(R.string.admob_unit_id_2)) }
 
         // ActionBarに戻るボタンを設定
         val activity = requireActivity()

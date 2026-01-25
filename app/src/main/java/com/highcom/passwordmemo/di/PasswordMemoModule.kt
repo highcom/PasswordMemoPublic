@@ -8,6 +8,7 @@ import com.highcom.passwordmemo.data.MIGRATION_2_3
 import com.highcom.passwordmemo.data.MIGRATION_3_4
 import com.highcom.passwordmemo.data.MIGRATION_4_5
 import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
+import com.highcom.passwordmemo.domain.billing.PurchaseManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -82,4 +83,15 @@ object PasswordMemoModule {
     @ActivityRetainedScoped
     @Provides
     fun provideGroupDao(db: PasswordMemoRoomDatabase) = db.groupDao()
+
+    /**
+     * 購入状態管理マネージャープロバイダ
+     *
+     * @param context アプリケーションコンテキスト
+     */
+    @ActivityRetainedScoped
+    @Provides
+    fun providePurchaseManager(
+        @ApplicationContext context: Context
+    ) = PurchaseManager(context)
 }

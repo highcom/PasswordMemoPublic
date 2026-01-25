@@ -20,6 +20,7 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.lifecycleScope
@@ -42,6 +43,7 @@ import com.highcom.passwordmemo.domain.login.LoginDataManager
 import com.highcom.passwordmemo.PasswordMemoDrawerActivity
 import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.ui.list.DrawerGroupListAdapter
+import com.highcom.passwordmemo.ui.viewmodel.BillingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.recruit_mp.android.rmp_appirater.RmpAppirater
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -66,7 +68,8 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     /** スワイプボタン表示用通知ヘルパー */
     private var simpleCallbackHelper: SimpleCallbackHelper? = null
     /** バナー広告処理 */
-    private var adBanner: AdBanner? = null
+    @Inject
+    lateinit var adBanner: AdBanner
     /** 広告コンテナ */
     private var adContainerView: FrameLayout? = null
     /** パスワード一覧表示用リサイクラービュー */
@@ -87,6 +90,8 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     private val passwordListViewModel: PasswordListViewModel by hiltNavGraphViewModels(R.id.passwordmemo_nav_graph)
     /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels()
+    /** 課金ビューモデル */
+    private val billingViewModel: BillingViewModel by activityViewModels()
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,9 +114,12 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // BillingViewModelの初期化
+        billingViewModel.initializeBillingManager()
+
         adContainerView = binding.adViewFrame
-        adBanner = AdBanner(this, adContainerView)
-        adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_1)) }
+        adContainerView?.post { adBanner.loadBanner(this, adContainerView, getString(R.string.admob_unit_id_1)) }
         // ドロワーを操作可能にする
         val activity = requireActivity()
         if (activity is PasswordMemoDrawerActivity) {
@@ -554,7 +562,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        adBanner?.destroy()
+        adBanner.destroy()
     }
 
     /**

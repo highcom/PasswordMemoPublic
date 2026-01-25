@@ -18,6 +18,7 @@ import android.widget.Spinner
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -35,6 +36,7 @@ import com.highcom.passwordmemo.domain.SelectColorUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import com.highcom.passwordmemo.ui.list.ColorItem
 import com.highcom.passwordmemo.ui.list.ColorList
+import com.highcom.passwordmemo.ui.viewmodel.BillingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -54,12 +56,15 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
     /** パスワード編集データ */
     lateinit var passwordEditData: PasswordEditData
     /** バナー広告処理 */
-    private var adBanner: AdBanner? = null
+    @Inject
+    lateinit var adBanner: AdBanner
     /** 広告コンテナ */
     private var adContainerView: FrameLayout? = null
     /** ログインデータ管理 */
     @Inject
     lateinit var loginDataManager: LoginDataManager
+    /** 課金ビューモデル */
+    private val billingViewModel: BillingViewModel by activityViewModels()
     /** グループ選択スピナー */
     private var selectGroupSpinner: Spinner? = null
     /** グループ名称一覧 */
@@ -89,12 +94,14 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
         return binding.root
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // BillingViewModelの初期化
+        billingViewModel.initializeBillingManager()
+
         adContainerView = binding.adViewFrameInput
-        adBanner = AdBanner(this, adContainerView)
-        adContainerView?.post { adBanner?.loadBanner(getString(R.string.admob_unit_id_3)) }
+        adContainerView?.post { adBanner.loadBanner(this, adContainerView, getString(R.string.admob_unit_id_3)) }
         // ActionBarに戻るボタンを設定
         val activity = requireActivity()
         if (activity is PasswordMemoDrawerActivity) {
@@ -259,7 +266,7 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
 
     override fun onDestroyView() {
         super.onDestroyView()
-        adBanner?.destroy()
+        adBanner.destroy()
     }
 
     /**
