@@ -61,6 +61,9 @@ class LoginDataManager @Inject constructor(application: Application) {
     /** 選択グループID */
     var selectGroup: Long = 0
         private set
+    /** ダークモード設定値 */
+    var darkMode = 0
+        private set
 
     init {
         sharedPref = application.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
@@ -86,6 +89,7 @@ class LoginDataManager @Inject constructor(application: Application) {
         textSize = sharedPref.getFloat("textSize", TextSizeUtil.TEXT_SIZE_MEDIUM.toFloat())
         copyClipboard = sharedPref.getInt("copyClipboard", 0)
         selectGroup = sharedPref.getLong("selectGroup", 1)
+        darkMode = sharedPref.getInt("darkMode", 0)
         try {
             masterPassword = passUtil.getMasterPasswordString("masterPassword")
         } catch (e: Exception) {
@@ -191,6 +195,16 @@ class LoginDataManager @Inject constructor(application: Application) {
     fun setSelectGroup(select: Long) {
         sharedPref.edit().putLong("selectGroup", select).apply()
         selectGroup = select
+    }
+
+    /**
+     * ダークモード設定処理
+     *
+     * @param mode ダークモード設定値(0:OFF, 1:ON, 2:AUTO)
+     */
+    fun setDarkMode(mode: Int) {
+        sharedPref.edit().putInt("darkMode", mode).apply()
+        darkMode = mode
     }
 
     /** マスターパスワードが設定されているかどうか */

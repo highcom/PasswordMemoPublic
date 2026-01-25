@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
@@ -36,6 +37,7 @@ import com.highcom.passwordmemo.domain.file.InputExternalFile
 import com.highcom.passwordmemo.domain.file.OutputExternalFile
 import com.highcom.passwordmemo.domain.file.RestoreDbFile
 import com.highcom.passwordmemo.domain.file.SelectInputOutputFileDialog
+import com.highcom.passwordmemo.domain.DarkModeUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -67,6 +69,10 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
     private var copyClipboardSpinner: Spinner? = null
     /** クリップボードコピー設定名 */
     private var copyClipboardNames: ArrayList<String?>? = null
+    /** ダークモード設定用スピナー */
+    private var darkModeSpinner: Spinner? = null
+    /** ダークモード設定名 */
+    private var darkModeNames: ArrayList<String?>? = null
     /** 設定ビューモデル */
     private val settingViewModel: SettingViewModel by viewModels()
     /** 課金ビューモデル */
@@ -107,10 +113,10 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
             requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
 
-        // 背景色を設定する
-        binding.settingView.setBackgroundColor(
-            loginDataManager.backgroundColor
-        )
+        // 背景色を設定する（ダークモード時はテーマの色を優先）
+        if (!DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
+            binding.settingView.setBackgroundColor(loginDataManager.backgroundColor)
+        }
 
         // データ削除スイッチ処理
         val deleteSwitch = binding.deleteSwitch
@@ -173,6 +179,27 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
         copyClipboardSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, i: Int, l: Long) {
                 loginDataManager.setCopyClipboard(i)
+            }
+
+            override fun onNothingSelected(adapterView: AdapterView<*>?) {}
+        }
+
+        // ダークモードスピナー処理
+        darkModeSpinner = binding.darkModeSpinner
+        darkModeNames = ArrayList()
+        darkModeNames?.add(getString(R.string.dark_mode_off))
+        darkModeNames?.add(getString(R.string.dark_mode_on))
+        darkModeNames?.add(getString(R.string.dark_mode_auto))
+        val darkModeAdapter =
+            SetTextSizeAdapter(requireContext(), darkModeNames, loginDataManager.textSize.toInt())
+        darkModeSpinner?.adapter = darkModeAdapter
+        darkModeSpinner?.setSelection(loginDataManager.darkMode)
+        darkModeSpinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(adapterView: AdapterView<*>?, view: View?, i: Int, l: Long) {
+                loginDataManager.setDarkMode(i)
+                // ダークモード設定が変更された場合、アプリを再起動して反映
+                DarkModeUtil.applyDarkMode(requireContext(), i)
+//                restartPasswordMemoActivity()
             }
 
             override fun onNothingSelected(adapterView: AdapterView<*>?) {}
@@ -416,12 +443,42 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
      */
     @SuppressLint("InflateParams")
     private fun operationInstructionDialog() {
-        val alertDialog = AlertDialog.Builder(requireContext())
+        val themeResId = if (DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
+            android.R.style.Theme_DeviceDefault_Dialog
+        } else {
+            android.R.style.Theme_DeviceDefault_Light_Dialog
+        }
+        val alertDialog = AlertDialog.Builder(requireContext(), themeResId)
             .setTitle(R.string.operation_instruction)
             .setView(layoutInflater.inflate(R.layout.alert_operating_instructions, null))
             .setPositiveButton(R.string.close, null)
             .create()
+
+        // タイトル部分の色をダークモードに対応させる
+        alertDialog.setOnShowListener {
+            try {
+                // AlertDialogのタイトル部分の背景色を設定
+                val titleView = alertDialog.findViewById<TextView>(android.R.id.title)
+                if (titleView != null) {
+                    titleView.setTextColor(if (DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
+                        resources.getColor(android.R.color.white, null)
+                    } else {
+                        resources.getColor(android.R.color.black, null)
+                    })
+                    // タイトル部分の背景色も設定
+                    titleView.setBackgroundColor(if (DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
+                        resources.getColor(android.R.color.black, null)
+                    } else {
+                        resources.getColor(android.R.color.white, null)
+                    })
+                }
+            } catch (e: Exception) {
+                // タイトルが見つからない場合は無視
+            }
+        }
+
         alertDialog.show()
+
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
             .setOnClickListener { alertDialog.dismiss() }
     }
@@ -433,9 +490,12 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
      */
     @SuppressLint("ResourceType")
     override fun onSelectColorClicked(color: Int) {
-        // 設定画面の背景色を設定
-        binding.settingView.setBackgroundColor(color)
-        // ドロワー画面の背景色を設定
+        // ダークモード時はテーマの背景色を優先するため、設定画面の背景色は変更しない
+        if (!DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
+            // 設定画面の背景色を設定
+            binding.settingView.setBackgroundColor(color)
+        }
+        // ドロワー画面の背景色を設定（ダークモード時も適用）
         val activity = requireActivity()
         if (activity is PasswordMemoDrawerActivity) {
             activity.setBackgroundColor(color)
@@ -479,6 +539,10 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
         binding.colorSelectButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
         binding.textMasterPasswordView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.masterPasswordSetButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.textDarkModeView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        val darkModeAdapter = SetTextSizeAdapter(requireContext(), darkModeNames, size.toInt())
+        darkModeSpinner?.adapter = darkModeAdapter
+        darkModeSpinner?.setSelection(loginDataManager.darkMode)
         binding.textOperationInstructionView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.operationInstructionButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
         binding.textRateView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)

@@ -42,7 +42,6 @@
             android:imeOptions="flagNoExtractUi"
             android:background="#00000000"
             android:gravity="center_vertical"
-            android:textColor="@android:color/black"
             android:text="@={groupEntity.name}"
             android:textSize="15dp" />
 

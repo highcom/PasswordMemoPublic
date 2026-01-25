@@ -24,7 +24,6 @@
             android:text="@string/data_deletion_enable"
             android:textSize="15dp"
             android:checked="false"
-            android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -60,7 +59,6 @@
             android:text="@string/login_biometrics_enable"
             android:textSize="15dp"
             android:checked="true"
-            android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/delete_text_view"
@@ -96,7 +94,6 @@
             android:text="@string/display_background_enable"
             android:textSize="15dp"
             android:checked="false"
-            android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_biometric_login"
@@ -132,7 +129,6 @@
             android:text="@string/memo_visible_enable"
             android:textSize="15dp"
             android:checked="false"
-            android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_display_background"
@@ -168,7 +164,6 @@
             android:text="@string/password_visible_enable"
             android:textSize="15dp"
             android:checked="false"
-            android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_text_visible"
@@ -203,7 +198,6 @@
             android:text="@string/text_size"
             android:textSize="15dp"
             android:layout_weight="1"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/text_size_spinner" />
 
@@ -249,7 +243,6 @@
             android:text="@string/copy_clipboard"
             android:textSize="15dp"
             android:layout_weight="1"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/copy_clipboard_spinner" />
 
@@ -294,7 +287,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/db_input_output"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/db_backup_button" />
 
@@ -338,7 +330,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/csv_input_output"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/csv_output_button" />
 
@@ -382,7 +373,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/select_color"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/color_select_button" />
 
@@ -426,7 +416,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/change_master_password"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/master_password_set_button" />
 
@@ -462,6 +451,49 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/color_select_button" />
 
+        <TextView
+            android:id="@+id/text_dark_mode_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/dark_mode"
+            android:textSize="15dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/dark_mode_spinner" />
+
+        <TextView
+            android:id="@+id/text_dark_mode_detail_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/dark_mode_message"
+            android:textSize="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_dark_mode_view" />
+
+        <View
+            android:id="@+id/text_dark_mode_detail_view_line"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"
+            android:layout_marginVertical="2dp"
+            android:layout_marginRight="110dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_dark_mode_detail_view" />
+
+        <Spinner
+            android:id="@+id/dark_mode_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/output"
+            android:layout_gravity="center_vertical"
+            android:gravity="right"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_master_password_detail_view" />
+
         <View
             android:id="@+id/setting_separate_line"
             android:layout_width="match_parent"
@@ -470,7 +502,7 @@
             android:layout_marginVertical="20dp"
             android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/master_password_set_button" />
+            app:layout_constraintTop_toBottomOf="@+id/text_dark_mode_detail_view" />
 
         <TextView
             android:id="@+id/text_membership_plan_view"
@@ -525,7 +557,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/operation_instruction"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/operation_instruction_button" />
 
@@ -569,7 +600,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/rate"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/rate_button" />
 
@@ -623,7 +653,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/license"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/license_button" />
 
@@ -668,7 +697,6 @@
             android:layout_marginTop="8dp"
             android:text="@string/privacy_policy"
             android:textSize="15dp"
-            android:textColor="@android:color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/privacy_policy_button" />
 

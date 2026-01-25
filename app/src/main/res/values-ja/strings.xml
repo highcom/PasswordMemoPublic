@@ -108,6 +108,11 @@
     <string name="output">出力</string>
     <string name="change_master_password">マスターパスワードの変更</string>
     <string name="change_master_password_message">ログイン時のマスターパスワードを変更</string>
+    <string name="dark_mode">ダークモード</string>
+    <string name="dark_mode_message">ダークモードのON/OFFと自動適用を設定</string>
+    <string name="dark_mode_off">OFF</string>
+    <string name="dark_mode_on">ON</string>
+    <string name="dark_mode_auto">AUTO</string>
     <string name="operation_instruction">操作説明</string>
     <string name="operation_instruction_message">このアプリの簡単な操作説明を表示</string>
     <string name="close">閉じる</string>

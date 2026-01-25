@@ -108,6 +108,11 @@
     <string name="output">output</string>
     <string name="change_master_password">Change master password</string>
     <string name="change_master_password_message">Change master password at login</string>
+    <string name="dark_mode">Dark mode</string>
+    <string name="dark_mode_message">Configure dark mode ON/OFF and automatic application</string>
+    <string name="dark_mode_off">OFF</string>
+    <string name="dark_mode_on">ON</string>
+    <string name="dark_mode_auto">AUTO</string>
     <string name="operation_instruction">Operating instructions</string>
     <string name="operation_instruction_message">Show a brief operating instructions of this app.</string>
     <string name="close">Close</string>

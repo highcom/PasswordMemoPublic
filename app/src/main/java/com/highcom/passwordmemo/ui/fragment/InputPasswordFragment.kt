@@ -32,6 +32,7 @@ import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
 import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.ui.viewmodel.PasswordListViewModel
 import com.highcom.passwordmemo.domain.AdBanner
+import com.highcom.passwordmemo.domain.DarkModeUtil
 import com.highcom.passwordmemo.domain.SelectColorUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import com.highcom.passwordmemo.ui.list.ColorItem
@@ -230,8 +231,11 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
     @SuppressLint("ResourceType")
     override fun onStart() {
         super.onStart()
-        // 背景色を設定する
-        binding.inputPasswordView.setBackgroundColor(loginDataManager.backgroundColor)
+
+        // 背景色を設定する（ダークモード時はテーマの色を優先）
+        if (!DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
+            binding.inputPasswordView.setBackgroundColor(loginDataManager.backgroundColor)
+        }
         // テキストサイズを設定する
         setTextSize(loginDataManager.textSize)
     }

@@ -13,6 +13,7 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.highcom.passwordmemo.databinding.ActivityPasswordMemoDrawerBinding
+import com.highcom.passwordmemo.domain.DarkModeUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -45,7 +46,16 @@ class PasswordMemoDrawerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setTheme(R.style.AppTheme)
+        // ダークモード設定を適用
+        DarkModeUtil.applyDarkMode(this, loginDataManager.darkMode)
+
+        // テーマを設定（ダークモード設定に基づいて適切なテーマを選択）
+        val themeResId = if (DarkModeUtil.isDarkModeEnabled(this, loginDataManager.darkMode)) {
+            R.style.AppTheme_Dark
+        } else {
+            R.style.AppTheme
+        }
+        setTheme(themeResId)
         binding = ActivityPasswordMemoDrawerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -53,6 +63,12 @@ class PasswordMemoDrawerActivity : AppCompatActivity() {
         // Drawer Layoutの設定
         drawerLayout = binding.drawerLayout
         toolBar = binding.appBarPasswordMemoDrawer.toolbar
+        // ToolbarのpopupThemeを設定（ダークモード対応）
+        toolBar.popupTheme = if (DarkModeUtil.isDarkModeEnabled(this, loginDataManager.darkMode)) {
+            R.style.AppTheme_Dark_PopupOverlay
+        } else {
+            R.style.AppTheme_PopupOverlay
+        }
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         toggle = ActionBarDrawerToggle(this, drawerLayout,
             binding.appBarPasswordMemoDrawer.toolbar,
@@ -70,8 +86,17 @@ class PasswordMemoDrawerActivity : AppCompatActivity() {
         }
         // グループ一覧
         drawerGroupList = binding.groupListViewInsideNav
-        // 背景色を設定する
-        binding.drawerListView.setBackgroundColor(loginDataManager.backgroundColor)
+        // 背景色を設定する（ダークモード時はテーマの色を優先）
+        if (!DarkModeUtil.isDarkModeEnabled(this, loginDataManager.darkMode)) {
+            binding.drawerListView.setBackgroundColor(loginDataManager.backgroundColor)
+            // ナビゲーションヘッダーの背景色も設定（ライトモード時は青色）
+            binding.navHeader.root.setBackgroundColor(resources.getColor(R.color.blue, null))
+        } else {
+            // ダークモード時はテーマの背景色を設定
+            binding.drawerListView.setBackgroundColor(resources.getColor(android.R.color.black, null))
+            // ナビゲーションヘッダーの背景色もダークモード用に設定
+            binding.navHeader.root.setBackgroundColor(resources.getColor(R.color.blue, null))
+        }
 
         // Firebaseの設定
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
@@ -93,7 +118,15 @@ class PasswordMemoDrawerActivity : AppCompatActivity() {
      * @param color 設定する背景色
      */
     fun setBackgroundColor(color: Int) {
-        binding.drawerListView.setBackgroundColor(color)
+        // ダークモード時はテーマの色を優先
+        if (!DarkModeUtil.isDarkModeEnabled(this, loginDataManager.darkMode)) {
+            binding.drawerListView.setBackgroundColor(color)
+        } else {
+            // ダークモード時はテーマの背景色を設定
+            binding.drawerListView.setBackgroundColor(resources.getColor(android.R.color.black, null))
+        }
+        // ナビゲーションヘッダーの背景色は常に青色を維持
+        binding.navHeader.root.setBackgroundColor(resources.getColor(R.color.blue, null))
     }
 
     /**
