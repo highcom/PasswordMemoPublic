@@ -221,13 +221,13 @@
     <string name="membership_plan_message">Access premium features and remove ads</string>
     <string name="membership_plan_title">Membership Plans</string>
     <string name="monthly_subscription">Monthly Subscription</string>
-    <string name="monthly_subscription_price">¥500/month</string>
+    <string name="monthly_subscription_price">No ads/Unlimited registration/CSV function unlocked</string>
     <string name="half_year_subscription">Half Year Subscription</string>
-    <string name="half_year_subscription_price">¥2,500/half year</string>
+    <string name="half_year_subscription_price">No ads/Unlimited registration/CSV function unlocked</string>
     <string name="yearly_subscription">Yearly Subscription</string>
-    <string name="yearly_subscription_price">¥4,500/year</string>
+    <string name="yearly_subscription_price">No ads/Unlimited registration/CSV function unlocked</string>
     <string name="remove_ads_one_time">Remove Ads (One-time)</string>
-    <string name="remove_ads_one_time_price">¥2,000</string>
+    <string name="remove_ads_one_time_price">Ad-free only applies forever</string>
     <string name="purchase">Purchase</string>
     <string name="restore_purchase">Restore Purchase</string>
     <string name="purchase_success">Purchase completed successfully</string>
