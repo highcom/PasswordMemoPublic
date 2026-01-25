@@ -2,7 +2,6 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/membership_plan_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -12,7 +11,7 @@
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <!-- Monthly Subscription -->
         <TextView
@@ -22,8 +21,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/monthly_subscription"
-            android:textSize="15dp"
-            android:textColor="@android:color/black"
+            android:textSize="15sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -33,7 +31,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/monthly_subscription_price"
-            android:textSize="12dp"
+            android:textSize="12sp"
+            android:textColor="@color/darkgray"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_monthly_subscription_title" />
 
@@ -43,7 +42,7 @@
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
-            android:layout_marginRight="110dp"
+            android:layout_marginEnd="110dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_monthly_subscription_price" />
 
@@ -66,8 +65,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/half_year_subscription"
-            android:textSize="15dp"
-            android:textColor="@android:color/black"
+            android:textSize="15sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/half_year_subscription_button" />
 
@@ -77,7 +75,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/half_year_subscription_price"
-            android:textSize="12dp"
+            android:textSize="12sp"
+            android:textColor="@color/darkgray"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_half_year_subscription_title" />
 
@@ -87,7 +86,7 @@
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
-            android:layout_marginRight="110dp"
+            android:layout_marginEnd="110dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_half_year_subscription_price" />
 
@@ -111,8 +110,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/yearly_subscription"
-            android:textSize="15dp"
-            android:textColor="@android:color/black"
+            android:textSize="15sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/yearly_subscription_button" />
 
@@ -122,7 +120,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/yearly_subscription_price"
-            android:textSize="12dp"
+            android:textSize="12sp"
+            android:textColor="@color/darkgray"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_yearly_subscription_title" />
 
@@ -132,7 +131,7 @@
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
-            android:layout_marginRight="110dp"
+            android:layout_marginEnd="110dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_yearly_subscription_price" />
 
@@ -156,8 +155,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/remove_ads_one_time"
-            android:textSize="15dp"
-            android:textColor="@android:color/black"
+            android:textSize="15sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/remove_ads_button" />
 
@@ -167,7 +165,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/remove_ads_one_time_price"
-            android:textSize="12dp"
+            android:textSize="12sp"
+            android:textColor="@color/darkgray"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_remove_ads_title" />
 
@@ -177,7 +176,7 @@
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
-            android:layout_marginRight="110dp"
+            android:layout_marginEnd="110dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_remove_ads_price" />
 
@@ -201,8 +200,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/restore_purchase"
-            android:textSize="15dp"
-            android:textColor="@android:color/black"
+            android:textSize="15sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/restore_purchase_button" />
 
@@ -212,7 +210,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/membership_plan_message"
-            android:textSize="12dp"
+            android:textSize="12sp"
+            android:textColor="@color/darkgray"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_restore_purchase_title" />
 
@@ -222,7 +221,7 @@
             android:layout_height="1dp"
             android:background="@color/gray"
             android:layout_marginVertical="2dp"
-            android:layout_marginRight="110dp"
+            android:layout_marginEnd="110dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_restore_purchase_description" />
 

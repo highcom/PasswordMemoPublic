@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.highcom.passwordmemo.PasswordMemoDrawerActivity
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.databinding.FragmentMembershipPlanBinding
+import com.highcom.passwordmemo.domain.DarkModeUtil
 import com.highcom.passwordmemo.domain.billing.BillingManager
 import com.highcom.passwordmemo.domain.billing.PurchaseManager
 import com.highcom.passwordmemo.domain.login.LoginDataManager
@@ -67,10 +68,10 @@ class MembershipPlanFragment : Fragment() {
             }
         }
 
-        // 背景色を設定する
-        binding.membershipPlanView.setBackgroundColor(
-            loginDataManager.backgroundColor
-        )
+        // 背景色を設定する（ダークモード時はテーマの色を優先）
+        if (!DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
+            binding.membershipPlanView.setBackgroundColor(loginDataManager.backgroundColor)
+        }
 
         // BillingViewModelの初期化
         billingViewModel.initializeBillingManager()
