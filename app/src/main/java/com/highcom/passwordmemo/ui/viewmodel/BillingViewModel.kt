@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.highcom.passwordmemo.domain.billing.BillingManager
 import com.highcom.passwordmemo.domain.billing.PurchaseManager
+import com.highcom.passwordmemo.data.PasswordMemoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -29,7 +30,8 @@ sealed class PurchaseEvent {
 @HiltViewModel
 class BillingViewModel @Inject constructor(
     application: Application,
-    private val purchaseManager: PurchaseManager
+    private val purchaseManager: PurchaseManager,
+    private val repository: PasswordMemoRepository
 ) : AndroidViewModel(application) {
 
     // BillingManager
@@ -138,6 +140,13 @@ class BillingViewModel @Inject constructor(
      */
     fun hasActiveSubscription(): Boolean {
         return purchaseManager.hasActiveSubscription()
+    }
+
+    /**
+     * パスワード総件数を取得（SettingViewModel を渡さずにここで取得できるようにするため）
+     */
+    suspend fun getPasswordCount(): Int {
+        return repository.getPasswordCount()
     }
 
     override fun onCleared() {

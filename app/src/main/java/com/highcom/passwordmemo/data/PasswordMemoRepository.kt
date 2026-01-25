@@ -29,6 +29,13 @@ class PasswordMemoRepository @Inject constructor(private val passwordDao: Passwo
     }
 
     /**
+     * パスワード総件数取得
+     */
+    suspend fun getPasswordCount(): Int {
+        return passwordDao.getPasswordCount()
+    }
+
+    /**
      * パスワードデータ追加
      *
      * @param passwordEntity パスワードデータ

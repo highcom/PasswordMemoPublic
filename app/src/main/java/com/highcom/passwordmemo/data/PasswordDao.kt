@@ -30,6 +30,12 @@ interface PasswordDao {
     fun getSelectGroupPasswordList(groupId: Long): Flow<List<PasswordEntity>>
 
     /**
+     * パスワードデータの総件数を取得
+     */
+    @Query("SELECT COUNT(*) FROM passworddata")
+    suspend fun getPasswordCount(): Int
+
+    /**
      * パスワードデータ追加
      *
      * @param passwordEntity パスワードデータ
