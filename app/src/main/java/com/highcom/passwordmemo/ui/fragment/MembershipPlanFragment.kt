@@ -23,6 +23,8 @@ import com.highcom.passwordmemo.ui.viewmodel.PurchaseEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 
 /**
  * 有料会員プラン画面フラグメント
@@ -203,7 +205,13 @@ class MembershipPlanFragment : Fragment() {
      * SnackBarを表示
      */
     private fun showSnackBar(message: String) {
-        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
+        val snack = Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
+        // Snackbar のメッセージテキストの TextView を取得して色を強制
+        val textView = snack.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+        textView?.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary_dark))
+        // アクションテキストも同じ色にしておく
+        snack.setActionTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary_dark))
+        snack.show()
     }
 
     /**

@@ -37,6 +37,7 @@ import com.highcom.passwordmemo.ui.viewmodel.GroupListViewModel
 import com.highcom.passwordmemo.domain.AdBanner
 import com.highcom.passwordmemo.domain.DarkModeUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
+import com.highcom.passwordmemo.ui.extension.showThemedSnackBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -227,11 +228,9 @@ class ReferencePasswordFragment : Fragment() {
         // クリップボードへの格納成功時は成功メッセージをトーストで表示
         val result = setClipData(allText)
         if (result) {
-            Snackbar.make(view, getString(R.string.copy_clipboard_success), Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+            view.showThemedSnackBar(getString(R.string.copy_clipboard_success), Snackbar.LENGTH_LONG)
         } else {
-            Snackbar.make(view, getString(R.string.copy_clipboard_failure), Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+            view.showThemedSnackBar(getString(R.string.copy_clipboard_failure), Snackbar.LENGTH_LONG)
         }
     }
 
