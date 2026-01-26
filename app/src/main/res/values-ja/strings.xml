@@ -236,6 +236,13 @@
     <string name="restore_failed">購入の復元に失敗しました</string>
     <string name="billing_unavailable">課金サービスが利用できません</string>
     <string name="already_purchased">購入済み</string>
+
+    <!-- About Membership (Japanese) -->
+    <string name="about_membership_title">有料会員プランについて</string>
+    <string name="about_membership_description">有料会員プランで利用可能な機能について説明</string>
+    <string name="membership_plan_dialog_title">有料会員プランとは</string>
+    <string name="membership_plan_dialog_description">・全ての画面にて広告が非表示になります。\n・登録データが100件以上でも追加登録が無制限になります。\n・CSVファイル入出力機能が解放されます。\n\n・広告の非表示の買い切りプランは１度の購入で広告の非表示のみが永続します。</string>
+
     <!-- Registration limit dialog (Japanese) -->
     <string name="registration_limit_title">登録件数の上限です</string>
     <string name="registration_limit_message">無料で追加登録できる件数の上限に達しました。\n\n制限を解除して追加登録するために有料会員への課金が必要です。</string>

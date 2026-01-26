@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.snackbar.Snackbar
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -131,6 +132,11 @@ class MembershipPlanFragment : Fragment() {
             billingViewModel.restorePurchases()
         }
 
+        // 有料会員についてボタン処理
+        binding.aboutMembershipButton.setOnClickListener {
+            showAboutMembershipDialog()
+        }
+
         // ボタンの初期状態を設定
         updateButtonStates()
 
@@ -225,6 +231,10 @@ class MembershipPlanFragment : Fragment() {
         // 購入復元
         binding.textRestorePurchaseTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.restorePurchaseButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+
+        // 有料会員について
+        binding.textAboutMembershipTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.aboutMembershipButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
     }
 
     /**
@@ -250,5 +260,16 @@ class MembershipPlanFragment : Fragment() {
                 showSnackBar(getString(R.string.billing_unavailable))
             }
         }
+    }
+
+    /**
+     * 有料会員プランについての説明
+     */
+    private fun showAboutMembershipDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.membership_plan_dialog_title))
+            .setMessage(getString(R.string.membership_plan_dialog_description))
+            .setPositiveButton(R.string.ok, null)
+            .show()
     }
 }

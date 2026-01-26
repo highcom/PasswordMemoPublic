@@ -237,5 +237,50 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_remove_ads_line" />
 
+        <!-- About Membership Plan (new) -->
+        <TextView
+            android:id="@+id/text_about_membership_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/about_membership_title"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/about_membership_button" />
+
+        <TextView
+            android:id="@+id/text_about_membership_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/about_membership_description"
+            android:textSize="12sp"
+            android:textColor="@color/darkgray"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_about_membership_title" />
+
+        <View
+            android:id="@+id/text_about_membership_line"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"
+            android:layout_marginVertical="2dp"
+            android:layout_marginEnd="110dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_about_membership_description" />
+
+        <Button
+            android:id="@+id/about_membership_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/original_button"
+            android:text="@string/view"
+            android:textColor="@color/blue"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_restore_purchase_line" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
