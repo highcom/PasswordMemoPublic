@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="clear">#00FFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="cream">#E7E18F</color>
+    <!-- ダークモードでのblue色を0053adに変更 -->
+    <color name="blue">#0053ad</color>
+    <color name="gray">#CCCCCC</color>
+    <color name="green">#93FFE0</color>
+    <color name="deepgreen">#21FFC0</color>
+
+    <color name="darkgray">#888888</color>
+
+    <color name="underlay_red">#FF3C30</color>
+    <color name="underlay_gray">#C7C7CB</color>
+
+    <color name="lightgray">#d3d3d3</color>
+    <color name="lightcyan">#e0ffff</color>
+    <color name="lavender">#e6e6fa</color>
+    <color name="bisque">#ffe4c4</color>
+    <color name="pink">#ffc0cb</color>
+    <color name="palegoldenrod">#eee8aa</color>
+    <color name="palegreen">#98fb98</color>
+
+    <color name="safe_red">#ff4b00</color>
+    <color name="safe_yellow_red">#f6aa00</color>
+    <color name="safe_yellow">#f2e700</color>
+    <color name="safe_green">#00b06b</color>
+    <color name="safe_blue">#1971ff</color>
+    <color name="safe_purple">#990099</color>
+
+    <!-- テキスト色 -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_primary_dark">#FFFFFF</color>
+
+    <!-- ドロワー背景色 -->
+    <color name="drawer_background">#000000</color>
+    <color name="drawer_background_dark">#000000</color>
+</resources>

@@ -1,0 +1,63 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme for dark mode. -->
+    <style name="AppTheme" parent="Theme.AppCompat">
+        <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:targetApi="35">true</item>
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/blue</item>
+        <item name="colorPrimaryDark">@color/blue</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <!-- Remove global android:textColor to avoid forcing color on every widget -->
+        <!-- Instead, set a default TextView style so only TextView uses text_primary -->
+        <item name="android:textViewStyle">@style/Widget.App.TextView</item>
+        <!-- Ensure Snackbar uses our custom style -->
+        <item name="snackbarStyle">@style/Widget.App.Snackbar</item>
+        <item name="android:colorBackground">@android:color/black</item>
+    </style>
+
+    <style name="SplashTheme" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/splash</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
+
+    <style name="AppTheme.Dark" parent="Theme.AppCompat">
+        <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:targetApi="35">true</item>
+        <item name="colorPrimary">@color/blue</item>
+        <item name="colorPrimaryDark">@color/blue</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:colorBackground">@android:color/black</item>
+        <!-- Dark theme: use dark text color for TextView by default -->
+        <item name="android:textViewStyle">@style/Widget.App.TextView.Dark</item>
+        <item name="snackbarStyle">@style/Widget.App.Snackbar.Dark</item>
+    </style>
+
+    <style name="AppTheme.Dark.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.Dark.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
+
+    <!-- TextView specific styles: only TextView will get these default text colors -->
+    <style name="Widget.App.TextView" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <style name="Widget.App.TextView.Dark" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/text_primary_dark</item>
+    </style>
+
+    <!-- Snackbar styles: set the message and action text color to text_primary_dark -->
+    <style name="Widget.App.Snackbar" parent="Widget.Design.Snackbar">
+        <!-- message text color (snackbar_text) -->
+        <item name="android:textColor">@color/text_primary_dark</item>
+        <!-- action text color will use the same color by default -->
+    </style>
+
+    <style name="Widget.App.Snackbar.Dark" parent="Widget.Design.Snackbar">
+        <item name="android:textColor">@color/text_primary_dark</item>
+    </style>
+</resources>
