@@ -4,7 +4,6 @@ import android.util.DisplayMetrics
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.ads.AdRequest
@@ -43,8 +42,8 @@ class AdBanner @Inject constructor(
         currentUnitId = unitId
 
         // 広告状態の変更を監視
-        fragment.lifecycleScope.launch {
-            fragment.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        fragment.viewLifecycleOwner.lifecycleScope.launch {
+            fragment.viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 purchaseManager.adsRemovedFlow.collect { adsRemoved ->
                     updateAdVisibility(adsRemoved)
                 }
@@ -60,6 +59,9 @@ class AdBanner @Inject constructor(
      */
     private fun updateAdVisibility(adsRemoved: Boolean) {
         val fragment = currentFragment ?: return
+        if (!fragment.isAdded) {
+            return
+        }
         val adContainerView = currentAdContainerView ?: return
         val unitId = currentUnitId ?: return
 
@@ -73,11 +75,12 @@ class AdBanner @Inject constructor(
         } else {
             // 広告を表示
             if (currentAdView == null) {
-                currentAdView = AdView(fragment.requireContext())
+                val context = fragment.context ?: return
+                currentAdView = AdView(context)
                 currentAdView?.adUnitId = unitId
                 adContainerView.removeAllViews()
                 adContainerView.addView(currentAdView)
-                val adSize = adSize(fragment, adContainerView)
+                val adSize = adSize(fragment, adContainerView) ?: return
                 currentAdView?.setAdSize(adSize)
                 val adRequest = AdRequest.Builder().build()
                 currentAdView?.loadAd(adRequest)
@@ -87,9 +90,10 @@ class AdBanner @Inject constructor(
 
     /** 広告サイズ設定 */
     @Suppress("DEPRECATION")
-    private fun adSize(fragment: Fragment, adContainerView: FrameLayout?): AdSize {
+    private fun adSize(fragment: Fragment, adContainerView: FrameLayout?): AdSize? {
+        val activity = fragment.activity ?: return null
         // Determine the screen width (less decorations) to use for the ad width.
-        val display = fragment.requireActivity().windowManager.defaultDisplay
+        val display = activity.windowManager.defaultDisplay
         val outMetrics = DisplayMetrics()
         display.getMetrics(outMetrics)
         val density = outMetrics.density
@@ -100,7 +104,8 @@ class AdBanner @Inject constructor(
             adWidthPixels = outMetrics.widthPixels.toFloat()
         }
         val adWidth = (adWidthPixels / density).toInt()
-        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(fragment.requireContext(), adWidth)
+        val context = fragment.context ?: return null
+        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, adWidth)
     }
 
     /**
