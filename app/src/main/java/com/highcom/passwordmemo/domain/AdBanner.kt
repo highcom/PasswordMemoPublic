@@ -91,20 +91,17 @@ class AdBanner @Inject constructor(
     /** 広告サイズ設定 */
     @Suppress("DEPRECATION")
     private fun adSize(fragment: Fragment, adContainerView: FrameLayout?): AdSize? {
-        val activity = fragment.activity ?: return null
+        val context = fragment.context ?: return null // activityの代わりにcontextを使用
         // Determine the screen width (less decorations) to use for the ad width.
-        val display = activity.windowManager.defaultDisplay
-        val outMetrics = DisplayMetrics()
-        display.getMetrics(outMetrics)
-        val density = outMetrics.density
+        val displayMetrics = context.resources.displayMetrics
+        val density = displayMetrics.density
         var adWidthPixels = adContainerView?.width?.toFloat() ?: 0f
 
         // If the ad hasn't been laid out, default to the full screen width.
         if (adWidthPixels == 0f) {
-            adWidthPixels = outMetrics.widthPixels.toFloat()
+            adWidthPixels = displayMetrics.widthPixels.toFloat()
         }
         val adWidth = (adWidthPixels / density).toInt()
-        val context = fragment.context ?: return null
         return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, adWidth)
     }
 
