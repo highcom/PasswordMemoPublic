@@ -121,7 +121,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         billingViewModel.initializeBillingManager()
 
         adContainerView = binding.adViewFrame
-        adContainerView?.post { adBanner.loadBanner(this, adContainerView, getString(R.string.admob_unit_id_1)) }
+        adContainerView?.post { adBanner.loadBanner(viewLifecycleOwner, requireContext(), adContainerView, getString(R.string.admob_unit_id_1)) }
         // ドロワーを操作可能にする
         val activity = requireActivity()
         if (activity is PasswordMemoDrawerActivity) {

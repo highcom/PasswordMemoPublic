@@ -1,9 +1,10 @@
 package com.highcom.passwordmemo.domain
 
+import android.content.Context
 import android.util.DisplayMetrics
 import android.widget.FrameLayout
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.ads.AdRequest
@@ -22,7 +23,7 @@ class AdBanner @Inject constructor(
     private val purchaseManager: PurchaseManager
 ) {
     private var currentAdView: AdView? = null
-    private var currentFragment: Fragment? = null
+    private var currentContext: Context? = null
     private var currentAdContainerView: FrameLayout? = null
     private var currentUnitId: String? = null
     /** 広告ビュー */
@@ -31,19 +32,20 @@ class AdBanner @Inject constructor(
     /**
      * バナー広告ロード処理
      *
-     * @param fragment 広告表示対象フラグメント
+     * @param lifecycleOwner ライフサイクルオーナー
+     * @param context コンテキスト
      * @param adContainerView 広告用コンテナ
      * @param unitId 広告ユニットID
      */
-    fun loadBanner(fragment: Fragment, adContainerView: FrameLayout?, unitId: String) {
+    fun loadBanner(lifecycleOwner: LifecycleOwner, context: Context, adContainerView: FrameLayout?, unitId: String) {
         // 現在の情報を保存
-        currentFragment = fragment
+        currentContext = context
         currentAdContainerView = adContainerView
         currentUnitId = unitId
 
         // 広告状態の変更を監視
-        fragment.viewLifecycleOwner.lifecycleScope.launch {
-            fragment.viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        lifecycleOwner.lifecycleScope.launch {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 purchaseManager.adsRemovedFlow.collect { adsRemoved ->
                     updateAdVisibility(adsRemoved)
                 }
@@ -58,12 +60,9 @@ class AdBanner @Inject constructor(
      * 広告の表示・非表示を更新
      */
     private fun updateAdVisibility(adsRemoved: Boolean) {
-        val fragment = currentFragment ?: return
-        if (!fragment.isAdded) {
-            return
-        }
         val adContainerView = currentAdContainerView ?: return
         val unitId = currentUnitId ?: return
+        val context = currentContext ?: return
 
         if (adsRemoved) {
             // 広告を非表示
@@ -75,12 +74,11 @@ class AdBanner @Inject constructor(
         } else {
             // 広告を表示
             if (currentAdView == null) {
-                val context = fragment.context ?: return
                 currentAdView = AdView(context)
                 currentAdView?.adUnitId = unitId
                 adContainerView.removeAllViews()
                 adContainerView.addView(currentAdView)
-                val adSize = adSize(fragment, adContainerView) ?: return
+                val adSize = adSize(context, adContainerView) ?: return
                 currentAdView?.setAdSize(adSize)
                 val adRequest = AdRequest.Builder().build()
                 currentAdView?.loadAd(adRequest)
@@ -90,8 +88,7 @@ class AdBanner @Inject constructor(
 
     /** 広告サイズ設定 */
     @Suppress("DEPRECATION")
-    private fun adSize(fragment: Fragment, adContainerView: FrameLayout?): AdSize? {
-        val context = fragment.context ?: return null // activityの代わりにcontextを使用
+    private fun adSize(context: Context, adContainerView: FrameLayout?): AdSize? {
         // Determine the screen width (less decorations) to use for the ad width.
         val displayMetrics = context.resources.displayMetrics
         val density = displayMetrics.density

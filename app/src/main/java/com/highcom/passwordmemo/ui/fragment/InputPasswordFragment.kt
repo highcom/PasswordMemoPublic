@@ -102,7 +102,7 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
         billingViewModel.initializeBillingManager()
 
         adContainerView = binding.adViewFrameInput
-        adContainerView?.post { adBanner.loadBanner(this, adContainerView, getString(R.string.admob_unit_id_3)) }
+        adContainerView?.post { adBanner.loadBanner(viewLifecycleOwner, requireContext(), adContainerView, getString(R.string.admob_unit_id_3)) }
         // ActionBarに戻るボタンを設定
         val activity = requireActivity()
         if (activity is PasswordMemoDrawerActivity) {

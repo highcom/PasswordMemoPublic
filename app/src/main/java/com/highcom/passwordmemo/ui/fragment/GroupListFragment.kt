@@ -101,7 +101,7 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
         billingViewModel.initializeBillingManager()
 
         adContainerView = binding.adViewGroupFrame
-        adContainerView?.post { adBanner.loadBanner(this, adContainerView, getString(R.string.admob_unit_id_4)) }
+        adContainerView?.post { adBanner.loadBanner(viewLifecycleOwner, requireContext(), adContainerView, getString(R.string.admob_unit_id_4)) }
         requireActivity().title = getString(R.string.group_title) + getString(R.string.group_title_edit)
         // ActionBarに戻るボタンを設定
         val activity = requireActivity()
@@ -281,7 +281,7 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        adBanner?.destroy()
+        adBanner.destroy()
     }
 
     /**

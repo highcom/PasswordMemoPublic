@@ -93,7 +93,7 @@ class ReferencePasswordFragment : Fragment() {
         billingViewModel.initializeBillingManager()
 
         adContainerView = binding.adViewFrameReference
-        adContainerView?.post { adBanner.loadBanner(this, adContainerView, getString(R.string.admob_unit_id_2)) }
+        adContainerView?.post { adBanner.loadBanner(viewLifecycleOwner, requireContext(), adContainerView, getString(R.string.admob_unit_id_2)) }
 
         // ActionBarに戻るボタンを設定
         val activity = requireActivity()
@@ -263,7 +263,7 @@ class ReferencePasswordFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        adBanner?.destroy()
+        adBanner.destroy()
     }
 
     /**
