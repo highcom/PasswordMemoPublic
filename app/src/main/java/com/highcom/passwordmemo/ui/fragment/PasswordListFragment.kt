@@ -340,7 +340,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         val searchView = searchMenuItem.actionView as SearchView?
         // Use platform AutoCompleteTextView instead of SearchView.SearchAutoComplete to avoid
         // library group access restrictions when referencing the inner class.
-        val searchAutoComplete = searchView?.findViewById<android.widget.AutoCompleteTextView>(androidx.appcompat.R.id.search_src_text)
+        val searchAutoComplete = searchView?.findViewById<android.widget.AutoCompleteTextView>(R.id.search_src_text)
         searchAutoComplete?.setHintTextColor(Color.rgb(0xff, 0xff, 0xff))
         searchAutoComplete?.hint = getString(R.string.search_text_message)
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
