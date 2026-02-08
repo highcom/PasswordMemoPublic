@@ -75,6 +75,13 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
     /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels()
 
+    private val adLoader = Runnable {
+        if (view == null) return@Runnable
+        adContainerView?.let {
+            adBanner.loadBanner(viewLifecycleOwner, requireContext(), it, getString(R.string.admob_unit_id_4))
+        }
+    }
+
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,7 +108,7 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
         billingViewModel.initializeBillingManager()
 
         adContainerView = binding.adViewGroupFrame
-        adContainerView?.post { adBanner.loadBanner(viewLifecycleOwner, requireContext(), adContainerView, getString(R.string.admob_unit_id_4)) }
+        adContainerView?.post(adLoader)
         requireActivity().title = getString(R.string.group_title) + getString(R.string.group_title_edit)
         // ActionBarに戻るボタンを設定
         val activity = requireActivity()
@@ -281,7 +288,9 @@ class GroupListFragment : Fragment(), GroupListAdapter.GroupAdapterListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        adBanner.destroy()
+        adContainerView?.removeCallbacks(adLoader)
+        adBanner.destroyAd(adContainerView)
+        adContainerView = null
     }
 
     /**

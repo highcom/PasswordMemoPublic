@@ -15,86 +15,64 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * バナー広告
+ * バナー広告を管理するクラス
  *
- * @property purchaseManager 購入状態管理マネージャー
+ * @property purchaseManager 購入状態を管理するマネージャー
  */
 class AdBanner @Inject constructor(
     private val purchaseManager: PurchaseManager
 ) {
-    private var currentAdView: AdView? = null
-    private var currentContext: Context? = null
-    private var currentAdContainerView: FrameLayout? = null
-    private var currentUnitId: String? = null
-    /** 広告ビュー */
-    private var mAdView: AdView? = null
-
     /**
-     * バナー広告ロード処理
+     * バナー広告を読み込んで表示する。
+     * ライフサイクルを監視し、課金状態に応じて広告の表示・非表示を自動で切り替える。
      *
-     * @param lifecycleOwner ライフサイクルオーナー
-     * @param context コンテキスト
-     * @param adContainerView 広告用コンテナ
+     * @param lifecycleOwner 広告のライフサイクルを監視するためのLifecycleOwner
+     * @param context Context
+     * @param adContainerView 広告を表示するFrameLayout
      * @param unitId 広告ユニットID
      */
-    fun loadBanner(lifecycleOwner: LifecycleOwner, context: Context, adContainerView: FrameLayout?, unitId: String) {
-        // 現在の情報を保存
-        currentContext = context
-        currentAdContainerView = adContainerView
-        currentUnitId = unitId
+    fun loadBanner(
+        lifecycleOwner: LifecycleOwner,
+        context: Context,
+        adContainerView: FrameLayout,
+        unitId: String
+    ) {
+        var adView: AdView? = null
 
-        // 広告状態の変更を監視
         lifecycleOwner.lifecycleScope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 purchaseManager.adsRemovedFlow.collect { adsRemoved ->
-                    updateAdVisibility(adsRemoved)
+                    if (adsRemoved) {
+                        adView?.destroy()
+                        adContainerView.removeAllViews()
+                        adView = null
+                    } else {
+                        if (adView == null) {
+                            adView = AdView(context).apply {
+                                adUnitId = unitId
+                                setAdSize(adSize(context, adContainerView))
+                                adContainerView.addView(this)
+                                loadAd(AdRequest.Builder().build())
+                            }
+                        }
+                    }
                 }
             }
         }
-
-        // 初期表示
-        updateAdVisibility(purchaseManager.isAdsRemoved())
     }
 
     /**
-     * 広告の表示・非表示を更新
+     * デバイスの画面幅に基づいて、アダプティブバナーの広告サイズを計算する。
+     *
+     * @param context Context
+     * @param adContainerView 広告コンテナビュー
+     * @return 計算されたAdSize
      */
-    private fun updateAdVisibility(adsRemoved: Boolean) {
-        val adContainerView = currentAdContainerView ?: return
-        val unitId = currentUnitId ?: return
-        val context = currentContext ?: return
-
-        if (adsRemoved) {
-            // 広告を非表示
-            adContainerView.removeAllViews()
-            currentAdView?.destroy()
-            currentAdView = null
-            mAdView?.destroy()
-            mAdView = null
-        } else {
-            // 広告を表示
-            if (currentAdView == null) {
-                currentAdView = AdView(context)
-                currentAdView?.adUnitId = unitId
-                adContainerView.removeAllViews()
-                adContainerView.addView(currentAdView)
-                val adSize = adSize(context, adContainerView) ?: return
-                currentAdView?.setAdSize(adSize)
-                val adRequest = AdRequest.Builder().build()
-                currentAdView?.loadAd(adRequest)
-            }
-        }
-    }
-
-    /** 広告サイズ設定 */
     @Suppress("DEPRECATION")
-    private fun adSize(context: Context, adContainerView: FrameLayout?): AdSize? {
-        // Determine the screen width (less decorations) to use for the ad width.
+    private fun adSize(context: Context, adContainerView: FrameLayout): AdSize {
         val displayMetrics = context.resources.displayMetrics
         val density = displayMetrics.density
-        var adWidthPixels = adContainerView?.width?.toFloat() ?: 0f
-
-        // If the ad hasn't been laid out, default to the full screen width.
+        var adWidthPixels = adContainerView.width.toFloat()
         if (adWidthPixels == 0f) {
             adWidthPixels = displayMetrics.widthPixels.toFloat()
         }
@@ -103,10 +81,15 @@ class AdBanner @Inject constructor(
     }
 
     /**
-     * 広告終了処理
+     * 指定されたコンテナ内の広告ビューを破棄し、ビューをすべて削除する。
      *
+     * @param adContainerView 広告が配置されているFrameLayout
      */
-    fun destroy() {
-        mAdView?.destroy()
+    fun destroyAd(adContainerView: FrameLayout?) {
+        adContainerView?.let {
+            val adView = it.getChildAt(0) as? AdView
+            adView?.destroy()
+            it.removeAllViews()
+        }
     }
 }

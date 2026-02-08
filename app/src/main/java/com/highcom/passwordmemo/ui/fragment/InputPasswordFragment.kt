@@ -77,6 +77,13 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
     /** グループ一覧ビューモデル */
     private val groupListViewModel: GroupListViewModel by viewModels()
 
+    private val adLoader = Runnable {
+        if (view == null) return@Runnable
+        adContainerView?.let {
+            adBanner.loadBanner(viewLifecycleOwner, requireContext(), it, getString(R.string.admob_unit_id_3))
+        }
+    }
+
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,7 +109,7 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
         billingViewModel.initializeBillingManager()
 
         adContainerView = binding.adViewFrameInput
-        adContainerView?.post { adBanner.loadBanner(viewLifecycleOwner, requireContext(), adContainerView, getString(R.string.admob_unit_id_3)) }
+        adContainerView?.post(adLoader)
         // ActionBarに戻るボタンを設定
         val activity = requireActivity()
         if (activity is PasswordMemoDrawerActivity) {
@@ -270,7 +277,9 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
 
     override fun onDestroyView() {
         super.onDestroyView()
-        adBanner.destroy()
+        adContainerView?.removeCallbacks(adLoader)
+        adBanner.destroyAd(adContainerView)
+        adContainerView = null
     }
 
     /**

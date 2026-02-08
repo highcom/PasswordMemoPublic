@@ -95,6 +95,13 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
     /** 課金ビューモデル */
     private val billingViewModel: BillingViewModel by activityViewModels()
 
+    private val adLoader = Runnable {
+        if (view == null) return@Runnable
+        adContainerView?.let {
+            adBanner.loadBanner(viewLifecycleOwner, requireContext(), it, getString(R.string.admob_unit_id_1))
+        }
+    }
+
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,7 +128,7 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         billingViewModel.initializeBillingManager()
 
         adContainerView = binding.adViewFrame
-        adContainerView?.post { adBanner.loadBanner(viewLifecycleOwner, requireContext(), adContainerView, getString(R.string.admob_unit_id_1)) }
+        adContainerView?.post(adLoader)
         // ドロワーを操作可能にする
         val activity = requireActivity()
         if (activity is PasswordMemoDrawerActivity) {
@@ -574,7 +581,9 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        adBanner.destroy()
+        adContainerView?.removeCallbacks(adLoader)
+        adBanner.destroyAd(adContainerView)
+        adContainerView = null
     }
 
     /**
