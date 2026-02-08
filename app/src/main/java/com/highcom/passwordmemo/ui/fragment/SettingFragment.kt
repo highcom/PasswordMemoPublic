@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.util.TypedValue
@@ -16,6 +17,7 @@ import android.widget.AdapterView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.fragment.app.viewModels
@@ -94,6 +96,7 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     @Suppress("DEPRECATION")
     @SuppressLint("ResourceType", "UseSwitchCompatOrMaterialCode")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -441,6 +444,7 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
      * 操作説明ダイアログ表示処理
      *
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     @SuppressLint("InflateParams")
     private fun operationInstructionDialog() {
         val themeResId = if (DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {

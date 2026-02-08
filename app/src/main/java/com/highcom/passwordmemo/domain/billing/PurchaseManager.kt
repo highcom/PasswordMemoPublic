@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.core.content.edit
 
 /**
  * 購入状態管理マネージャー
@@ -93,7 +94,7 @@ class PurchaseManager @Inject constructor(
      * 広告非表示状態を設定
      */
     private fun setAdsRemoved(removed: Boolean) {
-        prefs.edit().putBoolean(KEY_ADS_REMOVED, removed).apply()
+        prefs.edit { putBoolean(KEY_ADS_REMOVED, removed) }
     }
 
     /**
@@ -107,11 +108,11 @@ class PurchaseManager @Inject constructor(
      * 全ての購入状態をクリア（テスト用）
      */
     fun clearAllPurchases() {
-        val editor = prefs.edit()
-        ALL_PRODUCT_IDS.forEach { productId ->
-            editor.remove("$KEY_PURCHASE_PREFIX$productId")
+        prefs.edit {
+            ALL_PRODUCT_IDS.forEach { productId ->
+                remove("$KEY_PURCHASE_PREFIX$productId")
+            }
+            remove(KEY_ADS_REMOVED)
         }
-        editor.remove(KEY_ADS_REMOVED)
-        editor.apply()
     }
 }

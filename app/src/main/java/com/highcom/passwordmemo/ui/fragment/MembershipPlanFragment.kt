@@ -207,7 +207,7 @@ class MembershipPlanFragment : Fragment() {
     private fun showSnackBar(message: String) {
         val snack = Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
         // Snackbar のメッセージテキストの TextView を取得して色を強制
-        val textView = snack.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+        val textView = snack.view.findViewById<TextView>(R.id.snackbar_text)
         textView?.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary_dark))
         // アクションテキストも同じ色にしておく
         snack.setActionTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary_dark))
