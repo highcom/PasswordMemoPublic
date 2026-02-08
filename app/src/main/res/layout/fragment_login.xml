@@ -35,6 +35,17 @@
                 android:text=""
                 tools:ignore="SmallSp" />
 
+            <ImageView
+                android:id="@+id/key_icon_login"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_above="@id/navigate_text"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="8dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_login_top"
+                app:tint="?attr/colorPrimary" />
+
             <TextView
                 android:id="@+id/navigate_text"
                 android:layout_width="wrap_content"
