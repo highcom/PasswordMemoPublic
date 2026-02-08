@@ -57,6 +57,7 @@
     <string name="sort_update">- Sort (update order)</string>
     <string name="select_group">Edit group</string>
     <string name="setting_menu">Setting</string>
+    <string name="empty_prompt_message">Register your password from the bottom right button</string>
 
     <string name="back">back</string>
     <string name="title_top">Title</string>

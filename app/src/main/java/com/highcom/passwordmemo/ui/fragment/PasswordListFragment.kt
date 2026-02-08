@@ -209,6 +209,12 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                 adapter?.sortPasswordList(loginDataManager.sortKey)
                 reflesh()
 
+                if (list.isEmpty()) {
+                    binding.emptyPrompt.visibility = View.VISIBLE
+                } else {
+                    binding.emptyPrompt.visibility = View.GONE
+                }
+
                 // データ更新後にスクロール位置を復元
                 passwordListViewModel.recyclerViewState?.let { state ->
                     recyclerView?.layoutManager?.onRestoreInstanceState(state)
