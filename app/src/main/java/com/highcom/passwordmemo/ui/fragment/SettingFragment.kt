@@ -168,6 +168,9 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
         // オートフィルスイッチ処理（有料会員のみ操作可能）
         val autofillSwitch = binding.autofillSwitch
         val hasSubscription = billingViewModel.hasActiveSubscription()
+        if (!hasSubscription && loginDataManager.autofillSwitchEnable) {
+            loginDataManager.setAutofillSwitchEnable(false)
+        }
         autofillSwitch.isEnabled = hasSubscription
         autofillSwitch.text = if (hasSubscription) getString(R.string.autofill_setting) else getString(R.string.autofill_setting_paid)
         autofillSwitch.isChecked = loginDataManager.autofillSwitchEnable

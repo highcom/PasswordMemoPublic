@@ -10,14 +10,15 @@ import android.service.autofill.FillRequest
 import android.service.autofill.FillResponse
 import android.view.autofill.AutofillId
 import android.view.autofill.AutofillValue
+import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.room.Room
+import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.MIGRATION_2_3
 import com.highcom.passwordmemo.data.MIGRATION_3_4
 import com.highcom.passwordmemo.data.MIGRATION_4_5
-import com.highcom.passwordmemo.data.PasswordEntity
 import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
-import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.domain.billing.BillingManager
 import kotlinx.coroutines.runBlocking
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SQLiteDatabaseHook
@@ -38,14 +39,38 @@ class PasswordMemoAutofillService : AutofillService() {
             callback.onSuccess(null)
             return
         }
-
-        val structure = request.fillContexts.lastOrNull()?.structure ?: run {
+        val purchasePrefs = applicationContext.getSharedPreferences("purchase_prefs", Context.MODE_PRIVATE)
+        val hasActiveSubscription = BillingManager.SUBSCRIPTION_PRODUCT_IDS.any { id ->
+            purchasePrefs.getBoolean("purchase_$id", false)
+        }
+        if (!hasActiveSubscription) {
             callback.onSuccess(null)
             return
         }
 
-        val (requestDomain, usernameIds, passwordIds) = parseStructure(structure)
-        if (requestDomain.isNullOrBlank() || (usernameIds.isEmpty() && passwordIds.isEmpty())) {
+        val lastContext = request.fillContexts.lastOrNull() ?: run {
+            callback.onSuccess(null)
+            return
+        }
+        val structure = lastContext.structure ?: run {
+            callback.onSuccess(null)
+            return
+        }
+
+        val (requestDomainFromStructure, usernameIds, passwordIds) = parseStructure(structure)
+        var requestDomain = requestDomainFromStructure
+        if (requestDomain.isNullOrBlank()) {
+            for (ctx in request.fillContexts) {
+                if (ctx.structure === structure) continue
+                val s = ctx.structure ?: continue
+                val (domain, _, _) = parseStructure(s)
+                if (!domain.isNullOrBlank()) {
+                    requestDomain = domain
+                    break
+                }
+            }
+        }
+        if (usernameIds.isEmpty() && passwordIds.isEmpty()) {
             callback.onSuccess(null)
             return
         }
@@ -58,8 +83,13 @@ class PasswordMemoAutofillService : AutofillService() {
             }
         }
 
-        val matched = passwords.filter { entity ->
-            requestDomain == extractDomain(entity.url)
+        val matched = if (requestDomain.isNullOrBlank()) {
+            // Chromeなどでドメインが取得できない場合は全件を候補表示（ユーザーが選択）
+            passwords
+        } else {
+            passwords.filter { entity ->
+                requestDomain == extractDomain(entity.url)
+            }
         }
 
         if (matched.isEmpty()) {
@@ -69,7 +99,10 @@ class PasswordMemoAutofillService : AutofillService() {
 
         val responseBuilder = FillResponse.Builder()
         for (entity in matched) {
-            val datasetBuilder = Dataset.Builder()
+            val presentation = RemoteViews(applicationContext.packageName, R.layout.autofill_dataset_item).apply {
+                setTextViewText(R.id.autofill_item_title, entity.title.ifBlank { entity.account }.ifBlank { applicationContext.getString(R.string.app_name) })
+            }
+            val datasetBuilder = Dataset.Builder(presentation)
             usernameIds.forEach { id -> datasetBuilder.setValue(id, AutofillValue.forText(entity.account)) }
             passwordIds.forEach { id -> datasetBuilder.setValue(id, AutofillValue.forText(entity.password)) }
             responseBuilder.addDataset(datasetBuilder.build())
@@ -89,9 +122,10 @@ class PasswordMemoAutofillService : AutofillService() {
 
         fun traverse(node: AssistStructure.ViewNode) {
             node.webDomain?.let { d -> if (domain.isNullOrBlank()) domain = normalizeDomain(d) }
+            val hints = node.autofillHints?.map { it.lowercase() } ?: emptyList()
             when {
-                node.autofillHints?.any { it.equals("username", true) || it.equals("email", true) } == true -> node.autofillId?.let { usernameIds.add(it) }
-                node.autofillHints?.any { it.equals("password", true) } == true -> node.autofillId?.let { passwordIds.add(it) }
+                hints.any { it in listOf("username", "email", "emailaddress") } -> node.autofillId?.let { if (it !in usernameIds) usernameIds.add(it) }
+                hints.any { it in listOf("password", "current-password", "new-password") } -> node.autofillId?.let { if (it !in passwordIds) passwordIds.add(it) }
             }
             for (i in 0 until node.childCount) {
                 traverse(node.getChildAt(i))
