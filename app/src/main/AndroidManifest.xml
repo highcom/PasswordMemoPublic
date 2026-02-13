@@ -51,7 +51,8 @@
         <service
             android:name=".service.PasswordMemoAutofillService"
             android:exported="true"
-            android:permission="android.permission.BIND_AUTOFILL_SERVICE">
+            android:permission="android.permission.BIND_AUTOFILL_SERVICE"
+            tools:targetApi="26">
             <intent-filter>
                 <action android:name="android.service.autofill.AutofillService" />
             </intent-filter>

@@ -1,7 +1,6 @@
 package com.highcom.passwordmemo.service
 
 import android.app.assist.AssistStructure
-import android.content.Context
 import android.os.Build
 import android.service.autofill.AutofillService
 import android.service.autofill.Dataset
@@ -12,38 +11,38 @@ import android.view.autofill.AutofillId
 import android.view.autofill.AutofillValue
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
-import androidx.room.Room
 import com.highcom.passwordmemo.R
-import com.highcom.passwordmemo.data.MIGRATION_2_3
-import com.highcom.passwordmemo.data.MIGRATION_3_4
-import com.highcom.passwordmemo.data.MIGRATION_4_5
-import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
-import com.highcom.passwordmemo.domain.billing.BillingManager
+import com.highcom.passwordmemo.data.PasswordDao
+import com.highcom.passwordmemo.domain.billing.PurchaseManager
+import com.highcom.passwordmemo.domain.login.LoginDataManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
-import net.sqlcipher.database.SQLiteDatabase
-import net.sqlcipher.database.SQLiteDatabaseHook
-import net.sqlcipher.database.SupportFactory
+import javax.inject.Inject
 
 /**
  * 登録データを利用したオートフィルサービス。
  * PasswordEntityのurlとリクエストのドメインが一致するものを特定し、accountとpasswordを提供する。
  */
 @RequiresApi(Build.VERSION_CODES.O)
+@AndroidEntryPoint
 class PasswordMemoAutofillService : AutofillService() {
 
-    override fun onFillRequest(request: android.service.autofill.FillRequest, cancellationSignal: android.os.CancellationSignal, callback: FillCallback) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+    @Inject
+    lateinit var passwordDao: PasswordDao
 
-        val prefs = applicationContext.getSharedPreferences("com.highcom.LoginActivity.MasterPass", Context.MODE_PRIVATE)
-        if (!prefs.getBoolean("autofillSwitchEnable", false)) {
+    @Inject
+    lateinit var loginDataManager: LoginDataManager
+
+    @Inject
+    lateinit var purchaseManager: PurchaseManager
+
+    override fun onFillRequest(request: FillRequest, cancellationSignal: android.os.CancellationSignal, callback: FillCallback) {
+
+        if (!loginDataManager.autofillSwitchEnable) {
             callback.onSuccess(null)
             return
         }
-        val purchasePrefs = applicationContext.getSharedPreferences("purchase_prefs", Context.MODE_PRIVATE)
-        val hasActiveSubscription = BillingManager.SUBSCRIPTION_PRODUCT_IDS.any { id ->
-            purchasePrefs.getBoolean("purchase_$id", false)
-        }
-        if (!hasActiveSubscription) {
+        if (!purchaseManager.hasActiveSubscription()) {
             callback.onSuccess(null)
             return
         }
@@ -52,10 +51,7 @@ class PasswordMemoAutofillService : AutofillService() {
             callback.onSuccess(null)
             return
         }
-        val structure = lastContext.structure ?: run {
-            callback.onSuccess(null)
-            return
-        }
+        val structure = lastContext.structure
 
         val (requestDomainFromStructure, usernameIds, passwordIds) = parseStructure(structure)
         var requestDomain = requestDomainFromStructure
@@ -77,7 +73,7 @@ class PasswordMemoAutofillService : AutofillService() {
 
         val passwords = runBlocking {
             try {
-                getDatabase().passwordDao().getAllPasswords()
+                passwordDao.getAllPasswords()
             } catch (e: Exception) {
                 emptyList()
             }
@@ -158,28 +154,5 @@ class PasswordMemoAutofillService : AutofillService() {
         } catch (e: Exception) {
             null
         }
-    }
-
-    private fun getDatabase(): PasswordMemoRoomDatabase {
-        if (db == null) {
-            val key = applicationContext.getString(R.string.db_secret_key).toCharArray()
-            db = Room.databaseBuilder(
-                applicationContext,
-                PasswordMemoRoomDatabase::class.java,
-                "PasswordMemoDB"
-            ).allowMainThreadQueries()
-                .fallbackToDestructiveMigration()
-                .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
-                .openHelperFactory(SupportFactory(SQLiteDatabase.getBytes(key), object : SQLiteDatabaseHook {
-                    override fun preKey(database: SQLiteDatabase?) {}
-                    override fun postKey(database: SQLiteDatabase?) {}
-                }))
-                .build()
-        }
-        return db!!
-    }
-
-    companion object {
-        private var db: PasswordMemoRoomDatabase? = null
     }
 }
