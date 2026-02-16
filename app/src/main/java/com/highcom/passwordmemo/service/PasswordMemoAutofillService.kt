@@ -104,6 +104,11 @@ class PasswordMemoAutofillService : AutofillService() {
         for (entity in matched) {
             val presentation = RemoteViews(applicationContext.packageName, R.layout.autofill_dataset_item).apply {
                 setTextViewText(R.id.autofill_item_title, entity.title.ifBlank { entity.account }.ifBlank { applicationContext.getString(R.string.app_name) })
+                if (usernameIds.isNotEmpty()) {
+                    setTextViewText(R.id.autofill_item_subtitle, entity.account)
+                } else {
+                    setTextViewText(R.id.autofill_item_subtitle, "••••••••")
+                }
             }
             val datasetBuilder = Dataset.Builder(presentation)
             usernameIds.forEach { id -> datasetBuilder.setValue(id, AutofillValue.forText(entity.account)) }
