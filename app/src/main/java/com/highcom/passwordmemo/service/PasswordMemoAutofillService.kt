@@ -36,6 +36,13 @@ class PasswordMemoAutofillService : AutofillService() {
     @Inject
     lateinit var purchaseManager: PurchaseManager
 
+    /**
+     * オートフィルのリクエストがあった際に呼び出される
+     *
+     * @param request オートフィルリクエスト
+     * @param cancellationSignal キャンセルシグナル
+     * @param callback コールバック
+     */
     override fun onFillRequest(request: FillRequest, cancellationSignal: android.os.CancellationSignal, callback: FillCallback) {
 
         if (!loginDataManager.autofillSwitchEnable) {
@@ -106,22 +113,42 @@ class PasswordMemoAutofillService : AutofillService() {
         callback.onSuccess(responseBuilder.build())
     }
 
+    /**
+     * オートフィルの保存リクエストがあった際に呼び出される
+     *
+     * @param request 保存リクエスト
+     * @param callback コールバック
+     */
     override fun onSaveRequest(request: android.service.autofill.SaveRequest, callback: android.service.autofill.SaveCallback) {
         // 保存リクエストは扱わない（登録はアプリ内のみ）
         callback.onSuccess()
     }
 
+    /**
+     * AssistStructureを解析して、ドメインとユーザー名・パスワードのIDを取得する
+     *
+     * @param structure 解析対象のAssistStructure
+     * @return ドメイン、ユーザー名IDリスト、パスワードIDリストのTriple
+     */
     private fun parseStructure(structure: AssistStructure): Triple<String?, List<AutofillId>, List<AutofillId>> {
         var domain: String? = null
         val usernameIds = mutableListOf<AutofillId>()
         val passwordIds = mutableListOf<AutofillId>()
 
+        val usernameHints = listOf(
+            "username", "email", "emailaddress", "name",
+            "loginid", "userid", "accountname", "membername", "tel", "phone"
+        )
+        val passwordHints = listOf(
+            "password", "current-password", "new-password", "passwd"
+        )
+
         fun traverse(node: AssistStructure.ViewNode) {
             node.webDomain?.let { d -> if (domain.isNullOrBlank()) domain = normalizeDomain(d) }
             val hints = node.autofillHints?.map { it.lowercase() } ?: emptyList()
             when {
-                hints.any { it in listOf("username", "email", "emailaddress") } -> node.autofillId?.let { if (it !in usernameIds) usernameIds.add(it) }
-                hints.any { it in listOf("password", "current-password", "new-password") } -> node.autofillId?.let { if (it !in passwordIds) passwordIds.add(it) }
+                hints.any { it in usernameHints } -> node.autofillId?.let { if (it !in usernameIds) usernameIds.add(it) }
+                hints.any { it in passwordHints } -> node.autofillId?.let { if (it !in passwordIds) passwordIds.add(it) }
             }
             for (i in 0 until node.childCount) {
                 traverse(node.getChildAt(i))
@@ -134,6 +161,12 @@ class PasswordMemoAutofillService : AutofillService() {
         return Triple(domain, usernameIds, passwordIds)
     }
 
+    /**
+     * ドメイン名を正規化する
+     *
+     * @param domain 正規化対象のドメイン名
+     * @return 正規化されたドメイン名
+     */
     private fun normalizeDomain(domain: String?): String? {
         if (domain.isNullOrBlank()) return null
         var d = domain.lowercase().trim()
@@ -141,6 +174,12 @@ class PasswordMemoAutofillService : AutofillService() {
         return d.ifBlank { null }
     }
 
+    /**
+     * URLからドメインを抽出する
+     *
+     * @param url 抽出対象のURL
+     * @return 抽出されたドメイン名
+     */
     private fun extractDomain(url: String?): String? {
         if (url.isNullOrBlank()) return null
         val trimmed = url.trim()
