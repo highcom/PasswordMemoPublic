@@ -41,8 +41,8 @@
     <string name="copy_title">copy</string>
     <string name="edit">edit</string>
     <string name="delete">delete</string>
-    <string name="delete_title_head">\"</string>
-    <string name="delete_title">\" will be deleted.</string>
+    <string name="delete_title_head">"</string>
+    <string name="delete_title">" will be deleted.</string>
     <string name="delete_message">Is it OK?</string>
     <string name="delete_execute">Execute</string>
     <string name="delete_cancel">Cancel</string>
@@ -225,7 +225,7 @@
     <string name="membership_plan_message">Access premium features and remove ads</string>
     <string name="membership_plan_title">Membership Plans</string>
     <string name="monthly_subscription">Monthly Subscription</string>
-    <string name="monthly_subscription_price">No ads/Unlimited registration/CSV function unlocked</string>
+    <string name="monthly_subscription_price">No ads/Unlimited registration/All function unlocked</string>
     <string name="half_year_subscription">Half Year Subscription</string>
     <string name="half_year_subscription_price">No ads/Unlimited registration/CSV function unlocked</string>
     <string name="yearly_subscription">Yearly Subscription</string>
@@ -245,7 +245,10 @@
     <string name="about_membership_title">About Membership Plans</string>
     <string name="about_membership_description">Description of features available</string>
     <string name="membership_plan_dialog_title">What is a membership plan?</string>
-    <string name="membership_plan_dialog_description">• Ads are hidden across all screens.\n• Unlimited additional registrations even when registered data exceeds 100 items.\n• CSV import/export features are unlocked.\n• The one-time ad removal purchase permanently hides ads only.</string>
+    <string name="about_membership_title_monthly_half_yearly">Monthly/Half-yearly/Yearly membership plan</string>
+    <string name="about_membership_desc_monthly_half_yearly">- Ads will be hidden on all screens.\n- Unlimited additional registrations even if the registered data exceeds 100.\n- Password autofill settings will be unlocked.\n- CSV file import/export function will be unlocked.</string>
+    <string name="about_membership_title_remove_ads">Hide ads (one-time purchase)</string>
+    <string name="about_membership_desc_remove_ads">- A single purchase will permanently hide ads only.</string>
 
     <!-- Registration limit dialog -->
     <string name="registration_limit_title">Registration limit reached</string>

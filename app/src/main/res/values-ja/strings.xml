@@ -92,8 +92,8 @@
     <string name="memo_visible_enable_message">パスワード一覧画面にメモ欄の内容を表示</string>
     <string name="password_visible_enable">パスワードの表示</string>
     <string name="password_visible_enable_message">参照画面でのパスワード欄の初期表示設定</string>
-    <string name="autofill_setting">オートフィル設定</string>
-    <string name="autofill_setting_paid">オートフィル設定(有料)</string>
+    <string name="autofill_setting">パスワード自動入力設定</string>
+    <string name="autofill_setting_paid">パスワード自動入力設定(有料)</string>
     <string name="autofill_setting_message">ブラウザでIDやパスワードの自動入力を設定</string>
     <string name="text_size">テキストサイズ変更</string>
     <string name="text_size_message">このアプリの表示テキストサイズを変更</string>
@@ -225,7 +225,7 @@
     <string name="membership_plan_message">広告の非表示や有料会員の機能が利用可能</string>
     <string name="membership_plan_title">有料会員プラン</string>
     <string name="monthly_subscription">月額プラン（¥150/月）</string>
-    <string name="monthly_subscription_price">広告の非表示/登録無制限/CSV入出力機能解放</string>
+    <string name="monthly_subscription_price">広告の非表示/登録無制限/全ての機能解放</string>
     <string name="half_year_subscription">半年プラン（¥750/半年）</string>
     <string name="half_year_subscription_price">月額プランと同一機能で1ヶ月分お得</string>
     <string name="yearly_subscription">年額プラン（¥1,200/年）</string>
@@ -245,14 +245,17 @@
     <string name="about_membership_title">有料会員プランについて</string>
     <string name="about_membership_description">有料会員プランで利用可能な機能について説明</string>
     <string name="membership_plan_dialog_title">有料会員プランとは</string>
-    <string name="membership_plan_dialog_description">・全ての画面にて広告が非表示になります。\n・登録データが100件以上でも追加登録が無制限になります。\n・CSVファイル入出力機能が解放されます。\n\n・広告の非表示の買い切りプランは１度の購入で広告の非表示のみが永続します。</string>
+    <string name="about_membership_title_monthly_half_yearly">月額/半年/年額会員プラン</string>
+    <string name="about_membership_desc_monthly_half_yearly">・全ての画面にて広告が非表示になります。\n・登録データが100件以上でも追加登録が無制限になります。\n・パスワード自動入力設定が開放されます。\n・CSVファイル入出力機能が解放されます。</string>
+    <string name="about_membership_title_remove_ads">広告の非表示(買い切り)</string>
+    <string name="about_membership_desc_remove_ads">・１度の購入で広告の非表示のみが永続します。</string>
 
     <!-- Registration limit dialog (Japanese) -->
     <string name="registration_limit_title">登録件数の上限です</string>
     <string name="registration_limit_message">無料で追加登録できる件数の上限に達しました。\n\n制限を解除して追加登録するために有料会員への課金が必要です。</string>
 
     <!-- Autofill setting dialog -->
-    <string name="autofill_setting_title">オートフィル設定</string>
+    <string name="autofill_setting_title">パスワード自動入力設定</string>
     <string name="autofill_setting_description_1">1.端末設定を変更</string>
     <string name="autofill_setting_description_2">設定アプリ\n→パスワードとアカウント\n→優先するサービス\n→パスワードメモに変更</string>
     <string name="autofill_setting_description_3">2.Chromeブラウザの設定を変更</string>

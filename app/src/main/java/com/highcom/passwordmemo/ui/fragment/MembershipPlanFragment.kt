@@ -274,9 +274,10 @@ class MembershipPlanFragment : Fragment() {
      * 有料会員プランについての説明
      */
     private fun showAboutMembershipDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.alert_about_membership, null)
         AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.membership_plan_dialog_title))
-            .setMessage(getString(R.string.membership_plan_dialog_description))
+            .setView(dialogView)
             .setPositiveButton(R.string.ok, null)
             .show()
     }
