@@ -47,6 +47,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 /**
  * 設定画面フラグメント
@@ -174,13 +175,12 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
         autofillSwitch.isEnabled = hasSubscription
         autofillSwitch.text = if (hasSubscription) getString(R.string.autofill_setting) else getString(R.string.autofill_setting_paid)
         autofillSwitch.isChecked = loginDataManager.autofillSwitchEnable
-        autofillSwitch.setOnCheckedChangeListener { _, b ->
-            loginDataManager.setAutofillSwitchEnable(b)
-            if (b && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val intent = Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE).apply {
-                    data = Uri.parse("package:${requireContext().packageName}")
+        autofillSwitch.setOnCheckedChangeListener { _, isChecked ->
+            loginDataManager.setAutofillSwitchEnable(isChecked)
+            if (isChecked) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    autofillSettingDialog()
                 }
-                startActivity(intent)
             }
         }
 
@@ -505,6 +505,48 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
             .setOnClickListener { alertDialog.dismiss() }
+    }
+
+    /**
+     * オートフィル設定ダイアログ表示処理
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    @SuppressLint("InflateParams")
+    private fun autofillSettingDialog() {
+        val themeResId = if (DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
+            android.R.style.Theme_DeviceDefault_Dialog
+        } else {
+            android.R.style.Theme_DeviceDefault_Light_Dialog
+        }
+
+        val alertDialog = AlertDialog.Builder(requireContext(), themeResId)
+            .setTitle(R.string.autofill_setting_title)
+            .setView(layoutInflater.inflate(R.layout.alert_autofill_setting_dialog, null))
+            .setPositiveButton(R.string.autofill_setting_service_button, null)
+            .setNegativeButton(R.string.cancel, null)
+            .create()
+
+        alertDialog.setOnShowListener {
+            // Dark mode handling for title
+        }
+
+        alertDialog.show()
+
+        // Positive button action
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val intent = Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE).apply {
+                data = "package:${requireContext().packageName}".toUri()
+            }
+            startActivity(intent)
+            alertDialog.dismiss()
+        }
+
+        // Negative button action
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
+            loginDataManager.setAutofillSwitchEnable(false)
+            binding.autofillSwitch.isChecked = false
+            alertDialog.dismiss()
+        }
     }
 
     /**

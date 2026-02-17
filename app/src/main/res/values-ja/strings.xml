@@ -94,7 +94,7 @@
     <string name="password_visible_enable_message">参照画面でのパスワード欄の初期表示設定</string>
     <string name="autofill_setting">オートフィル設定</string>
     <string name="autofill_setting_paid">オートフィル設定(有料)</string>
-    <string name="autofill_setting_message">IDやパスワードの自動入力を設定</string>
+    <string name="autofill_setting_message">ブラウザでIDやパスワードの自動入力を設定</string>
     <string name="text_size">テキストサイズ変更</string>
     <string name="text_size_message">このアプリの表示テキストサイズを変更</string>
     <string name="copy_clipboard">パスワードのコピー方法</string>
@@ -250,4 +250,12 @@
     <!-- Registration limit dialog (Japanese) -->
     <string name="registration_limit_title">登録件数の上限です</string>
     <string name="registration_limit_message">無料で追加登録できる件数の上限に達しました。\n\n制限を解除して追加登録するために有料会員への課金が必要です。</string>
+
+    <!-- Autofill setting dialog -->
+    <string name="autofill_setting_title">オートフィル設定</string>
+    <string name="autofill_setting_description_1">1.端末設定を変更</string>
+    <string name="autofill_setting_description_2">設定アプリ\n→パスワードとアカウント\n→優先するサービス\n→パスワードメモに変更</string>
+    <string name="autofill_setting_description_3">2.Chromeブラウザの設定を変更</string>
+    <string name="autofill_setting_description_4">Chromeの設定\n→自動入力サービス\n→別の自動サービスを使用して自動入力を選択</string>
+    <string name="autofill_setting_service_button">端末設定へ</string>
 </resources>
