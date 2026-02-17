@@ -37,6 +37,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.AutofillInputActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.Dialog" />
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_app_id" />

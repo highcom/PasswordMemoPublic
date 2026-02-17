@@ -261,4 +261,6 @@
     <string name="autofill_setting_description_3">2.Chromeブラウザの設定を変更</string>
     <string name="autofill_setting_description_4">Chromeの設定\n→自動入力サービス\n→別の自動サービスを使用して自動入力を選択</string>
     <string name="autofill_setting_service_button">端末設定へ</string>
+    <string name="autofill_save_title">パスワードメモに保存</string>
+    <string name="autofill_save_message">このパスワードをパスワードメモに保存しますか？</string>
 </resources>

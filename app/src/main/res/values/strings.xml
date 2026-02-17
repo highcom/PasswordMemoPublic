@@ -261,4 +261,6 @@
     <string name="autofill_setting_description_3">2. Change Chrome browser</string>
     <string name="autofill_setting_description_4">Chrome settings\n -> Autofill service\n -> Select Autofill using another service</string>
     <string name="autofill_setting_service_button">Go to settings</string>
+    <string name="autofill_save_title">Save to PasswordMemo</string>
+    <string name="autofill_save_message">Do you want to save this password to PasswordMemo?</string>
 </resources>

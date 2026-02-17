@@ -1,12 +1,14 @@
 package com.highcom.passwordmemo.service
 
 import android.app.assist.AssistStructure
+import android.content.Intent
 import android.os.Build
 import android.service.autofill.AutofillService
 import android.service.autofill.Dataset
 import android.service.autofill.FillCallback
 import android.service.autofill.FillRequest
 import android.service.autofill.FillResponse
+import android.service.autofill.SaveInfo
 import android.view.autofill.AutofillId
 import android.view.autofill.AutofillValue
 import android.widget.RemoteViews
@@ -15,6 +17,7 @@ import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.data.PasswordDao
 import com.highcom.passwordmemo.domain.billing.PurchaseManager
 import com.highcom.passwordmemo.domain.login.LoginDataManager
+import com.highcom.passwordmemo.ui.AutofillInputActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -95,12 +98,18 @@ class PasswordMemoAutofillService : AutofillService() {
             }
         }
 
+        val responseBuilder = FillResponse.Builder()
+
         if (matched.isEmpty()) {
-            callback.onSuccess(null)
+            val saveInfo = SaveInfo.Builder(
+                SaveInfo.SAVE_DATA_TYPE_USERNAME or SaveInfo.SAVE_DATA_TYPE_PASSWORD,
+                (usernameIds + passwordIds).toTypedArray()
+            ).build()
+            responseBuilder.setSaveInfo(saveInfo)
+            callback.onSuccess(responseBuilder.build())
             return
         }
 
-        val responseBuilder = FillResponse.Builder()
         for (entity in matched) {
             val presentation = RemoteViews(applicationContext.packageName, R.layout.autofill_dataset_item).apply {
                 setTextViewText(R.id.autofill_item_title, entity.title.ifBlank { entity.account }.ifBlank { applicationContext.getString(R.string.app_name) })
@@ -115,6 +124,11 @@ class PasswordMemoAutofillService : AutofillService() {
             passwordIds.forEach { id -> datasetBuilder.setValue(id, AutofillValue.forText(entity.password)) }
             responseBuilder.addDataset(datasetBuilder.build())
         }
+        val saveInfo = SaveInfo.Builder(
+            SaveInfo.SAVE_DATA_TYPE_USERNAME or SaveInfo.SAVE_DATA_TYPE_PASSWORD,
+            (usernameIds + passwordIds).toTypedArray()
+        ).build()
+        responseBuilder.setSaveInfo(saveInfo)
         callback.onSuccess(responseBuilder.build())
     }
 
@@ -125,8 +139,26 @@ class PasswordMemoAutofillService : AutofillService() {
      * @param callback コールバック
      */
     override fun onSaveRequest(request: android.service.autofill.SaveRequest, callback: android.service.autofill.SaveCallback) {
-        // 保存リクエストは扱わない（登録はアプリ内のみ）
-        callback.onSuccess()
+        if (!loginDataManager.autofillSwitchEnable) {
+            callback.onSuccess()
+            return
+        }
+        val context = request.fillContexts
+        val structure = context.last().structure
+
+        val (domain, usernameIds, passwordIds) = parseStructure(structure)
+        if (usernameIds.isEmpty() || passwordIds.isEmpty()) {
+            callback.onFailure(getString(R.string.autofill_save_message))
+            return
+        }
+
+        val intent = Intent(this, AutofillInputActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            putExtra("url", domain)
+        }
+        val intentSender = android.app.PendingIntent.getActivity(this, 0, intent, android.app.PendingIntent.FLAG_CANCEL_CURRENT or android.app.PendingIntent.FLAG_MUTABLE).intentSender
+
+        callback.onSuccess(intentSender)
     }
 
     /**
