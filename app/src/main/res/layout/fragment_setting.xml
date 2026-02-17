@@ -194,6 +194,42 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_password_visible" />
 
+        <Switch
+            android:id="@+id/autofill_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/autofill_setting"
+            android:textSize="15dp"
+            android:checked="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_password_visible_line"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+        <TextView
+            android:id="@+id/text_autofill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/autofill_setting_message"
+            android:textSize="12dp"
+            android:textColor="@color/darkgray"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/autofill_switch" />
+
+        <View
+            android:id="@+id/text_autofill_line"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"
+            android:layout_marginVertical="2dp"
+            android:layout_marginRight="110dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_autofill" />
+
         <TextView
             android:id="@+id/text_size_view"
             android:layout_width="wrap_content"
@@ -238,7 +274,7 @@
             android:layout_gravity="center_vertical"
             android:gravity="right"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_password_visible" />
+            app:layout_constraintTop_toBottomOf="@+id/text_autofill_line" />
 
         <TextView
             android:id="@+id/copy_clipboard_view"

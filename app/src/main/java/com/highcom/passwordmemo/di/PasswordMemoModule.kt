@@ -12,18 +12,18 @@ import com.highcom.passwordmemo.domain.billing.PurchaseManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.ActivityRetainedScoped
+import dagger.hilt.components.SingletonComponent
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SQLiteDatabaseHook
 import net.sqlcipher.database.SupportFactory
+import javax.inject.Singleton
 
 /**
  * パスワードメモアプリDagger Hilt用モジュール定義クラス
  */
 @Module
-@InstallIn(ActivityRetainedComponent::class)
+@InstallIn(SingletonComponent::class)
 object PasswordMemoModule {
 
     /**
@@ -31,7 +31,7 @@ object PasswordMemoModule {
      *
      * @param context コンテキスト
      */
-    @ActivityRetainedScoped
+    @Singleton
     @Provides
     fun provideDatabase(
         @ApplicationContext context: Context
@@ -71,7 +71,7 @@ object PasswordMemoModule {
      *
      * @param db データベース
      */
-    @ActivityRetainedScoped
+    @Singleton
     @Provides
     fun providePasswordDao(db: PasswordMemoRoomDatabase) = db.passwordDao()
 
@@ -80,7 +80,7 @@ object PasswordMemoModule {
      *
      * @param db データベース
      */
-    @ActivityRetainedScoped
+    @Singleton
     @Provides
     fun provideGroupDao(db: PasswordMemoRoomDatabase) = db.groupDao()
 
@@ -89,7 +89,7 @@ object PasswordMemoModule {
      *
      * @param context アプリケーションコンテキスト
      */
-    @ActivityRetainedScoped
+    @Singleton
     @Provides
     fun providePurchaseManager(
         @ApplicationContext context: Context

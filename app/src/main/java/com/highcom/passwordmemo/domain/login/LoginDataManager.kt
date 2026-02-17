@@ -49,6 +49,9 @@ class LoginDataManager @Inject constructor(application: Application) {
     /** 参照画面でのパスワード欄の初期表示設定 */
     var passwordVisibleSwitchEnable = false
         private set
+    /** オートフィル有効設定 */
+    var autofillSwitchEnable = false
+        private set
     /** 背景色設定値 */
     var backgroundColor = 0
         private set
@@ -85,6 +88,7 @@ class LoginDataManager @Inject constructor(application: Application) {
             sharedPref.getBoolean("displayBackgroundSwitchEnable", false)
         memoVisibleSwitchEnable = sharedPref.getBoolean("memoVisibleSwitchEnable", false)
         passwordVisibleSwitchEnable = sharedPref.getBoolean("passwordVisibleSwitchEnable", false)
+        autofillSwitchEnable = sharedPref.getBoolean("autofillSwitchEnable", false)
         backgroundColor = sharedPref.getInt("backgroundColor", 0)
         textSize = sharedPref.getFloat("textSize", TextSizeUtil.TEXT_SIZE_MEDIUM.toFloat())
         copyClipboard = sharedPref.getInt("copyClipboard", 0)
@@ -154,6 +158,16 @@ class LoginDataManager @Inject constructor(application: Application) {
      */
     fun setPasswordVisibleSwitchEnable(b: Boolean) {
         sharedPref.edit().putBoolean("passwordVisibleSwitchEnable", b).apply()
+        updateSetting()
+    }
+
+    /**
+     * オートフィル有効設定処理
+     *
+     * @param b オートフィル有効設定ON-OFF
+     */
+    fun setAutofillSwitchEnable(b: Boolean) {
+        sharedPref.edit().putBoolean("autofillSwitchEnable", b).apply()
         updateSetting()
     }
 

@@ -36,7 +36,7 @@
     <string name="sort_name_update">update</string>
     <string name="end">end</string>
     <string name="add">add</string>
-    <string name="setting">setting</string>
+    <string name="setting">settings</string>
     <string name="copy">copy</string>
     <string name="copy_title">copy</string>
     <string name="edit">edit</string>
@@ -56,7 +56,7 @@
     <string name="sort_title">- Sort (title order)</string>
     <string name="sort_update">- Sort (update order)</string>
     <string name="select_group">Edit group</string>
-    <string name="setting_menu">Setting</string>
+    <string name="setting_menu">Settings</string>
     <string name="empty_prompt_message">Register your password from the bottom right button</string>
 
     <string name="back">back</string>
@@ -92,6 +92,9 @@
     <string name="memo_visible_enable_message">Display the memo on password list screen</string>
     <string name="password_visible_enable">Display password</string>
     <string name="password_visible_enable_message">Initial display of password field on reference screen</string>
+    <string name="autofill_setting">Autofill settings</string>
+    <string name="autofill_setting_paid">Autofill settings (Paid)</string>
+    <string name="autofill_setting_message">Set up automatic entry of ID and password</string>
     <string name="text_size">Change text size</string>
     <string name="text_size_message">Change the text size of this app</string>
     <string name="copy_clipboard">How to copy password</string>
@@ -247,4 +250,12 @@
     <!-- Registration limit dialog -->
     <string name="registration_limit_title">Registration limit reached</string>
     <string name="registration_limit_message">You have reached the maximum number of items that can be added for free. \n\nTo remove this restriction and add more entries, please purchase a paid membership.</string>
+
+    <!-- Autofill setting dialog -->
+    <string name="autofill_setting_title">Autofill settings</string>
+    <string name="autofill_setting_description_1">1. Change settings</string>
+    <string name="autofill_setting_description_2">Settings app\n -> Passwords and accounts\n -> Preferred service\n -> to Password Memo</string>
+    <string name="autofill_setting_description_3">2. Change Chrome browser</string>
+    <string name="autofill_setting_description_4">Chrome settings\n -> Autofill service\n -> Select Autofill using another service</string>
+    <string name="autofill_setting_service_button">Go to settings</string>
 </resources>

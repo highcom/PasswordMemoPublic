@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.os.Bundle
 import android.os.Handler
 import android.util.TypedValue
@@ -46,6 +47,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 /**
  * 設定画面フラグメント
@@ -162,6 +164,24 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
         passwordVisibleSwitch.isChecked = loginDataManager.passwordVisibleSwitchEnable
         passwordVisibleSwitch.setOnCheckedChangeListener { _, b ->
             loginDataManager.setPasswordVisibleSwitchEnable(b)
+        }
+
+        // オートフィルスイッチ処理（有料会員のみ操作可能）
+        val autofillSwitch = binding.autofillSwitch
+        val hasSubscription = billingViewModel.hasActiveSubscription()
+        if (!hasSubscription && loginDataManager.autofillSwitchEnable) {
+            loginDataManager.setAutofillSwitchEnable(false)
+        }
+        autofillSwitch.isEnabled = hasSubscription
+        autofillSwitch.text = if (hasSubscription) getString(R.string.autofill_setting) else getString(R.string.autofill_setting_paid)
+        autofillSwitch.isChecked = loginDataManager.autofillSwitchEnable
+        autofillSwitch.setOnCheckedChangeListener { _, isChecked ->
+            loginDataManager.setAutofillSwitchEnable(isChecked)
+            if (isChecked) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    autofillSettingDialog()
+                }
+            }
         }
 
         // テキストサイズスピナー処理
@@ -488,6 +508,48 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
     }
 
     /**
+     * オートフィル設定ダイアログ表示処理
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    @SuppressLint("InflateParams")
+    private fun autofillSettingDialog() {
+        val themeResId = if (DarkModeUtil.isDarkModeEnabled(requireContext(), loginDataManager.darkMode)) {
+            android.R.style.Theme_DeviceDefault_Dialog
+        } else {
+            android.R.style.Theme_DeviceDefault_Light_Dialog
+        }
+
+        val alertDialog = AlertDialog.Builder(requireContext(), themeResId)
+            .setTitle(R.string.autofill_setting_title)
+            .setView(layoutInflater.inflate(R.layout.alert_autofill_setting_dialog, null))
+            .setPositiveButton(R.string.autofill_setting_service_button, null)
+            .setNegativeButton(R.string.cancel, null)
+            .create()
+
+        alertDialog.setOnShowListener {
+            // Dark mode handling for title
+        }
+
+        alertDialog.show()
+
+        // Positive button action
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val intent = Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE).apply {
+                data = "package:${requireContext().packageName}".toUri()
+            }
+            startActivity(intent)
+            alertDialog.dismiss()
+        }
+
+        // Negative button action
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
+            loginDataManager.setAutofillSwitchEnable(false)
+            binding.autofillSwitch.isChecked = false
+            alertDialog.dismiss()
+        }
+    }
+
+    /**
      * 背景色選択処理
      *
      * @param color 選択背景色
@@ -529,6 +591,7 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
         binding.displayBackgroundSwitch.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.memoVisibleSwitch.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.passwordVisibleSwitch.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.autofillSwitch.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.textSizeView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         // テキストサイズ設定のSpinnerは設定不要
         binding.copyClipboardView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)

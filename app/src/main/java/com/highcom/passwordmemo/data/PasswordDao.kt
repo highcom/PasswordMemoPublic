@@ -22,6 +22,14 @@ interface PasswordDao {
     fun getPasswordList(): Flow<List<PasswordEntity>>
 
     /**
+     * オートフィル用に全パスワードデータを一括取得
+     *
+     * @return パスワードデータ一覧
+     */
+    @Query("SELECT * FROM passworddata ORDER BY id ASC")
+    suspend fun getAllPasswords(): List<PasswordEntity>
+
+    /**
      * 選択グループのパスワードデータ一覧取得
      *
      * @return 選択グループのパスワードデータ
