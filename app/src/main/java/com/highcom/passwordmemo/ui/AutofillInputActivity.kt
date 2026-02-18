@@ -45,5 +45,10 @@ class AutofillInputActivity : AppCompatActivity() {
             autofillManager?.commit()
             finish()
         }
+
+        findViewById<Button>(R.id.cancel_button).setOnClickListener {
+            setResult(Activity.RESULT_CANCELED)
+            finish()
+        }
     }
 }
