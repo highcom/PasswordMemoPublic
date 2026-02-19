@@ -169,8 +169,12 @@ class ReferencePasswordFragment : Fragment() {
      */
     fun onUrlParseTextClick(view: View) {
         if (view is EditText) {
-            if (view.text.toString() == "") return
-            val uri = Uri.parse(view.text.toString())
+            var url = view.text.toString()
+            if (url.isEmpty()) return
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                url = "http://$url"
+            }
+            val uri = Uri.parse(url)
             val intent = Intent(Intent.ACTION_VIEW, uri)
             val chooser = Intent.createChooser(intent, "選択")
             startActivity(chooser)
