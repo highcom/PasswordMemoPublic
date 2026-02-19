@@ -42,7 +42,6 @@
         android:layout_height="wrap_content"
         android:hint="@string/enter_memo_message"
         android:inputType="textMultiLine"
-        android:minLines="3"
         android:gravity="top|start" />
 
     <LinearLayout
@@ -54,6 +53,7 @@
         <Button
             android:id="@+id/cancel_button"
             style="?android:attr/buttonBarButtonStyle"
+            android:textColor="@color/blue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/cancel"/>
@@ -61,6 +61,7 @@
         <Button
             android:id="@+id/ok_button"
             style="?android:attr/buttonBarButtonStyle"
+            android:textColor="@color/blue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ok"/>

@@ -39,6 +39,13 @@ class PasswordMemoAutofillService : AutofillService() {
     @Inject
     lateinit var purchaseManager: PurchaseManager
 
+    data class ParsedStructure(
+        val domain: String?,
+        val usernameIds: List<AutofillId>,
+        val passwordIds: List<AutofillId>,
+        val values: Map<AutofillId, String>
+    )
+
     /**
      * オートフィルのリクエストがあった際に呼び出される
      *
@@ -63,13 +70,16 @@ class PasswordMemoAutofillService : AutofillService() {
         }
         val structure = lastContext.structure
 
-        val (requestDomainFromStructure, usernameIds, passwordIds) = parseStructure(structure)
+        val parsed = parseStructure(structure)
+        val requestDomainFromStructure = parsed.domain
+        val usernameIds = parsed.usernameIds
+        val passwordIds = parsed.passwordIds
         var requestDomain = requestDomainFromStructure
         if (requestDomain.isNullOrBlank()) {
             for (ctx in request.fillContexts) {
                 if (ctx.structure === structure) continue
                 val s = ctx.structure ?: continue
-                val (domain, _, _) = parseStructure(s)
+                val domain = parseStructure(s).domain
                 if (!domain.isNullOrBlank()) {
                     requestDomain = domain
                     break
@@ -138,6 +148,7 @@ class PasswordMemoAutofillService : AutofillService() {
      * @param request 保存リクエスト
      * @param callback コールバック
      */
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onSaveRequest(request: android.service.autofill.SaveRequest, callback: android.service.autofill.SaveCallback) {
         if (!loginDataManager.autofillSwitchEnable) {
             callback.onSuccess()
@@ -146,15 +157,23 @@ class PasswordMemoAutofillService : AutofillService() {
         val context = request.fillContexts
         val structure = context.last().structure
 
-        val (domain, usernameIds, passwordIds) = parseStructure(structure)
+        val parsed = parseStructure(structure)
+        val domain = parsed.domain
+        val usernameIds = parsed.usernameIds
+        val passwordIds = parsed.passwordIds
         if (usernameIds.isEmpty() || passwordIds.isEmpty()) {
             callback.onFailure(getString(R.string.autofill_save_message))
             return
         }
 
+        val username = usernameIds.firstOrNull()?.let { parsed.values[it] }
+        val password = passwordIds.firstOrNull()?.let { parsed.values[it] }
+
         val intent = Intent(this, AutofillInputActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             putExtra("url", domain)
+            putExtra("account", username)
+            putExtra("password", password)
         }
         val intentSender = android.app.PendingIntent.getActivity(this, 0, intent, android.app.PendingIntent.FLAG_CANCEL_CURRENT or android.app.PendingIntent.FLAG_MUTABLE).intentSender
 
@@ -167,10 +186,11 @@ class PasswordMemoAutofillService : AutofillService() {
      * @param structure 解析対象のAssistStructure
      * @return ドメイン、ユーザー名IDリスト、パスワードIDリストのTriple
      */
-    private fun parseStructure(structure: AssistStructure): Triple<String?, List<AutofillId>, List<AutofillId>> {
+    private fun parseStructure(structure: AssistStructure): ParsedStructure {
         var domain: String? = null
         val usernameIds = mutableListOf<AutofillId>()
         val passwordIds = mutableListOf<AutofillId>()
+        val values = mutableMapOf<AutofillId, String>()
 
         val usernameHints = listOf(
             "username", "email", "emailaddress", "name",
@@ -184,8 +204,18 @@ class PasswordMemoAutofillService : AutofillService() {
             node.webDomain?.let { d -> if (domain.isNullOrBlank()) domain = normalizeDomain(d) }
             val hints = node.autofillHints?.map { it.lowercase() } ?: emptyList()
             when {
-                hints.any { it in usernameHints } -> node.autofillId?.let { if (it !in usernameIds) usernameIds.add(it) }
-                hints.any { it in passwordHints } -> node.autofillId?.let { if (it !in passwordIds) passwordIds.add(it) }
+                hints.any { it in usernameHints } -> node.autofillId?.let {
+                    if (it !in usernameIds) {
+                        usernameIds.add(it)
+                        node.text?.toString()?.let { text -> values[it] = text }
+                    }
+                }
+                hints.any { it in passwordHints } -> node.autofillId?.let {
+                    if (it !in passwordIds) {
+                        passwordIds.add(it)
+                        node.text?.toString()?.let { text -> values[it] = text }
+                    }
+                }
             }
             for (i in 0 until node.childCount) {
                 traverse(node.getChildAt(i))
@@ -195,7 +225,7 @@ class PasswordMemoAutofillService : AutofillService() {
         for (i in 0 until structure.windowNodeCount) {
             structure.getWindowNodeAt(i).rootViewNode?.let { traverse(it) }
         }
-        return Triple(domain, usernameIds, passwordIds)
+        return ParsedStructure(domain, usernameIds, passwordIds, values)
     }
 
     /**

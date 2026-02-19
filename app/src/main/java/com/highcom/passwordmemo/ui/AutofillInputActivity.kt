@@ -1,53 +1,43 @@
 package com.highcom.passwordmemo.ui
 
-import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.autofill.AutofillManager
-import android.view.autofill.AutofillValue
-import android.widget.Button
-import android.widget.EditText
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.highcom.passwordmemo.R
+import com.highcom.passwordmemo.databinding.ActivityAutofillInputBinding
 
 class AutofillInputActivity : AppCompatActivity() {
-    private lateinit var accountEditText: EditText
-    private lateinit var passwordEditText: EditText
-    private lateinit var urlEditText: EditText
+    private lateinit var binding: ActivityAutofillInputBinding
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_autofill_input)
-
-        accountEditText = findViewById(R.id.edit_account)
-        passwordEditText = findViewById(R.id.edit_password)
-        urlEditText = findViewById(R.id.edit_url)
+        binding = ActivityAutofillInputBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val extras = intent.extras
         if (extras != null) {
-            val autofillValue = extras.getParcelable<AutofillValue>(AutofillManager.EXTRA_AUTHENTICATION_RESULT)
-            if (autofillValue != null && autofillValue.isText) {
-                val text = autofillValue.textValue.toString()
-                if (accountEditText.text.isEmpty()) {
-                    accountEditText.setText(text)
-                } else if (passwordEditText.text.isEmpty()) {
-                    passwordEditText.setText(text)
-                }
-            }
             val url = extras.getString("url")
-            urlEditText.setText(url)
+            val account = extras.getString("account")
+            val password = extras.getString("password")
+            binding.editTitle.setText(url)
+            binding.editUrl.setText(url)
+            binding.editAccount.setText(account)
+            binding.editPassword.setText(password)
         }
 
-        findViewById<Button>(R.id.ok_button).setOnClickListener {
+        binding.okButton.setOnClickListener {
             val result = Intent()
-            setResult(Activity.RESULT_OK, result)
+            setResult(RESULT_OK, result)
             val autofillManager = getSystemService(AutofillManager::class.java)
             autofillManager?.commit()
             finish()
         }
 
-        findViewById<Button>(R.id.cancel_button).setOnClickListener {
-            setResult(Activity.RESULT_CANCELED)
+        binding.cancelButton.setOnClickListener {
+            setResult(RESULT_CANCELED)
             finish()
         }
     }
