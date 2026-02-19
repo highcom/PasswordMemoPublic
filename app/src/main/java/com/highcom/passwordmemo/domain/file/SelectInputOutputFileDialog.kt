@@ -49,16 +49,18 @@ class SelectInputOutputFileDialog(
     }
 
     fun init() {
-        items = arrayOfNulls(2)
         when (operation) {
             Operation.DB_RESTORE_BACKUP -> {
+                items = arrayOfNulls(2)
                 items[0] = context.getString(R.string.restore_db)
                 items[1] = context.getString(R.string.backup_db)
             }
 
             Operation.CSV_INPUT_OUTPUT -> {
-                items[0] = context.getString(R.string.input_csv)
-                items[1] = context.getString(R.string.output_csv)
+                items = arrayOfNulls(3)
+                items[0] = context.getString(R.string.input_csv_override)
+                items[1] = context.getString(R.string.input_csv_add)
+                items[2] = context.getString(R.string.output_csv)
             }
         }
     }
@@ -73,7 +75,7 @@ class SelectInputOutputFileDialog(
         builder.setTitle(context.getString(R.string.select_operation))
             .setSingleChoiceItems(items, checkedItem) { _, which -> checkedItem = which }
             .setPositiveButton(R.string.next) { _, _ ->
-                if (checkedItem == 0 || checkedItem == 1) {
+                if (checkedItem >= 0 && checkedItem < items.size) {
                     inputOutputFileDialogListener.onSelectOperationClicked(items[checkedItem])
                 } else {
                     val ts = Toast.makeText(

@@ -22,6 +22,24 @@ class SettingViewModel @Inject constructor(private val repository: PasswordMemoR
     val groupList = repository.groupList
 
     /**
+     * パスワードデータ一覧の挿入
+     *
+     * @param passwordList 挿入するパスワード一覧
+     */
+    fun insertPassword(passwordList: List<PasswordEntity>) = viewModelScope.launch {
+        repository.insertPasswords(passwordList)
+    }
+
+    /**
+     * グループデータ一覧の挿入
+     *
+     * @param groupList 挿入するグループ一覧
+     */
+    fun insertGroup(groupList: List<GroupEntity>) = viewModelScope.launch {
+        repository.insertGroups(groupList)
+    }
+
+    /**
      * パスワードデータ一覧の再挿入
      * * 既存のパスワード一覧を削除して再度パスワード一覧データを挿入する
      *

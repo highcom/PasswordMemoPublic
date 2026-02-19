@@ -81,6 +81,7 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
     private val settingViewModel: SettingViewModel by viewModels()
     /** 課金ビューモデル */
     private val billingViewModel: BillingViewModel by activityViewModels()
+    private var selectedCsvInputMode: String? = null
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -338,7 +339,8 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
             getString(R.string.backup_db) -> {
                 confirmBackupSelectFile()
             }
-            getString(R.string.input_csv) -> {
+            getString(R.string.input_csv_override), getString(R.string.input_csv_add) -> {
+                selectedCsvInputMode = path
                 confirmInputSelectFile()
             }
             getString(R.string.output_csv) -> {
@@ -428,7 +430,8 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
                 // CSV入力
                 INPUT_CSV -> {
                     val inputExternalFile = InputExternalFile(requireActivity(), settingViewModel)
-                    inputExternalFile.inputSelectFolder(uri)
+                    val isOverride = selectedCsvInputMode == getString(R.string.input_csv_override)
+                    inputExternalFile.confirmInputDialog(uri, isOverride)
                 }
                 // CSV出力
                 OUTPUT_CSV -> {

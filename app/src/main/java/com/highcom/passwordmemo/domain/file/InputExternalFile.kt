@@ -31,8 +31,7 @@ import java.util.concurrent.Executors
  * @property activity ダイアログ表示用アクティビティ
  * @property settingViewModel ビューモデル
  */
-class InputExternalFile(private val activity: Activity,
-                        private val settingViewModel: SettingViewModel) {
+class InputExternalFile(private val activity: Activity, private val settingViewModel: SettingViewModel) {
     /** パスワード一覧データ */
     private var passwordList: MutableList<PasswordEntity>? = null
     /** グループ一覧データ */
@@ -45,6 +44,8 @@ class InputExternalFile(private val activity: Activity,
     private var progressAlertDialog: AlertDialog? = null
     /** 取込処理中のプログレスバー */
     private var progressBar: ProgressBar? = null
+    /** 上書きモードか */
+    private var isOverride = false
 
     /**
      * ファイル取込処理用バックグラウンドタスク
@@ -59,9 +60,15 @@ class InputExternalFile(private val activity: Activity,
          */
         @WorkerThread
         override fun run() {
-            settingViewModel.reInsertPassword(passwordList!!)
-            progressBar!!.progress = 50
-            settingViewModel.reInsertGroup(groupList!!)
+            if (isOverride) {
+                settingViewModel.reInsertPassword(passwordList!!)
+                progressBar!!.progress = 50
+                settingViewModel.reInsertGroup(groupList!!)
+            } else {
+                settingViewModel.insertPassword(passwordList!!)
+                progressBar!!.progress = 50
+                settingViewModel.insertGroup(groupList!!)
+            }
             progressBar!!.progress = 100
             val postExecutor = PostExecutor()
             _handler.post(postExecutor)
@@ -80,8 +87,9 @@ class InputExternalFile(private val activity: Activity,
         @UiThread
         override fun run() {
             progressAlertDialog!!.dismiss()
+            val title = if (isOverride) activity.getString(R.string.input_csv_override) else activity.getString(R.string.input_csv_add)
             AlertDialog.Builder(activity)
-                .setTitle(activity.getString(R.string.input_csv))
+                .setTitle(title)
                 .setMessage(
                     activity.getString(R.string.csv_input_complete_message) + System.getProperty(
                         "line.separator"
@@ -96,16 +104,31 @@ class InputExternalFile(private val activity: Activity,
      * CSVファイル取込元フォルダ選択確認ダイアログ表示処理
      *
      * @param uri 取込元ファイルURI
+     * @param isOverride 上書きモードか
      */
-    fun inputSelectFolder(uri: Uri?) {
+    fun confirmInputDialog(uri: Uri?, isOverride: Boolean) {
         this.uri = uri
+        this.isOverride = isOverride
+        val title: String
+        val messageFront: String
+        val messageRear: String
+        if (isOverride) {
+            title = activity.getString(R.string.input_csv_override)
+            messageFront = activity.getString(R.string.input_override_message_front)
+            messageRear = activity.getString(R.string.input_override_message_rear)
+        } else {
+            title = activity.getString(R.string.input_csv_add)
+            messageFront = activity.getString(R.string.input_add_message_front)
+            messageRear = activity.getString(R.string.input_add_message_rear)
+        }
         AlertDialog.Builder(activity)
-            .setTitle(activity.getString(R.string.input_csv))
+            .setTitle(title)
             .setMessage(
-                activity.getString(R.string.input_message_front) + getFileNameByUri(
+                messageFront + getFileNameByUri(
                     activity,
                     uri
-                ) + System.getProperty("line.separator") + activity.getString(R.string.input_message_rear)
+                ) + System.getProperty("line.separator") + messageRear
+
             )
             .setPositiveButton(R.string.input_button) { _, _ ->
                 if (importDatabase(uri)) {
@@ -286,9 +309,19 @@ class InputExternalFile(private val activity: Activity,
      */
     @SuppressLint("InflateParams")
     private fun execImportDatabase() {
+        val title: String
+        val message: String
+        if (isOverride) {
+            title = activity.getString(R.string.input_csv_override)
+            message = activity.getString(R.string.csv_input_override_confirm_message)
+        } else {
+            title = activity.getString(R.string.input_csv_add)
+            message = activity.getString(R.string.csv_input_add_confirm_message)
+        }
+
         AlertDialog.Builder(activity)
-            .setTitle(activity.getString(R.string.input_csv))
-            .setMessage(activity.getString(R.string.csv_input_confirm_message))
+            .setTitle(title)
+            .setMessage(message)
             .setPositiveButton(R.string.execute) { _, _ -> // 取込み中のプログレスバーを表示する
                 val binding = AlertProgressbarBinding.inflate(activity.layoutInflater)
                 progressAlertDialog = AlertDialog.Builder(activity)
@@ -316,24 +349,25 @@ class InputExternalFile(private val activity: Activity,
      *
      */
     private fun failedImportDatabase() {
+        val title = if (isOverride) activity.getString(R.string.input_csv_override) else activity.getString(R.string.input_csv_add)
         if (id == HEADER_RECORD) {
             // ヘッダが正しくないエラーを表示する
             AlertDialog.Builder(activity)
-                .setTitle(activity.getString(R.string.input_csv))
+                .setTitle(title)
                 .setMessage(activity.getString(R.string.csv_input_failed_header_message))
                 .setPositiveButton(R.string.ok, null)
                 .show()
         } else if (id > MAX_RECORD) {
             // 入力上限を超えたエラーを表示する
             AlertDialog.Builder(activity)
-                .setTitle(activity.getString(R.string.input_csv))
+                .setTitle(title)
                 .setMessage(activity.getString(R.string.csv_input_failed_counts_message))
                 .setPositiveButton(R.string.ok, null)
                 .show()
         } else {
             // 指定行がエラーであるエラーを表示する
             AlertDialog.Builder(activity)
-                .setTitle(activity.getString(R.string.input_csv))
+                .setTitle(title)
                 .setMessage(activity.getString(R.string.csv_input_failed_body_message) + id)
                 .setPositiveButton(R.string.ok, null)
                 .show()

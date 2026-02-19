@@ -146,7 +146,8 @@
     <string name="select_operation_err_message">No operation is selected.</string>
     <string name="restore_db">Restore DB</string>
     <string name="backup_db">Backup DB</string>
-    <string name="input_csv">Input CSV</string>
+    <string name="input_csv_override">CSV Import (Overwrite)</string>
+    <string name="input_csv_add">CSV Import (Add)</string>
     <string name="output_csv">Output CSV</string>
     <string name="restore_button">Restore</string>
     <string name="backup_button">Backup</string>
@@ -157,8 +158,10 @@
     <string name="restore_message_error_file">The selected files cannot be restored.</string>
     <string name="backup_message_front">Backup to </string>
     <string name="backup_message_rear"></string>
-    <string name="input_message_front">Input from </string>
-    <string name="input_message_rear"></string>
+    <string name="input_override_message_front">Overwrite and import from</string>
+    <string name="input_override_message_rear"></string>
+    <string name="input_add_message_front">Add and import from</string>
+    <string name="input_add_message_rear"></string>
     <string name="output_message_front">Output to </string>
     <string name="output_message_rear"></string>
     <string name="no_access_message">You do not have access.\nPlease set the permission of the application.\nDo you want to go to settings?</string>
@@ -168,6 +171,8 @@
     <string name="db_restore_failed_message">DB file restore failed.</string>
     <string name="csv_input_processing">CSV importing</string>
     <string name="csv_input_confirm_message">All data will be overwritten. Do you want to run it?</string>
+    <string name="csv_input_override_confirm_message">All data will be overwritten. Do you want to run it?</string>
+    <string name="csv_input_add_confirm_message">Add data. Do you want to run it?</string>
     <string name="csv_input_complete_message">CSV file input completed.</string>
     <string name="csv_input_failed_header_message">Import was canceled because the header line was not set correctly.\nTITLE, ACCOUNT, PASSWORD, URL, MEMO, INPUT DATE, GCOLOR, PCOLOR must be set.</string>
     <string name="csv_input_failed_counts_message">Import was canceled because the data line is invalid. It is not possible to import more than 30000 data.</string>

@@ -146,7 +146,8 @@
     <string name="select_operation_err_message">操作が選択されていません。</string>
     <string name="restore_db">DB復元</string>
     <string name="backup_db">DBバックアップ</string>
-    <string name="input_csv">CSV取込</string>
+    <string name="input_csv_override">CSV取込(上書)</string>
+    <string name="input_csv_add">CSV取込(追加)</string>
     <string name="output_csv">CSV出力</string>
     <string name="restore_button">復元</string>
     <string name="backup_button">バックアップ</string>
@@ -157,8 +158,10 @@
     <string name="restore_message_error_file">選択したファイルは復元できません。</string>
     <string name="backup_message_front"></string>
     <string name="backup_message_rear">にバックアップします</string>
-    <string name="input_message_front"></string>
-    <string name="input_message_rear">を取込みます</string>
+    <string name="input_override_message_front"></string>
+    <string name="input_override_message_rear">を上書きで取込みます</string>
+    <string name="input_add_message_front"></string>
+    <string name="input_add_message_rear">を追加で取込みます</string>
     <string name="output_message_front"></string>
     <string name="output_message_rear">に出力します</string>
     <string name="no_access_message">アクセス権限がありません。\nアプリの権限を設定して下さい。\n設定に移動しますか？</string>
@@ -168,6 +171,8 @@
     <string name="db_restore_failed_message">DBファイルの復元に失敗しました。</string>
     <string name="csv_input_processing">CSV取込み中</string>
     <string name="csv_input_confirm_message">すべでのデータは上書きされます。実行しますか？</string>
+    <string name="csv_input_override_confirm_message">すべでのデータは上書きされます。実行しますか？</string>
+    <string name="csv_input_add_confirm_message">データを追加します。実行しますか？</string>
     <string name="csv_input_complete_message">CSVファイルを取込みました。</string>
     <string name="csv_input_failed_header_message">ヘッダ行が正しく設定されていないため取込みを中止しました。\n「TITLE,ACCOUNT,PASSWORD,URL,MEMO,INPUTDATE,GCOLOR,PCOLOR」が設定されている必要があります。</string>
     <string name="csv_input_failed_counts_message">データ行が不正なため取込みを中止しました。30000件を超えるデータは取込みできません。</string>
