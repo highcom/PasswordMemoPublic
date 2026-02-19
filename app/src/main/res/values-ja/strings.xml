@@ -72,6 +72,9 @@
     <string name="enter_memo_message">メモを入力</string>
     <string name="copy_clipboard_success">クリップボードにコピーしました</string>
     <string name="copy_clipboard_failure">クリップボードにコピー失敗</string>
+    <string name="error_starting_app">アプリを起動できません。</string>
+    <string name="error_opening_url">URLを開けませんでした。</string>
+    <string name="choose_browser">選択</string>
     <string name="generate_password">パスワードを生成</string>
     <string name="generate_password_title">パスワード生成</string>
     <string name="character_type">文字種別</string>
@@ -261,4 +264,6 @@
     <string name="autofill_setting_description_3">2.Chromeブラウザの設定を変更</string>
     <string name="autofill_setting_description_4">Chromeの設定\n→自動入力サービス\n→別の自動サービスを使用して自動入力を選択</string>
     <string name="autofill_setting_service_button">端末設定へ</string>
+    <string name="autofill_save_title">パスワードメモに保存</string>
+    <string name="autofill_save_message">このパスワードをパスワードメモに保存しますか？</string>
 </resources>

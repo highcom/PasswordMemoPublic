@@ -37,6 +37,13 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.AutofillInputActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MaterialComponents.DayNight.Dialog"
+            android:excludeFromRecents="true"
+            android:taskAffinity="" />
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_app_id" />
