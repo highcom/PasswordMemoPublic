@@ -1,6 +1,7 @@
 package com.highcom.passwordmemo.ui.fragment
 
 import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipDescription
 import android.content.ClipboardManager
@@ -169,15 +170,35 @@ class ReferencePasswordFragment : Fragment() {
      */
     fun onUrlParseTextClick(view: View) {
         if (view is EditText) {
-            var url = view.text.toString()
-            if (url.isEmpty()) return
-            if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                url = "http://$url"
+            val urlOrPackage = view.text.toString()
+            if (urlOrPackage.isEmpty()) return
+
+            val pm = requireContext().packageManager
+            val launchIntent = pm.getLaunchIntentForPackage(urlOrPackage)
+
+            if (launchIntent != null) {
+                // App installed
+                try {
+                    startActivity(launchIntent)
+                } catch (e: ActivityNotFoundException) {
+                    // This should not happen if launchIntent is not null, but for safety
+                    view.showThemedSnackBar(getString(R.string.error_starting_app), Snackbar.LENGTH_LONG)
+                }
+            } else {
+                // Not a package name or app not installed, treat as URL
+                var url = urlOrPackage
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    url = "http://$url"
+                }
+                try {
+                    val uri = Uri.parse(url)
+                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                    val chooser = Intent.createChooser(intent, getString(R.string.choose_browser))
+                    startActivity(chooser)
+                } catch (e: Exception) {
+                    view.showThemedSnackBar(getString(R.string.error_opening_url), Snackbar.LENGTH_LONG)
+                }
             }
-            val uri = Uri.parse(url)
-            val intent = Intent(Intent.ACTION_VIEW, uri)
-            val chooser = Intent.createChooser(intent, "選択")
-            startActivity(chooser)
         }
     }
 

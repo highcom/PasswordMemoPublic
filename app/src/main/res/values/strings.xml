@@ -72,6 +72,9 @@
     <string name="enter_memo_message">Enter memo</string>
     <string name="copy_clipboard_success">Copied to clipboard</string>
     <string name="copy_clipboard_failure">Copy to clipboard failed</string>
+    <string name="error_starting_app">Could not start app.</string>
+    <string name="error_opening_url">Could not open URL.</string>
+    <string name="choose_browser">Select</string>
     <string name="generate_password">Generate password</string>
     <string name="generate_password_title">Password generation</string>
     <string name="character_type">Character type</string>

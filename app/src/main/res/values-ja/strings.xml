@@ -72,6 +72,9 @@
     <string name="enter_memo_message">メモを入力</string>
     <string name="copy_clipboard_success">クリップボードにコピーしました</string>
     <string name="copy_clipboard_failure">クリップボードにコピー失敗</string>
+    <string name="error_starting_app">アプリを起動できません。</string>
+    <string name="error_opening_url">URLを開けませんでした。</string>
+    <string name="choose_browser">選択</string>
     <string name="generate_password">パスワードを生成</string>
     <string name="generate_password_title">パスワード生成</string>
     <string name="character_type">文字種別</string>

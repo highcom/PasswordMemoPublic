@@ -225,6 +225,11 @@ class PasswordMemoAutofillService : AutofillService() {
         for (i in 0 until structure.windowNodeCount) {
             structure.getWindowNodeAt(i).rootViewNode?.let { traverse(it) }
         }
+
+        if (domain.isNullOrBlank()) {
+            domain = structure.activityComponent?.packageName
+        }
+
         return ParsedStructure(domain, usernameIds, passwordIds, values)
     }
 
