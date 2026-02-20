@@ -106,6 +106,8 @@
     <string name="db_input_output_message">Input / Output password data to DB file</string>
     <string name="csv_input_output">Input/Output CSV file</string>
     <string name="csv_input_output_message">Input / Output password data to CSV file</string>
+    <string name="chrome_csv_input_output">ChromeCSV file input/output</string>
+    <string name="chrome_csv_input_output_message">Import/output CSV data in Chrome format</string>
     <string name="select_input_output">Select</string>
     <string name="select_input_output_paid">Select (Paid)</string>
     <string name="csv_output">Output CSV file</string>
@@ -143,6 +145,7 @@
     <string name="password_change_message">Password changed</string>
     <string name="restart_message">Rebooted to reflect settings</string>
     <string name="select_operation">Select operation</string>
+    <string name="select_chrome_data_operation">Select chrome data operation</string>
     <string name="select_operation_err_message">No operation is selected.</string>
     <string name="restore_db">Restore DB</string>
     <string name="backup_db">Backup DB</string>
@@ -174,8 +177,9 @@
     <string name="csv_input_override_confirm_message">All data will be overwritten. Do you want to run it?</string>
     <string name="csv_input_add_confirm_message">Add data. Do you want to run it?</string>
     <string name="csv_input_complete_message">CSV file input completed.</string>
+    <string name="csv_input_failed_chrome_header_message">Import was canceled because the header line was not set correctly.\nname, url, username, password, note must be set.</string>
     <string name="csv_input_failed_header_message">Import was canceled because the header line was not set correctly.\nTITLE, ACCOUNT, PASSWORD, URL, MEMO, INPUT DATE, GCOLOR, PCOLOR must be set.</string>
-    <string name="csv_input_failed_counts_message">Import was canceled because the data line is invalid. It is not possible to import more than 30000 data.</string>
+    <string name="csv_input_failed_counts_message">Import was canceled because the data line is invalid. It is not possible to import more than 10000 data.</string>
     <string name="csv_input_failed_body_message">Import was canceled because the data is invalid. Check the number of columns in the data.\nLine :</string>
     <string name="csv_input_failed_message">CSV file input failed.</string>
     <string name="db_backup_complete_message">DB file backup completed.\nRestart the app.</string>

@@ -21,6 +21,8 @@ import com.highcom.passwordmemo.ui.viewmodel.SettingViewModel
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Objects
 import java.util.concurrent.Executors
 
@@ -105,8 +107,9 @@ class InputExternalFile(private val activity: Activity, private val settingViewM
      *
      * @param uri 取込元ファイルURI
      * @param isOverride 上書きモードか
+     * @param isChromeCsv ChromeCSVか
      */
-    fun confirmInputDialog(uri: Uri?, isOverride: Boolean) {
+    fun confirmInputDialog(uri: Uri?, isOverride: Boolean, isChromeCsv: Boolean) {
         this.uri = uri
         this.isOverride = isOverride
         val title: String
@@ -131,10 +134,10 @@ class InputExternalFile(private val activity: Activity, private val settingViewM
 
             )
             .setPositiveButton(R.string.input_button) { _, _ ->
-                if (importDatabase(uri)) {
+                if (importDatabase(uri, isChromeCsv)) {
                     execImportDatabase()
                 } else {
-                    failedImportDatabase()
+                    failedImportDatabase(isChromeCsv)
                 }
             }
             .setNegativeButton(R.string.cancel, null)
@@ -146,10 +149,12 @@ class InputExternalFile(private val activity: Activity, private val settingViewM
      * * CSVファイルを1行ずつ読み取りエンティティデータへ変換してリストデータを作成する
      *
      * @param uri 取込元ファイルURI
+     * @param isChromeCsv ChromeCSVか
      * @return 取込完了可否
      */
+    @SuppressLint("SimpleDateFormat")
     @Suppress("KotlinConstantConditions")
-    private fun importDatabase(uri: Uri?): Boolean {
+    private fun importDatabase(uri: Uri?, isChromeCsv: Boolean): Boolean {
         var inputStream: InputStream? = null
         try {
             // 文字コードを判定し、判定できなければデフォルトをutf8とする
@@ -174,32 +179,59 @@ class InputExternalFile(private val activity: Activity, private val settingViewM
             ))
             id = HEADER_RECORD
             while (reader.readLine().also { line = it ?: "" } != null) {
-                val result = line.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                // カラム数が合っていなかった場合終了
-                if (result.size != COLUMN_COUNT_6 && result.size != COLUMN_COUNT_7 && result.size != COLUMN_COUNT_9) return false
-                // 入力最大レコード数を30000件とする
-                if (id > MAX_RECORD) return false
+                val result = if (isChromeCsv) line.split(",".toRegex()).toTypedArray() else line.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                 // ヘッダが正しく設定されているか
-                if (!isHeaderCorrect && result.size == COLUMN_COUNT_6 &&
-                    result[0] == "TITLE" && result[1] == "ACCOUNT" && result[2] == "PASSWORD" && result[3] == "URL" && result[4] == "MEMO" && result[5] == "INPUTDATE") {
-                    // バージョン2系の場合
-                    isHeaderCorrect = true
-                    columnCount = COLUMN_COUNT_6
-                    continue
-                } else if (!isHeaderCorrect && result.size == COLUMN_COUNT_7 &&
-                    result[0] == "TITLE" && result[1] == "ACCOUNT" && result[2] == "PASSWORD" && result[3] == "URL" && result[4] == "GROUP" && result[5] == "MEMO" && result[6] == "INPUTDATE") {
-                    // バージョン3系4系の場合
-                    isHeaderCorrect = true
-                    columnCount = COLUMN_COUNT_7
-                    continue
-                } else if (!isHeaderCorrect && result.size == COLUMN_COUNT_9 &&
-                    result[0] == "TITLE" && result[1] == "ACCOUNT" && result[2] == "PASSWORD" && result[3] == "URL" && result[4] == "GROUP" && result[5] == "MEMO" && result[6] == "INPUTDATE" && result[7] == "GCOLOR" && result[8] == "PCOLOR") {
-                    // バージョン5系の場合
-                    isHeaderCorrect = true
-                    columnCount = COLUMN_COUNT_9
-                    continue
+                if (isChromeCsv) {
+                    // カラム数が合っていなかった場合終了
+                    if (result.size != COLUMN_COUNT_5) return false
+                    if (!isHeaderCorrect && result.size == COLUMN_COUNT_5 &&
+                        result[0] == "name" && result[1] == "url" && result[2] == "username" && result[3] == "password" && result[4] == "note") {
+                        isHeaderCorrect = true
+                        columnCount = COLUMN_COUNT_5
+                        continue
+                    }
+                } else {
+                    // カラム数が合っていなかった場合終了
+                    if (result.size != COLUMN_COUNT_6 && result.size != COLUMN_COUNT_7 && result.size != COLUMN_COUNT_9) return false
+                    if (!isHeaderCorrect && result.size == COLUMN_COUNT_6 &&
+                        result[0] == "TITLE" && result[1] == "ACCOUNT" && result[2] == "PASSWORD" && result[3] == "URL" && result[4] == "MEMO" && result[5] == "INPUTDATE") {
+                        // バージョン2系の場合
+                        isHeaderCorrect = true
+                        columnCount = COLUMN_COUNT_6
+                        continue
+                    } else if (!isHeaderCorrect && result.size == COLUMN_COUNT_7 &&
+                        result[0] == "TITLE" && result[1] == "ACCOUNT" && result[2] == "PASSWORD" && result[3] == "URL" && result[4] == "GROUP" && result[5] == "MEMO" && result[6] == "INPUTDATE") {
+                        // バージョン3系4系の場合
+                        isHeaderCorrect = true
+                        columnCount = COLUMN_COUNT_7
+                        continue
+                    } else if (!isHeaderCorrect && result.size == COLUMN_COUNT_9 &&
+                        result[0] == "TITLE" && result[1] == "ACCOUNT" && result[2] == "PASSWORD" && result[3] == "URL" && result[4] == "GROUP" && result[5] == "MEMO" && result[6] == "INPUTDATE" && result[7] == "GCOLOR" && result[8] == "PCOLOR") {
+                        // バージョン5系の場合
+                        isHeaderCorrect = true
+                        columnCount = COLUMN_COUNT_9
+                        continue
+                    }
                 }
-                if (isHeaderCorrect && columnCount == COLUMN_COUNT_6) {
+                // 入力最大レコード数を10000件とする
+                if (id > MAX_RECORD) return false
+
+                if (isHeaderCorrect && isChromeCsv) {
+                    val date = Date()
+                    val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+                    val passwordEntity = PasswordEntity(
+                        id = id,
+                        title = result[0],
+                        account = result[2],
+                        password = result[3],
+                        url = result[1],
+                        groupId = 1,
+                        memo = result[4],
+                        inputDate = sdf.format(date),
+                        color = 0
+                    )
+                    passwordList?.add(passwordEntity)
+                } else if (isHeaderCorrect && columnCount == COLUMN_COUNT_6) {
                     val passwordEntity = PasswordEntity(
                         id = id,
                         title = result[0],
@@ -348,13 +380,14 @@ class InputExternalFile(private val activity: Activity, private val settingViewM
      * CSVファイル取込失敗ダイアログ表示処理
      *
      */
-    private fun failedImportDatabase() {
+    private fun failedImportDatabase(isChromeCsv: Boolean) {
         val title = if (isOverride) activity.getString(R.string.input_csv_override) else activity.getString(R.string.input_csv_add)
         if (id == HEADER_RECORD) {
+            val failedHeaderMessage = if (isChromeCsv) activity.getString(R.string.csv_input_failed_chrome_header_message) else activity.getString(R.string.csv_input_failed_header_message)
             // ヘッダが正しくないエラーを表示する
             AlertDialog.Builder(activity)
                 .setTitle(title)
-                .setMessage(activity.getString(R.string.csv_input_failed_header_message))
+                .setMessage(failedHeaderMessage)
                 .setPositiveButton(R.string.ok, null)
                 .show()
         } else if (id > MAX_RECORD) {
@@ -402,6 +435,8 @@ class InputExternalFile(private val activity: Activity, private val settingViewM
         private const val HEADER_RECORD = 1L
         /** 取込最大レコード数 */
         private const val MAX_RECORD = 10000
+        /** カラム数が5 */
+        private const val COLUMN_COUNT_5 = 5
         /** カラム数が6 */
         private const val COLUMN_COUNT_6 = 6
         /** カラム数が7 */

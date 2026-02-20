@@ -31,8 +31,9 @@ class OutputExternalFile(private val context: Context,
      * CSVファイル出力先確認ダイアログ表示処理
      *
      * @param uri ファイル出力先URI
+     * @param isChromeCsv ChromeCSVか
      */
-    fun outputSelectFolder(uri: Uri?) {
+    fun outputSelectFolder(uri: Uri?, isChromeCsv: Boolean) {
         AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.output_csv))
             .setMessage(
@@ -44,7 +45,7 @@ class OutputExternalFile(private val context: Context,
             )
             .setPositiveButton(R.string.output_button) { _, _ ->
                 settingViewModel.viewModelScope.launch(Dispatchers.IO) {
-                    exportDatabase(uri)
+                    exportDatabase(uri, isChromeCsv)
                 }
             }
             .setNegativeButton(R.string.cancel, null)
@@ -56,9 +57,10 @@ class OutputExternalFile(private val context: Context,
      * * DBデータをCSV形式に変換してファイル出力する
      *
      * @param uri 出力先ファイルURI
+     * @param isChromeCsv ChromeCSVか
      * @return 出力完了可否
      */
-    private suspend fun exportDatabase(uri: Uri?): Boolean {
+    private suspend fun exportDatabase(uri: Uri?, isChromeCsv: Boolean): Boolean {
         var result = true
         var outputStream: OutputStream? = null
 
@@ -70,33 +72,42 @@ class OutputExternalFile(private val context: Context,
         try {
             outputStream = context.contentResolver.openOutputStream(uri!!)
             //Write the name of the table and the name of the columns (comma separated values) in the .csv file.
-            val header =
+            val header = if (isChromeCsv) {
+                "name,url,username,password,note" + System.getProperty("line.separator")
+            } else {
                 "TITLE,ACCOUNT,PASSWORD,URL,GROUP,MEMO,INPUTDATE,GCOLOR,PCOLOR" + System.getProperty("line.separator")
+            }
             withContext(Dispatchers.IO) {
                 outputStream!!.write(header.toByteArray())
             }
             for (passwordEntity in passwordList) {
-                val title = passwordEntity.title
-                val account = passwordEntity.account
-                val password = passwordEntity.password
-                val url = passwordEntity.url
-                val groupId = passwordEntity.groupId
-                var group = context.getString(R.string.list_title)
-                val memo = passwordEntity.memo.replace("\n", "  ")
-                val inputdate = passwordEntity.inputDate
-                var groupColor = 0
-                val passwordColor = passwordEntity.color
-                for (groupEntity in groupList) {
-                    if (groupId == groupEntity.groupId) {
-                        group = groupEntity.name
-                        groupColor = groupEntity.color
-                        break
+                val record = if (isChromeCsv) {
+                    val name = passwordEntity.title
+                    val url = passwordEntity.url
+                    val username = passwordEntity.account
+                    val password = passwordEntity.password
+                    val note = passwordEntity.memo.replace("\n", "  ")
+                    "$name,$url,$username,$password,$note" + System.getProperty("line.separator")
+                } else {
+                    val title = passwordEntity.title
+                    val account = passwordEntity.account
+                    val password = passwordEntity.password
+                    val url = passwordEntity.url
+                    val groupId = passwordEntity.groupId
+                    var group = context.getString(R.string.list_title)
+                    val memo = passwordEntity.memo.replace("\n", "  ")
+                    val inputdate = passwordEntity.inputDate
+                    var groupColor = 0
+                    val passwordColor = passwordEntity.color
+                    for (groupEntity in groupList) {
+                        if (groupId == groupEntity.groupId) {
+                            group = groupEntity.name
+                            groupColor = groupEntity.color
+                            break
+                        }
                     }
+                    "$title,$account,$password,$url,$group,$memo,$inputdate,$groupColor,$passwordColor" + System.getProperty("line.separator")
                 }
-                val record =
-                    "$title,$account,$password,$url,$group,$memo,$inputdate,$groupColor,$passwordColor" + System.getProperty(
-                        "line.separator"
-                    )
                 withContext(Dispatchers.IO) {
                     outputStream?.write(record.toByteArray())
                 }

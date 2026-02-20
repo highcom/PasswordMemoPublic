@@ -82,6 +82,7 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
     /** 課金ビューモデル */
     private val billingViewModel: BillingViewModel by activityViewModels()
     private var selectedCsvInputMode: String? = null
+    private var selectedOperation: SelectInputOutputFileDialog.Operation? = null
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -240,10 +241,15 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
         if (!billingViewModel.hasActiveSubscription()) {
             binding.csvOutputButton.text = getString(R.string.select_input_output_paid)
             binding.csvOutputButton.isEnabled = false
+            binding.chromeCsvOutputButton.text = getString(R.string.select_input_output_paid)
+            binding.chromeCsvOutputButton.isEnabled = false
         } else {
             binding.csvOutputButton.text = getString(R.string.select_input_output)
             binding.csvOutputButton.isEnabled = true
             binding.csvOutputButton.setOnClickListener { confirmSelectOperation(SelectInputOutputFileDialog.Operation.CSV_INPUT_OUTPUT) }
+            binding.chromeCsvOutputButton.text = getString(R.string.select_input_output)
+            binding.chromeCsvOutputButton.isEnabled = true
+            binding.chromeCsvOutputButton.setOnClickListener { confirmSelectOperation(SelectInputOutputFileDialog.Operation.CHROME_CSV_INPUT_OUTPUT) }
         }
 
         // 背景色ボタン処理
@@ -322,6 +328,7 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
      * @param operation 選択操作
      */
     private fun confirmSelectOperation(operation: SelectInputOutputFileDialog.Operation) {
+        selectedOperation = operation
         val selectInputOutputFileDialog = SelectInputOutputFileDialog(requireContext(), operation, this)
         selectInputOutputFileDialog.createOpenFileDialog().show()
     }
@@ -331,7 +338,7 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
      *
      * @param path 選択操作名称
      */
-    override fun onSelectOperationClicked(path: String?) {
+    override fun onSelectOperationClicked(path: String?, isChromeCsv: Boolean) {
         when (path) {
             getString(R.string.restore_db) -> {
                 confirmRestoreSelectFile()
@@ -344,7 +351,7 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
                 confirmInputSelectFile()
             }
             getString(R.string.output_csv) -> {
-                confirmOutputSelectFile()
+                confirmOutputSelectFile(isChromeCsv)
             }
         }
     }
@@ -392,8 +399,8 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
      *
      */
     @Suppress("DEPRECATION")
-    private fun confirmOutputSelectFile() {
-        val fileName = "PasswordListFile_$nowDateString.csv"
+    private fun confirmOutputSelectFile(isChromeCsv: Boolean) {
+        val fileName = if (isChromeCsv) "PasswordListChromeFile_$nowDateString.csv" else "PasswordListFile_$nowDateString.csv"
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "text/csv"
@@ -431,13 +438,13 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
                 INPUT_CSV -> {
                     val inputExternalFile = InputExternalFile(requireActivity(), settingViewModel)
                     val isOverride = selectedCsvInputMode == getString(R.string.input_csv_override)
-                    inputExternalFile.confirmInputDialog(uri, isOverride)
+                    inputExternalFile.confirmInputDialog(uri, isOverride, selectedOperation == SelectInputOutputFileDialog.Operation.CHROME_CSV_INPUT_OUTPUT)
                 }
                 // CSV出力
                 OUTPUT_CSV -> {
                     val outputExternalFile = OutputExternalFile(requireContext(), settingViewModel)
                     lifecycleScope.launch {
-                        outputExternalFile.outputSelectFolder(uri)
+                        outputExternalFile.outputSelectFolder(uri, selectedOperation == SelectInputOutputFileDialog.Operation.CHROME_CSV_INPUT_OUTPUT)
                     }
                 }
             }
@@ -605,6 +612,8 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
         binding.dbBackupButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
         binding.textCsvOutputView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.csvOutputButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.textChromeCsvOutputView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.chromeCsvOutputButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
         binding.textColorSelectView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.colorSelectButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
         binding.textMasterPasswordView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)

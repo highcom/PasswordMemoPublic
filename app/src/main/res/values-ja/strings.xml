@@ -106,6 +106,8 @@
     <string name="db_input_output_message">データバックアップ/復元をDBファイルで実行</string>
     <string name="csv_input_output">CSVファイル入出力</string>
     <string name="csv_input_output_message">データ取込/出力をCSVファイルで実行</string>
+    <string name="chrome_csv_input_output">ChromeCSVファイル入出力</string>
+    <string name="chrome_csv_input_output_message">ChromeのフォーマットでCSVデータ取込/出力</string>
     <string name="select_input_output">選択</string>
     <string name="select_input_output_paid">選択(有料)</string>
     <string name="csv_output">CSVファイル出力</string>
@@ -143,6 +145,7 @@
     <string name="password_change_message">パスワードを変更しました</string>
     <string name="restart_message">設定反映のため再起動しました</string>
     <string name="select_operation">操作選択</string>
+    <string name="select_chrome_data_operation">Chromeデータ操作選択</string>
     <string name="select_operation_err_message">操作が選択されていません。</string>
     <string name="restore_db">DB復元</string>
     <string name="backup_db">DBバックアップ</string>
@@ -174,8 +177,9 @@
     <string name="csv_input_override_confirm_message">すべでのデータは上書きされます。実行しますか？</string>
     <string name="csv_input_add_confirm_message">データを追加します。実行しますか？</string>
     <string name="csv_input_complete_message">CSVファイルを取込みました。</string>
+    <string name="csv_input_failed_chrome_header_message">ヘッダ行が正しく設定されていないため取込みを中止しました。\n「name,url,username,password,note」が設定されている必要があります。</string>
     <string name="csv_input_failed_header_message">ヘッダ行が正しく設定されていないため取込みを中止しました。\n「TITLE,ACCOUNT,PASSWORD,URL,MEMO,INPUTDATE,GCOLOR,PCOLOR」が設定されている必要があります。</string>
-    <string name="csv_input_failed_counts_message">データ行が不正なため取込みを中止しました。30000件を超えるデータは取込みできません。</string>
+    <string name="csv_input_failed_counts_message">データ行が不正なため取込みを中止しました。10000件を超えるデータは取込みできません。</string>
     <string name="csv_input_failed_body_message">データが不正なため取込みを中止しました。列数を確認してください。\n行数：</string>
     <string name="csv_input_failed_message">CSVファイル取込に失敗しました</string>
     <string name="db_backup_complete_message">DBファイルをバックアップしました。\nアプリを再起動します。</string>

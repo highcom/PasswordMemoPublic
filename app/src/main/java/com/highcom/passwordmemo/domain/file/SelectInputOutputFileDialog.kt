@@ -28,7 +28,7 @@ class SelectInputOutputFileDialog(
      *
      */
     enum class Operation {
-        DB_RESTORE_BACKUP, CSV_INPUT_OUTPUT
+        DB_RESTORE_BACKUP, CSV_INPUT_OUTPUT, CHROME_CSV_INPUT_OUTPUT
     }
 
     /**
@@ -41,7 +41,7 @@ class SelectInputOutputFileDialog(
          *
          * @param path 選択操作文字列
          */
-        fun onSelectOperationClicked(path: String?)
+        fun onSelectOperationClicked(path: String?, isChromeCsv: Boolean)
     }
 
     init {
@@ -56,7 +56,7 @@ class SelectInputOutputFileDialog(
                 items[1] = context.getString(R.string.backup_db)
             }
 
-            Operation.CSV_INPUT_OUTPUT -> {
+            Operation.CSV_INPUT_OUTPUT, Operation.CHROME_CSV_INPUT_OUTPUT -> {
                 items = arrayOfNulls(3)
                 items[0] = context.getString(R.string.input_csv_override)
                 items[1] = context.getString(R.string.input_csv_add)
@@ -72,11 +72,17 @@ class SelectInputOutputFileDialog(
      */
     fun createOpenFileDialog(): AlertDialog.Builder {
         val builder = AlertDialog.Builder(context)
-        builder.setTitle(context.getString(R.string.select_operation))
+        val isChromeCsv = operation == Operation.CHROME_CSV_INPUT_OUTPUT
+        val title = if (isChromeCsv) {
+            context.getString(R.string.select_chrome_data_operation)
+        } else {
+            context.getString(R.string.select_operation)
+        }
+        builder.setTitle(title)
             .setSingleChoiceItems(items, checkedItem) { _, which -> checkedItem = which }
             .setPositiveButton(R.string.next) { _, _ ->
                 if (checkedItem >= 0 && checkedItem < items.size) {
-                    inputOutputFileDialogListener.onSelectOperationClicked(items[checkedItem])
+                    inputOutputFileDialogListener.onSelectOperationClicked(items[checkedItem], isChromeCsv)
                 } else {
                     val ts = Toast.makeText(
                         context,
