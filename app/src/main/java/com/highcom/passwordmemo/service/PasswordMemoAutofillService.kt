@@ -14,7 +14,7 @@ import android.view.autofill.AutofillValue
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import com.highcom.passwordmemo.R
-import com.highcom.passwordmemo.data.PasswordDao
+import com.highcom.passwordmemo.data.DatabaseManager
 import com.highcom.passwordmemo.domain.billing.PurchaseManager
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import com.highcom.passwordmemo.ui.AutofillInputActivity
@@ -31,7 +31,7 @@ import javax.inject.Inject
 class PasswordMemoAutofillService : AutofillService() {
 
     @Inject
-    lateinit var passwordDao: PasswordDao
+    lateinit var dbManager: DatabaseManager
 
     @Inject
     lateinit var loginDataManager: LoginDataManager
@@ -93,7 +93,7 @@ class PasswordMemoAutofillService : AutofillService() {
 
         val passwords = runBlocking {
             try {
-                passwordDao.getAllPasswords()
+                dbManager.getDatabase().passwordDao().getAllPasswords()
             } catch (e: Exception) {
                 emptyList()
             }

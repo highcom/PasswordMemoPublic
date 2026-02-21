@@ -1,22 +1,13 @@
 package com.highcom.passwordmemo.di
 
 import android.content.Context
-import android.util.Log
-import androidx.room.Room
-import com.highcom.passwordmemo.R
-import com.highcom.passwordmemo.data.MIGRATION_2_3
-import com.highcom.passwordmemo.data.MIGRATION_3_4
-import com.highcom.passwordmemo.data.MIGRATION_4_5
-import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
+import com.highcom.passwordmemo.data.DatabaseManager
 import com.highcom.passwordmemo.domain.billing.PurchaseManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import net.sqlcipher.database.SQLiteDatabase
-import net.sqlcipher.database.SQLiteDatabaseHook
-import net.sqlcipher.database.SupportFactory
 import javax.inject.Singleton
 
 /**
@@ -27,67 +18,23 @@ import javax.inject.Singleton
 object PasswordMemoModule {
 
     /**
-     * パスワードメモRoomデータベースプロバイダ
+     * アプリケーションスコープで使う DatabaseManager を提供する。
      *
-     * @param context コンテキスト
+     * DatabaseManager は内部で Room のインスタンスを管理し、復元時に DB を再生成する機能を持つ。
+     * @param context アプリケーションコンテキスト
+     * @return シングルトンの [DatabaseManager]
      */
     @Singleton
     @Provides
-    fun provideDatabase(
-        @ApplicationContext context: Context
-    ) = Room.databaseBuilder(
-        context.applicationContext,
-        PasswordMemoRoomDatabase::class.java,
-        "PasswordMemoDB"
-    ).allowMainThreadQueries()
-        .fallbackToDestructiveMigration()
-        .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
-        .openHelperFactory(SupportFactory(SQLiteDatabase.getBytes(context.getString(R.string.db_secret_key).toCharArray()), object : SQLiteDatabaseHook {
-            override fun preKey(database: SQLiteDatabase?) {}
-
-            override fun postKey(database: SQLiteDatabase?) {
-                val cursor = database?.rawQuery("PRAGMA cipher_migrate", null)
-
-                var migrationOccurred = false
-
-                if (cursor?.count == 1) {
-                    cursor.moveToFirst()
-                    val selection: String = cursor.getString(0)
-                    migrationOccurred = selection == "0"
-                    Log.d("selection", selection)
-                }
-
-                cursor?.close()
-
-                Log.d("migrationOccurred:", migrationOccurred.toString())
-            }
-
-        }))
-        .build()
-
+    fun provideDatabaseManager(@ApplicationContext context: Context): DatabaseManager {
+        return DatabaseManager(context)
+    }
 
     /**
-     * パスワードデータアクセスオブジェクトプロバイダ
-     *
-     * @param db データベース
-     */
-    @Singleton
-    @Provides
-    fun providePasswordDao(db: PasswordMemoRoomDatabase) = db.passwordDao()
-
-    /**
-     * グループデータアクセスオブジェクトプロバイダ
-     *
-     * @param db データベース
-     */
-    @Singleton
-    @Provides
-    fun provideGroupDao(db: PasswordMemoRoomDatabase) = db.groupDao()
-
-    /**
-     * 購入状態管理マネージャープロバイダ
+     * 購入状態管理マネージャーを提供する。
      *
      * @param context アプリケーションコンテキスト
+     * @return シングルトンの [PurchaseManager]
      */
     @Singleton
     @Provides

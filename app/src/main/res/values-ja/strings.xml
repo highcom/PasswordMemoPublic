@@ -170,7 +170,7 @@
     <string name="no_access_message">アクセス権限がありません。\nアプリの権限を設定して下さい。\n設定に移動しますか？</string>
     <string name="db_restore_processing">DBデータ復元中</string>
     <string name="db_restore_confirm_message">すべでのデータは上書きされます。実行しますか？</string>
-    <string name="db_restore_complete_message">DBファイルの復元完了しました。\nアプリを再起動します。</string>
+    <string name="db_restore_complete_message">DBファイルの復元完了しました。</string>
     <string name="db_restore_failed_message">DBファイルの復元に失敗しました。</string>
     <string name="csv_input_processing">CSV取込み中</string>
     <string name="csv_input_confirm_message">すべでのデータは上書きされます。実行しますか？</string>
@@ -182,7 +182,7 @@
     <string name="csv_input_failed_counts_message">データ行が不正なため取込みを中止しました。10000件を超えるデータは取込みできません。</string>
     <string name="csv_input_failed_body_message">データが不正なため取込みを中止しました。列数を確認してください。\n行数：</string>
     <string name="csv_input_failed_message">CSVファイル取込に失敗しました</string>
-    <string name="db_backup_complete_message">DBファイルをバックアップしました。\nアプリを再起動します。</string>
+    <string name="db_backup_complete_message">DBファイルをバックアップしました。</string>
     <string name="db_backup_failed_message">DBファイルのバックアップに失敗しました。</string>
     <string name="csv_output_complete_message">CSVファイルを出力しました。</string>
     <string name="csv_output_failed_message">CSVファイル出力が失敗しました</string>

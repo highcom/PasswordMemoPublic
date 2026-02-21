@@ -1,152 +1,172 @@
 package com.highcom.passwordmemo.data
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * パスワードメモデータアクセスリポジトリ
  *
- * @property passwordDao パスワードデータアクセスオブジェクト
- * @property groupDao グループデータアクセスオブジェクト
+ * DatabaseManager を注入し、DB インスタンスの再生成時に Flow を切り替える
  */
-class PasswordMemoRepository @Inject constructor(private val passwordDao: PasswordDao, private val groupDao: GroupDao) {
-    /** グループ一覧データ */
-    val groupList: Flow<List<GroupEntity>> = groupDao.getGroupList()
+@OptIn(ExperimentalCoroutinesApi::class)
+class PasswordMemoRepository @Inject constructor(private val dbManager: DatabaseManager) {
+    /**
+     * グループ一覧データの Flow。
+     *
+     * DatabaseManager の再生成通知 ([DatabaseManager.dbRecreated]) をトリガーにして内部の DAO による Flow に切り替わる。
+     * UI はこの Flow を購読するだけで、DB を置換した際に自動的に新しい DB のデータを受け取れる。
+     */
+    val groupList: Flow<List<GroupEntity>> =
+        dbManager.dbRecreated
+            .onStart { emit(Unit) }
+            .flatMapLatest {
+                dbManager.getDatabase().groupDao().getGroupList()
+            }
 
     /**
      * パスワード一覧データ取得処理
-     * グループIDの指定があれば指定されたグループに対するパスワード一覧データを取得する
      *
-     * @param groupId グループID
-     * @return パスワード一覧データ
+     * 指定したグループのパスワード一覧を Flow で返す。
+     * DatabaseManager の再生成通知により内部の DAO による Flow に切り替わるため、
+     * DB が置き換わっても購読を継続していれば自動的に新しい内容が流れてくる。
+     *
+     * @param groupId 取得対象のグループID（1L は全件）
+     * @return パスワード一覧の Flow
      */
     fun getPasswordList(groupId: Long): Flow<List<PasswordEntity>> {
         return if (groupId == 1L) {
-            passwordDao.getPasswordList()
+            dbManager.dbRecreated
+                .onStart { emit(Unit) }
+                .flatMapLatest { dbManager.getDatabase().passwordDao().getPasswordList() }
         } else {
-            passwordDao.getSelectGroupPasswordList(groupId)
+            dbManager.dbRecreated
+                .onStart { emit(Unit) }
+                .flatMapLatest { dbManager.getDatabase().passwordDao().getSelectGroupPasswordList(groupId) }
         }
     }
 
     /**
-     * パスワード総件数取得
+     * パスワード総件数を同期的に取得する。
+     *
+     * @return パスワード総件数
      */
     suspend fun getPasswordCount(): Int {
-        return passwordDao.getPasswordCount()
+        return dbManager.getDatabase().passwordDao().getPasswordCount()
     }
 
     /**
-     * パスワードデータ追加
+     * 単一のパスワードデータを挿入する。
      *
-     * @param passwordEntity パスワードデータ
+     * @param passwordEntity 挿入する [PasswordEntity]
      */
     suspend fun insertPassword(passwordEntity: PasswordEntity) {
-        passwordDao.insertPassword(passwordEntity)
+        dbManager.getDatabase().passwordDao().insertPassword(passwordEntity)
     }
 
     /**
-     * パスワードデータ一括追加
+     * 複数のパスワードデータを一括挿入する。
      *
-     * @param passwordList パスワードデータリスト
+     * @param passwordList 挿入する [PasswordEntity] のリスト
      */
     suspend fun insertPasswords(passwordList: List<PasswordEntity>) {
-        passwordDao.insertPasswords(passwordList)
+        dbManager.getDatabase().passwordDao().insertPasswords(passwordList)
     }
 
     /**
-     * パスワードデータ更新
+     * 単一のパスワードデータを更新する。
      *
-     * @param passwordEntity パスワードデータ
+     * @param passwordEntity 更新対象の [PasswordEntity]
      */
     suspend fun updatePassword(passwordEntity: PasswordEntity) {
-        passwordDao.updatePassword(passwordEntity)
+        dbManager.getDatabase().passwordDao().updatePassword(passwordEntity)
     }
 
     /**
-     * パスワードデータ一括更新
+     * 複数のパスワードデータを一括更新する。
      *
-     * @param passwordList パスワードデータリスト
+     * @param passwordList 更新対象の [PasswordEntity] リスト
      */
     suspend fun updatePasswords(passwordList: List<PasswordEntity>) {
-        passwordDao.updatePasswords(passwordList)
+        dbManager.getDatabase().passwordDao().updatePasswords(passwordList)
     }
 
     /**
-     * パスワードデータ削除
+     * 指定した ID のパスワードデータを削除する。
      *
-     * @param id パスワードID
+     * @param id 削除するパスワードの ID
      */
     suspend fun deletePassword(id: Long) {
-        passwordDao.deletePassword(id)
+        dbManager.getDatabase().passwordDao().deletePassword(id)
     }
 
     /**
-     * パスワードデータ全削除
-     *
+     * パスワードテーブルを全削除する。
      */
     suspend fun deleteAllPassword() {
-        passwordDao.deleteAllPassword()
+        dbManager.getDatabase().passwordDao().deleteAllPassword()
     }
 
     /**
-     * 指定されたグループIDを初期グループIDにリセットする
+     * 指定されたグループID の参照を初期グループ（1）にリセットする。
      *
-     * @param groupId リセットするグループID
+     * @param groupId リセット対象のグループID
      */
     suspend fun resetGroupId(groupId: Long) {
-        passwordDao.resetGroupId(groupId)
+        dbManager.getDatabase().passwordDao().resetGroupId(groupId)
     }
 
     /**
-     * グループデータ追加
+     * グループを追加する。
      *
-     * @param groupEntity グループデータ
+     * @param groupEntity 追加する [GroupEntity]
      */
     suspend fun insertGroup(groupEntity: GroupEntity) {
-        groupDao.insertGroup(groupEntity)
+        dbManager.getDatabase().groupDao().insertGroup(groupEntity)
     }
 
     /**
-     * グループデータ一括追加
+     * グループを一括追加する。
      *
-     * @param groupList グループデータリスト
+     * @param groupList 追加する [GroupEntity] のリスト
      */
     suspend fun insertGroups(groupList: List<GroupEntity>) {
-        groupDao.insertGroups(groupList)
+        dbManager.getDatabase().groupDao().insertGroups(groupList)
     }
 
     /**
-     * グループデータ更新
+     * グループを更新する。
      *
-     * @param groupEntity グループデータ
+     * @param groupEntity 更新対象の [GroupEntity]
      */
     suspend fun updateGroup(groupEntity: GroupEntity) {
-        groupDao.updateGroup(groupEntity)
+        dbManager.getDatabase().groupDao().updateGroup(groupEntity)
     }
 
     /**
-     * グループデータ一括更新
+     * グループを一括更新する。
      *
-     * @param groupList グループデータリスト
+     * @param groupList 更新対象の [GroupEntity] リスト
      */
     suspend fun updateGroups(groupList: List<GroupEntity>) {
-        groupDao.updateGroups(groupList)
+        dbManager.getDatabase().groupDao().updateGroups(groupList)
     }
 
     /**
-     * グループデータ削除
+     * 指定したグループを削除する。
      *
-     * @param groupId グループID
+     * @param groupId 削除対象のグループID
      */
     suspend fun deleteGroup(groupId: Long) {
-        groupDao.deleteGroup(groupId)
+        dbManager.getDatabase().groupDao().deleteGroup(groupId)
     }
 
     /**
-     * グループデータ全削除
-     *
+     * グループテーブルを全削除する。
      */
     suspend fun deleteAllGroup() {
-        groupDao.deleteAllGroup()
+        dbManager.getDatabase().groupDao().deleteAllGroup()
     }
 }

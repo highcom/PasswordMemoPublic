@@ -170,7 +170,7 @@
     <string name="no_access_message">You do not have access.\nPlease set the permission of the application.\nDo you want to go to settings?</string>
     <string name="db_restore_processing">DB restoreing</string>
     <string name="db_restore_confirm_message">All data will be overwritten. Do you want to run it?</string>
-    <string name="db_restore_complete_message">DB file restore completed.\nRestart the app.</string>
+    <string name="db_restore_complete_message">DB file restore completed.</string>
     <string name="db_restore_failed_message">DB file restore failed.</string>
     <string name="csv_input_processing">CSV importing</string>
     <string name="csv_input_confirm_message">All data will be overwritten. Do you want to run it?</string>
@@ -182,7 +182,7 @@
     <string name="csv_input_failed_counts_message">Import was canceled because the data line is invalid. It is not possible to import more than 10000 data.</string>
     <string name="csv_input_failed_body_message">Import was canceled because the data is invalid. Check the number of columns in the data.\nLine :</string>
     <string name="csv_input_failed_message">CSV file input failed.</string>
-    <string name="db_backup_complete_message">DB file backup completed.\nRestart the app.</string>
+    <string name="db_backup_complete_message">DB file backup completed.</string>
     <string name="db_backup_failed_message">DB file backup failed.</string>
     <string name="csv_output_complete_message">CSV file output completed.</string>
     <string name="csv_output_failed_message">CSV file output failed.</string>

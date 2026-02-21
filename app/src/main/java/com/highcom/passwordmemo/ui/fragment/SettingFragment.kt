@@ -27,7 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.highcom.passwordmemo.PasswordMemoDrawerActivity
 import com.highcom.passwordmemo.R
-import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
+import com.highcom.passwordmemo.data.DatabaseManager
 import com.highcom.passwordmemo.databinding.FragmentSettingBinding
 import com.highcom.passwordmemo.ui.list.SetTextSizeAdapter
 import com.highcom.passwordmemo.ui.list.ColorList
@@ -58,9 +58,9 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
     TextSizeUtil.TextSizeListener, SelectInputOutputFileDialog.InputOutputFileDialogListener,
     RestoreDbFile.RestoreDbFileListener, BackupDbFile.BackupDbFileListener,
     EditMasterPasswordDialogFragment.EditMasterPasswordListener {
-    /** パスワードメモRoomデータベース */
+    /** DatabaseManager を注入 */
     @Inject
-    lateinit var db: PasswordMemoRoomDatabase
+    lateinit var dbManager: DatabaseManager
     /** 設定画面のbinding */
     private lateinit var binding: FragmentSettingBinding
     /** ログインデータ管理 */
@@ -426,12 +426,12 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
             when (requestCode) {
                 // DB復元
                 RESTORE_DB -> {
-                    val restoreDbFile = RestoreDbFile(requireActivity(), this)
+                    val restoreDbFile = RestoreDbFile(requireActivity(), this, dbManager)
                     restoreDbFile.restoreSelectFolder(uri)
                 }
                 // DBバックアップ
                 BACKUP_DB -> {
-                    val backupDbFile = BackupDbFile(requireContext(), db, this)
+                    val backupDbFile = BackupDbFile(requireContext(), dbManager, this)
                     backupDbFile.backupSelectFolder(uri)
                 }
                 // CSV入力
@@ -639,7 +639,10 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
      *
      */
     override fun restoreComplete() {
-        restartActivity()
+        // 復元が完了したら DatabaseManager に tmp を本体に置き換えさせ、Flow を再接続させる
+        lifecycleScope.launch {
+            dbManager.replaceDatabaseFromTmp()
+        }
     }
 
     /**
@@ -647,20 +650,7 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
      *
      */
     override fun backupComplete() {
-        restartActivity()
-    }
-
-    /**
-     * アプリ再起動処理
-     *
-     */
-    private fun restartActivity() {
-        // 起動しているActivityをすべて削除し、新しいタスクでActivityを起動する
-        // Hilt用モジュールがActivityRetainedComponentなので、データベースとリポジトリも再読み込みされる
-        val intent = Intent(requireContext(), PasswordMemoDrawerActivity::class.java)
-        intent.flags =
-            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
+        // バックアップは既にファイル出力済みのため、DB操作は不要。アクティビティの再起動も不要のため何もしない
     }
 
     companion object {

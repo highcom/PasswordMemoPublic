@@ -6,21 +6,21 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
+import androidx.core.net.toUri
 import com.highcom.passwordmemo.R
-import com.highcom.passwordmemo.data.PasswordMemoRoomDatabase
+import com.highcom.passwordmemo.data.DatabaseManager
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.InputStream
 import java.io.OutputStream
-import java.lang.NullPointerException
 
 /**
  * DBファイルのバックアップ処理クラス
  *
  * @property context コンテキスト
  */
-class BackupDbFile (private val context: Context, private val db: PasswordMemoRoomDatabase, private val listener: BackupDbFileListener) {
+class BackupDbFile (private val context: Context, private val dbManager: DatabaseManager, private val listener: BackupDbFileListener) {
     /**
      * DBファイルバックアップ処理完了通知リスナークラス
      *
@@ -46,7 +46,7 @@ class BackupDbFile (private val context: Context, private val db: PasswordMemoRo
                     .replace(
                         ":",
                         "/"
-                    ) + System.getProperty("line.separator") + context.getString(R.string.backup_message_rear)
+                    ) + System.lineSeparator() + context.getString(R.string.backup_message_rear)
             )
             .setPositiveButton(R.string.backup_button) { _, _ -> backupDatabase(uri) }
             .setNegativeButton(R.string.cancel, null)
@@ -63,9 +63,9 @@ class BackupDbFile (private val context: Context, private val db: PasswordMemoRo
         var outputStream: OutputStream? = null
         try {
             // バックアップをする前にDBを閉じる
-            db.close()
+            dbManager.closeDatabase()
             // DBバックアップの実施
-            val path = context.getDatabasePath("PasswordMemoDB").path
+            val path = dbManager.getDatabasePath().path
             val file = File(path)
             val inputStream: InputStream = FileInputStream(file)
             outputStream = context.contentResolver.openOutputStream(uri!!)
@@ -81,7 +81,7 @@ class BackupDbFile (private val context: Context, private val db: PasswordMemoRo
                 .setPositiveButton(R.string.move) { _, _ ->
                     val intent = Intent()
                     intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                    intent.data = Uri.parse("package:" + context.packageName)
+                    intent.data = "package:${context.packageName}".toUri()
                     context.startActivity(intent)
                 }
                 .setNegativeButton(R.string.end, null)
@@ -109,8 +109,8 @@ class BackupDbFile (private val context: Context, private val db: PasswordMemoRo
         AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.backup_db))
             .setMessage(
-                uri?.path?.replace(":", "/")
-                        + System.getProperty("line.separator")
+                (uri?.path ?: "") .replace(":", "/")
+                        + System.lineSeparator()
                         + context.getString(R.string.db_backup_complete_message)
             )
             .setPositiveButton(R.string.ok, null)

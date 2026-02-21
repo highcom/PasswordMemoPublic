@@ -14,6 +14,7 @@ import androidx.annotation.WorkerThread
 import androidx.core.os.HandlerCompat
 import com.highcom.passwordmemo.R
 import com.highcom.passwordmemo.databinding.AlertProgressbarBinding
+import com.highcom.passwordmemo.data.DatabaseManager
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -29,7 +30,7 @@ import java.util.concurrent.Executors
  *
  * @param listener 復元処理完了通知リスナー
  */
-class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListener) {
+class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListener, private val dbManager: DatabaseManager) {
     /** ダイアログ表示用コンテキスト */
     private val context: Context
     /** 復元処理完了通知リスナー */
@@ -65,18 +66,9 @@ class RestoreDbFile(private val activity: Activity, listener: RestoreDbFileListe
          */
         @WorkerThread
         override fun run() {
-            val destPath = context.getDatabasePath("PasswordMemoDB").path
-            val destFile = File(destPath)
-            destFile.delete()
-            val srcPath = context.getDatabasePath("PasswordMemoDB_tmp").path
-            val srcFile = File(srcPath)
-            srcFile.renameTo(destFile)
-            val walPath = context.getDatabasePath("PasswordMemoDB-wal").path
-            val walFile = File(walPath)
-            walFile.delete()
-            val shmPath = context.getDatabasePath("PasswordMemoDB-shm").path
-            val shmFile = File(shmPath)
-            shmFile.delete()
+            // restoreDatabase() で tmp ファイル（PasswordMemoDB_tmp）へ書き込まれているため
+            // 実際の本体置換は DatabaseManager.replaceDatabaseFromTmp() 側で行う。
+            // ここではプログレスバーを進めて完了通知を行うだけにする。
             progressBar!!.progress = 100
             val postExecutor = PostExecutor()
             _handler.post(postExecutor)

@@ -15,14 +15,21 @@ class PasswordMemoRepositoryTest {
 
     private lateinit var passwordDao: PasswordDao
     private lateinit var groupDao: GroupDao
+    private lateinit var db: PasswordMemoRoomDatabase
+    private lateinit var dbManager: DatabaseManager
     private lateinit var repository: PasswordMemoRepository
 
     @Before
     fun setUp() {
         passwordDao = mockk()
         groupDao = mockk()
+        db = mockk()
+        dbManager = mockk()
+        every { db.groupDao() } returns groupDao
+        every { db.passwordDao() } returns passwordDao
+        every { dbManager.getDatabase() } returns db
         every { groupDao.getGroupList() } returns flowOf(emptyList())
-        repository = PasswordMemoRepository(passwordDao, groupDao)
+        repository = PasswordMemoRepository(dbManager)
     }
 
     /**
@@ -36,7 +43,7 @@ class PasswordMemoRepositoryTest {
             GroupEntity(groupId = 2, groupOrder = 2, name = "Group B", color = 0)
         )
         every { groupDao.getGroupList() } returns flowOf(expectedGroupList)
-        repository = PasswordMemoRepository(passwordDao, groupDao)
+        // repository already constructed with dbManager mock in setUp
 
         val result = repository.groupList
 
@@ -57,7 +64,7 @@ class PasswordMemoRepositoryTest {
             PasswordEntity(id = 2, title = "b", account = "b", password = "b", url = "test", groupId = 1, memo = "b", inputDate = "20241111", color = 0),
         )
         every { passwordDao.getPasswordList() } returns flowOf(expectedPasswords)
-        repository = PasswordMemoRepository(passwordDao, groupDao)
+        // repository already constructed
 
         val result = repository.getPasswordList(1L)
 
@@ -76,7 +83,7 @@ class PasswordMemoRepositoryTest {
         val groupId = 2L
         val expectedPasswords = listOf(PasswordEntity(id = 3, title = "c", account = "c", password = "c", url = "test", groupId = 2, memo = "c", inputDate = "20241111", color = 0))
         every { passwordDao.getSelectGroupPasswordList(groupId) } returns flowOf(expectedPasswords)
-        repository = PasswordMemoRepository(passwordDao, groupDao)
+        // repository already constructed
 
         val result = repository.getPasswordList(groupId)
 
@@ -210,8 +217,8 @@ class PasswordMemoRepositoryTest {
     @Test
     fun insertGroups_called_success() = runTest {
         val expectedGroups = listOf(
-            GroupEntity(groupId = 1, groupOrder = 1, name = "Test Group", color = 0),
-            GroupEntity(groupId = 1, groupOrder = 2, name = "Test Group2", color = 0)
+            GroupEntity(groupId = 1, groupOrder = 1, name = "A", color = 0),
+            GroupEntity(groupId = 2, groupOrder = 2, name = "B", color = 0)
         )
         coEvery { groupDao.insertGroups(expectedGroups) } just Runs
 
@@ -241,8 +248,8 @@ class PasswordMemoRepositoryTest {
     @Test
     fun updateGroups_called_success() = runTest {
         val expectedGroups = listOf(
-            GroupEntity(groupId = 1, groupOrder = 1, name = "Test Group", color = 0),
-            GroupEntity(groupId = 1, groupOrder = 2, name = "Test Group2", color = 0)
+            GroupEntity(groupId = 1, groupOrder = 1, name = "A", color = 0),
+            GroupEntity(groupId = 2, groupOrder = 2, name = "B", color = 0)
         )
         coEvery { groupDao.updateGroups(expectedGroups) } just Runs
 
@@ -257,7 +264,7 @@ class PasswordMemoRepositoryTest {
      */
     @Test
     fun deleteGroup_called_success() = runTest {
-        val groupId = 2L
+        val groupId = 1L
         coEvery { groupDao.deleteGroup(groupId) } just Runs
 
         repository.deleteGroup(groupId)
@@ -266,7 +273,7 @@ class PasswordMemoRepositoryTest {
     }
 
     /**
-     * グループデータ一括削除処理の呼び出し成功テスト
+     * グループデータ全削除処理の呼び出し成功テスト
      *
      */
     @Test
