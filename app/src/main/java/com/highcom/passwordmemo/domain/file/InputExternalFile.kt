@@ -218,7 +218,7 @@ class InputExternalFile(private val activity: Activity, private val settingViewM
 
                 if (isHeaderCorrect && isChromeCsv) {
                     val date = Date()
-                    val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+                    val sdf = SimpleDateFormat("yyyy/MM/dd")
                     val passwordEntity = PasswordEntity(
                         id = if (isOverride) id else 0,
                         title = result[0],
