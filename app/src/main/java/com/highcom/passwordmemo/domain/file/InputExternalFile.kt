@@ -220,7 +220,7 @@ class InputExternalFile(private val activity: Activity, private val settingViewM
                     val date = Date()
                     val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
                     val passwordEntity = PasswordEntity(
-                        id = id,
+                        id = if (isOverride) id else 0,
                         title = result[0],
                         account = result[2],
                         password = result[3],
@@ -233,7 +233,7 @@ class InputExternalFile(private val activity: Activity, private val settingViewM
                     passwordList?.add(passwordEntity)
                 } else if (isHeaderCorrect && columnCount == COLUMN_COUNT_6) {
                     val passwordEntity = PasswordEntity(
-                        id = id,
+                        id = if (isOverride) id else 0,
                         title = result[0],
                         account = result[1],
                         password = result[2],
@@ -265,7 +265,7 @@ class InputExternalFile(private val activity: Activity, private val settingViewM
                         }
                     }
                     val passwordEntity = PasswordEntity(
-                        id = id,
+                        id = if (isOverride) id else 0,
                         title = result[0],
                         account = result[1],
                         password = result[2],
@@ -297,7 +297,7 @@ class InputExternalFile(private val activity: Activity, private val settingViewM
                         }
                     }
                     val passwordEntity = PasswordEntity(
-                        id = id,
+                        id = if (isOverride) id else 0,
                         title = result[0],
                         account = result[1],
                         password = result[2],
