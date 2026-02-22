@@ -86,6 +86,7 @@ class DatabaseManager @Inject constructor(private val context: Context) {
         )
             .allowMainThreadQueries()
             .fallbackToDestructiveMigration()
+            .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
             .openHelperFactory(factory)
             .build()
     }
@@ -166,7 +167,7 @@ class DatabaseManager @Inject constructor(private val context: Context) {
     /**
      * データベースファイルの File オブジェクトを返すユーティリティ。
      *
-     * @return アプリが使用するデータベースファイルのパス ([PasswordMemoDB])
+     * @return アプリが使用するデータベースファイルのパス ([PasswordMemoRoomDatabase])
      */
     fun getDatabasePath(): File = context.getDatabasePath(DB_NAME)
 }

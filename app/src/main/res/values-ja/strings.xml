@@ -258,7 +258,7 @@
     <string name="about_membership_description">有料会員プランで利用可能な機能について説明</string>
     <string name="membership_plan_dialog_title">有料会員プランとは</string>
     <string name="about_membership_title_monthly_half_yearly">月額/半年/年額会員プラン</string>
-    <string name="about_membership_desc_monthly_half_yearly">・全ての画面にて広告が非表示になります。\n・登録データが100件以上でも追加登録が無制限になります。\n・パスワード自動入力設定が開放されます。\n・CSVファイル入出力機能が解放されます。</string>
+    <string name="about_membership_desc_monthly_half_yearly">・全ての画面にて広告が非表示になります。\n・登録データが100件以上でも追加登録が無制限になります。\n・パスワード自動入力設定が解放されます。\n・CSVファイル入出力機能が解放されます。</string>
     <string name="about_membership_title_remove_ads">広告の非表示(買い切り)</string>
     <string name="about_membership_desc_remove_ads">・１度の購入で広告の非表示のみが永続します。</string>
 
