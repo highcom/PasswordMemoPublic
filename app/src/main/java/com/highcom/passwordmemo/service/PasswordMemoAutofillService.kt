@@ -104,7 +104,9 @@ class PasswordMemoAutofillService : AutofillService() {
             passwords
         } else {
             passwords.filter { entity ->
-                requestDomain == extractDomain(entity.url)
+                extractDomain(entity.url)?.let { entityDomain ->
+                    areDomainsMatching(requestDomain, entityDomain)
+                } ?: false
             }
         }
 
@@ -244,6 +246,20 @@ class PasswordMemoAutofillService : AutofillService() {
         var d = domain.lowercase().trim()
         if (d.startsWith("www.")) d = d.removePrefix("www.")
         return d.ifBlank { null }
+    }
+
+    /**
+     * ドメインが部分一致するかどうかを判定する
+     *
+     * @param requestDomain リクエストドメイン
+     * @param entityDomain エンティティドメイン
+     * @return 一致する場合はtrue
+     */
+    private fun areDomainsMatching(requestDomain: String, entityDomain: String): Boolean {
+        if (requestDomain == entityDomain) return true
+        if (requestDomain.endsWith(".$entityDomain")) return true
+        if (entityDomain.endsWith(".$requestDomain")) return true
+        return false
     }
 
     /**
