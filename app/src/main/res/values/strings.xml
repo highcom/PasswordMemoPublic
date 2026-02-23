@@ -275,4 +275,5 @@
     <string name="autofill_setting_service_button">Go to settings</string>
     <string name="autofill_save_title">Save to PasswordMemo</string>
     <string name="autofill_save_message">Do you want to save this password to PasswordMemo?</string>
+    <string name="autofill_setting_annotation">*May not work depending on the site</string>
 </resources>

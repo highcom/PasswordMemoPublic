@@ -275,4 +275,5 @@
     <string name="autofill_setting_service_button">端末設定へ</string>
     <string name="autofill_save_title">パスワードメモに保存</string>
     <string name="autofill_save_message">このパスワードをパスワードメモに保存しますか？</string>
+    <string name="autofill_setting_annotation">※サイトにより機能しない場合があります</string>
 </resources>
