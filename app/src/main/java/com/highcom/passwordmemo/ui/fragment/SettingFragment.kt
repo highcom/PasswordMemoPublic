@@ -263,8 +263,7 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
 
         // このアプリを評価ボタン押下処理
         binding.rateButton.setOnClickListener {
-            val uri =
-                Uri.parse("https://play.google.com/store/apps/details?id=com.highcom.passwordmemo")
+            val uri = getString(R.string.rate_url).toUri()
             val intent = Intent(Intent.ACTION_VIEW, uri)
             startActivity(intent)
         }
@@ -276,7 +275,7 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
 
         // プライバシーポリシーボタン処理
         binding.privacyPolicyButton.setOnClickListener {
-            val uri = Uri.parse("https://high-commu.amebaownd.com/pages/2891722/page_201905200001")
+            val uri = getString(R.string.privacy_policy_url).toUri()
             val intent = Intent(Intent.ACTION_VIEW, uri)
             startActivity(intent)
         }
