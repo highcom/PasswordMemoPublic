@@ -14,8 +14,11 @@ import com.highcom.passwordmemo.data.GroupEntity
 import com.highcom.passwordmemo.data.PasswordMemoRepository
 import com.highcom.passwordmemo.domain.login.LoginDataManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executor
@@ -35,6 +38,13 @@ class LoginViewModel @Inject constructor(private val repository: PasswordMemoRep
     /** ログイン時の案内メッセージ */
     private val _keyIconRotate = MutableStateFlow(false)
     val keyIconRotate: StateFlow<Boolean> = _keyIconRotate.asStateFlow()
+    /** スキップ確認ダイアログ表示イベント */
+    private val _showSkipConfirmDialog = MutableSharedFlow<Unit>()
+    val showSkipConfirmDialog: SharedFlow<Unit> = _showSkipConfirmDialog.asSharedFlow()
+    /** ログイン成功（遷移）イベント */
+    private val _loginSuccessEvent = MutableSharedFlow<Unit>()
+    val loginSuccessEvent: SharedFlow<Unit> = _loginSuccessEvent.asSharedFlow()
+
     /** 入力パスワード */
     val editMasterPassword = MutableStateFlow("")
     /** 初回ログインかどうか */
@@ -43,6 +53,10 @@ class LoginViewModel @Inject constructor(private val repository: PasswordMemoRep
     var firstPassword: String? = null
     /** パスワード誤り回数 */
     var incorrectPwCount = 0
+
+    /** マスターパスワードが作成済みかどうか */
+    val isMasterPasswordCreated: Boolean
+        get() = loginDataManager.isMasterPasswordCreated
 
     @Suppress("DEPRECATION")
     private val handler = Handler()
@@ -194,5 +208,28 @@ class LoginViewModel @Inject constructor(private val repository: PasswordMemoRep
 
         // Displays the "log in" prompt.
         biometricPrompt.authenticate(promptInfo)
+    }
+
+    /**
+     * スキップして始めるボタン押下処理
+     */
+    fun onSkipStartClicked() {
+        viewModelScope.launch {
+            val passwordCount = repository.getPasswordCount()
+            if (passwordCount > 0 && !loginDataManager.isMasterPasswordCreated) {
+                _showSkipConfirmDialog.emit(Unit)
+            } else {
+                _loginSuccessEvent.emit(Unit)
+            }
+        }
+    }
+
+    /**
+     * スキップ確認ダイアログで進むボタン押下処理
+     */
+    fun onSkipProceed() {
+        viewModelScope.launch {
+            _loginSuccessEvent.emit(Unit)
+        }
     }
 }

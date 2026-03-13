@@ -4,7 +4,7 @@
     <string name="login">ログイン</string>
     <string name="biometrics">生体認証</string>
     <string name="input_password">パスワードを入力して下さい</string>
-    <string name="new_password">新規にパスワードを作成します</string>
+    <string name="new_password">最初にパスワードを作成します</string>
     <string name="err_empty">パスワード入力が空です</string>
     <string name="err_input_same">もう一度同じパスワードを入力して下さい</string>
     <string name="err_input_different">最初に入力したパスワードと異なるためやり直します</string>
@@ -278,4 +278,10 @@
     <string name="autofill_save_title">パスワードメモに保存</string>
     <string name="autofill_save_message">このパスワードをパスワードメモに保存しますか？</string>
     <string name="autofill_setting_annotation">※サイトにより機能しない場合があります</string>
+
+    <string name="skip_start">スキップして始める</string>
+    <string name="skip_start_annotation">ログイン用のパスワードは後から登録できます</string>
+    <string name="skip_confirm_dialog_message">セキュリティ向上のためにログイン用のマスターパスワードを設定しましょう</string>
+    <string name="proceed">続ける</string>
+    <string name="recommend">パスワード登録を推奨</string>
 </resources>

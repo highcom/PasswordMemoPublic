@@ -12,6 +12,7 @@ import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
 import androidx.core.content.ContextCompat
@@ -94,6 +95,20 @@ class LoginFragment : Fragment() {
                 if (it) {
                     binding.masterKeyIcon.startAnimation(rotateAnimation)
                 }
+            }
+        }
+
+        // スキップ確認ダイアログ表示イベントの購読
+        lifecycleScope.launch {
+            loginViewModel.showSkipConfirmDialog.collect {
+                showSkipConfirmDialog()
+            }
+        }
+
+        // ログイン成功（遷移）イベントの購読
+        lifecycleScope.launch {
+            loginViewModel.loginSuccessEvent.collect {
+                login()
             }
         }
     }
@@ -179,6 +194,8 @@ class LoginFragment : Fragment() {
         binding.navigateText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.editMasterPassword.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.loginButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.skipStartButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
+        binding.skipStartAnnotation.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
     }
 
     /**
@@ -199,5 +216,19 @@ class LoginFragment : Fragment() {
             )
         }
         findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToPasswordListFragment(firstTime = loginViewModel.firstTime))
+    }
+
+    /**
+     * スキップ確認ダイアログ表示処理
+     */
+    private fun showSkipConfirmDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.recommend)
+            .setMessage(R.string.skip_confirm_dialog_message)
+            .setPositiveButton(R.string.proceed) { _, _ ->
+                loginViewModel.onSkipProceed()
+            }
+            .setNegativeButton(R.string.back, null)
+            .show()
     }
 }

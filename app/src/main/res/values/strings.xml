@@ -278,4 +278,10 @@
     <string name="autofill_save_title">Save to PasswordMemo</string>
     <string name="autofill_save_message">Do you want to save this password to PasswordMemo?</string>
     <string name="autofill_setting_annotation">*May not work depending on the site</string>
+
+    <string name="skip_start">Skip and start</string>
+    <string name="skip_start_annotation">* You can register your login password later.</string>
+    <string name="skip_confirm_dialog_message">Let\'s set a master password for login to improve security.</string>
+    <string name="proceed">Proceed</string>
+    <string name="recommend">Password registration is recommended</string>
 </resources>
