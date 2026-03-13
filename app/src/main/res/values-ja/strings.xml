@@ -281,7 +281,7 @@
     <string name="autofill_setting_annotation">※サイトにより機能しない場合があります</string>
 
     <string name="skip_start">スキップして始める</string>
-    <string name="skip_start_annotation">ログイン用のパスワードは後から登録できます</string>
+    <string name="skip_start_annotation">※ログイン用のパスワードは後からでも登録できます</string>
     <string name="skip_confirm_dialog_message">セキュリティ向上のためにログイン用のマスターパスワードを設定しましょう</string>
     <string name="proceed">続ける</string>
     <string name="recommend">パスワード登録を推奨</string>

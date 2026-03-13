@@ -195,7 +195,7 @@ class LoginFragment : Fragment() {
         binding.editMasterPassword.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
         binding.loginButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
         binding.skipStartButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
-        binding.skipStartAnnotation.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size)
+        binding.skipStartAnnotation.setTextSize(TypedValue.COMPLEX_UNIT_DIP, size - 3)
     }
 
     /**
