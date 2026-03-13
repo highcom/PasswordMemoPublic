@@ -76,7 +76,7 @@ class LoginFragment : Fragment() {
         rotateAnimation?.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation) {}
             override fun onAnimationEnd(animation: Animation) {
-                login()
+                login(false)
             }
 
             override fun onAnimationRepeat(animation: Animation) {}
@@ -107,8 +107,8 @@ class LoginFragment : Fragment() {
 
         // ログイン成功（遷移）イベントの購読
         lifecycleScope.launch {
-            loginViewModel.loginSuccessEvent.collect {
-                login()
+            loginViewModel.loginSuccessEvent.collect { isSkipStart ->
+                login(isSkipStart)
             }
         }
     }
@@ -202,8 +202,9 @@ class LoginFragment : Fragment() {
      * ログイン処理
      * * パスワード誤り回数などをリセットして次画面に遷移する
      *
+     * @param isSkipStart スキップして始めたかどうか
      */
-    private fun login() {
+    private fun login(isSkipStart: Boolean) {
         loginViewModel.incorrectPwCount = 0
         loginViewModel.firstPassword = null
         // キーボードは閉じる
@@ -215,7 +216,7 @@ class LoginFragment : Fragment() {
                 InputMethodManager.HIDE_NOT_ALWAYS
             )
         }
-        findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToPasswordListFragment(firstTime = loginViewModel.firstTime))
+        findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToPasswordListFragment(firstTime = loginViewModel.firstTime, isSkipStart = isSkipStart))
     }
 
     /**

@@ -41,9 +41,9 @@ class LoginViewModel @Inject constructor(private val repository: PasswordMemoRep
     /** スキップ確認ダイアログ表示イベント */
     private val _showSkipConfirmDialog = MutableSharedFlow<Unit>()
     val showSkipConfirmDialog: SharedFlow<Unit> = _showSkipConfirmDialog.asSharedFlow()
-    /** ログイン成功（遷移）イベント */
-    private val _loginSuccessEvent = MutableSharedFlow<Unit>()
-    val loginSuccessEvent: SharedFlow<Unit> = _loginSuccessEvent.asSharedFlow()
+    /** ログイン成功（遷移）イベント。引数はスキップして始めたかどうか */
+    private val _loginSuccessEvent = MutableSharedFlow<Boolean>()
+    val loginSuccessEvent: SharedFlow<Boolean> = _loginSuccessEvent.asSharedFlow()
 
     /** 入力パスワード */
     val editMasterPassword = MutableStateFlow("")
@@ -219,7 +219,7 @@ class LoginViewModel @Inject constructor(private val repository: PasswordMemoRep
             if (passwordCount > 0 && !loginDataManager.isMasterPasswordCreated) {
                 _showSkipConfirmDialog.emit(Unit)
             } else {
-                _loginSuccessEvent.emit(Unit)
+                _loginSuccessEvent.emit(true)
             }
         }
     }
@@ -229,7 +229,7 @@ class LoginViewModel @Inject constructor(private val repository: PasswordMemoRep
      */
     fun onSkipProceed() {
         viewModelScope.launch {
-            _loginSuccessEvent.emit(Unit)
+            _loginSuccessEvent.emit(true)
         }
     }
 }

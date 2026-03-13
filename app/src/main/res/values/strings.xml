@@ -58,6 +58,7 @@
     <string name="select_group">Edit group</string>
     <string name="setting_menu">Settings</string>
     <string name="empty_prompt_message">Register your password from the bottom right button</string>
+    <string name="registration_coach_mark">Register here</string>
 
     <string name="back">back</string>
     <string name="title_top">Title</string>

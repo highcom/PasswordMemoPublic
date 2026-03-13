@@ -58,6 +58,7 @@
     <string name="select_group">グループ編集</string>
     <string name="setting_menu">設定</string>
     <string name="empty_prompt_message">右下のボタンからパスワード登録ができます</string>
+    <string name="registration_coach_mark">ここから登録できます</string>
 
     <string name="back">戻る</string>
     <string name="title_top">タイトル</string>

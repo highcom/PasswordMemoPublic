@@ -200,6 +200,13 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
         recyclerView!!.layoutManager = LinearLayoutManager(context)
         recyclerView!!.adapter = adapter
 
+        // 渡されたデータを取得する
+        val args: PasswordListFragmentArgs by navArgs()
+        if (args.firstTime) {
+            operationInstructionDialog()
+        }
+        val isSkipStart = args.isSkipStart
+
         // 選択されているグループのパスワード一覧を設定する
         passwordListViewModel.setSelectGroup(loginDataManager.selectGroup)
         @Suppress("DEPRECATION")
@@ -211,8 +218,13 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
 
                 if (list.isEmpty()) {
                     binding.emptyPrompt.visibility = View.VISIBLE
+                    // スキップして始めた場合はコーチマークを表示する
+                    if (isSkipStart) {
+                        binding.coachMarkContainer.visibility = View.VISIBLE
+                    }
                 } else {
                     binding.emptyPrompt.visibility = View.GONE
+                    binding.coachMarkContainer.visibility = View.GONE
                 }
 
                 // データ更新後にスクロール位置を復元
@@ -318,6 +330,8 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
 
         // フローティングボタンからの新規追加処理
         binding.fab.setOnClickListener {
+            // コーチマークが表示されている場合は非表示にする
+            binding.coachMarkContainer.visibility = View.GONE
             val passwordEditData = PasswordEditData()
             // 選択されているグループIDを設定
             passwordEditData.groupId = loginDataManager.selectGroup
@@ -325,12 +339,6 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
             LimitCheckUtil.checkAndNavigate(this@PasswordListFragment, billingViewModel) {
                 findNavController().navigate(PasswordListFragmentDirections.actionPasswordListFragmentToInputPasswordFragment(editData = passwordEditData))
             }
-        }
-
-        // 渡されたデータを取得する
-        val args: PasswordListFragmentArgs by navArgs()
-        if (args.firstTime) {
-            operationInstructionDialog()
         }
     }
 
