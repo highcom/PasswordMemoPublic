@@ -158,8 +158,8 @@ class PasswordListFragment : Fragment(), PasswordListAdapter.AdapterListener {
                     return@ShowRateDialogCondition true
                 }
 
-                // 現在のアプリのバージョンで7回以上起動したか
-                if (appThisVersionCodeLaunchCount < 7) {
+                // 現在のアプリのバージョンで20回以上起動したか
+                if (appThisVersionCodeLaunchCount < 20) {
                     return@ShowRateDialogCondition false
                 }
                 // ダイアログで「いいえ」を選択していないか
