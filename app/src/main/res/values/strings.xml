@@ -201,11 +201,19 @@
 
     <string name="safe_color_none">None</string>
     <string name="safe_color_red">Red</string>
-    <string name="safe_color_yellow_red">Yellow red</string>
+    <string name="safe_color_yellow_red">Orange</string>
     <string name="safe_color_yellow">Yellow</string>
     <string name="safe_color_green">Green</string>
     <string name="safe_color_blue">Blue</string>
     <string name="safe_color_purple">Purple</string>
+
+    <string name="pastel_color_creme">Pastel Creme</string>
+    <string name="pastel_color_pink">Pastel Pink</string>
+    <string name="pastel_color_yellow_red">Pastel Orange</string>
+    <string name="pastel_color_yellow">Yellow</string>
+    <string name="pastel_color_green">Pastel Green</string>
+    <string name="pastel_color_blue">Pastel Blue</string>
+    <string name="pastel_color_purple">Pastel Purple</string>
 
     <string name="size_small">S</string>
     <string name="size_medium">M</string>

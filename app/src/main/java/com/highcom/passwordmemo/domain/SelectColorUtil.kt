@@ -22,7 +22,7 @@ import com.highcom.passwordmemo.ui.list.ColorItem
 @Suppress("DEPRECATION")
 class SelectColorUtil(val colors: List<ColorItem>, listener: SelectColorListener?) {
     /** 色設定通知用リスナー */
-    private var selectColorListener: SelectColorListener?
+    private var selectColorListener: SelectColorListener? = listener
 
     /**
      * 色設定通知用リスナークラス
@@ -35,10 +35,6 @@ class SelectColorUtil(val colors: List<ColorItem>, listener: SelectColorListener
          * @param color 選択色
          */
         fun onSelectColorClicked(color: Int)
-    }
-
-    init {
-        selectColorListener = listener
     }
 
     /**
@@ -60,19 +56,25 @@ class SelectColorUtil(val colors: List<ColorItem>, listener: SelectColorListener
      * @param context コンテキスト
      * @return 色選択ダイアログ
      */
-    fun createSelectColorDialog(context: Context): AlertDialog {
+    fun createSelectColorDialog(context: Context, numColumns: Int): AlertDialog {
         val binding = AlertSelectColorBinding.inflate(LayoutInflater.from(context))
         val alertDialog = AlertDialog.Builder(context)
             .setView(binding.root)
             .create()
         alertDialog.show()
-        val listView = binding.colorListView
+        val gridView = binding.colorGridView
+        gridView.numColumns = numColumns
         val adapter = ColorAdapter(context, R.layout.row_color, colors)
-        listView.adapter = adapter
-        listView.onItemClickListener = OnItemClickListener { _, _, i, _ ->
+        gridView.adapter = adapter
+        gridView.onItemClickListener = OnItemClickListener { _, _, i, _ ->
             colors[i].colorCode?.let { selectColorListener?.onSelectColorClicked(it) }
             alertDialog.dismiss()
         }
         return alertDialog
+    }
+
+    companion object {
+        const val NUM_COLUMNS_1 = 1
+        const val NUM_COLUMNS_2 = 2
     }
 }

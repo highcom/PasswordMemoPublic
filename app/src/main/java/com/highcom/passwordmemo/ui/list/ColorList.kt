@@ -21,16 +21,30 @@ object ColorList {
             ColorItem(PasswordMemoApplication.instance.getString(R.string.color_palegreen), ContextCompat.getColor(PasswordMemoApplication.instance, R.color.palegreen))
         )
     }
-    /** 安全色 */
-    val safeColors: List<ColorItem> by lazy {
+    /** アイコン色 */
+    val iconColors: List<ColorItem> by lazy {
         listOf(
+            // 1列目：安全色等 / 2列目：パステルカラー
             ColorItem(PasswordMemoApplication.instance.getString(R.string.safe_color_none), 0),
+            ColorItem(PasswordMemoApplication.instance.getString(R.string.pastel_color_creme), ContextCompat.getColor(PasswordMemoApplication.instance, R.color.pastel_creme)),
+
             ColorItem(PasswordMemoApplication.instance.getString(R.string.safe_color_red), ContextCompat.getColor(PasswordMemoApplication.instance, R.color.safe_red)),
+            ColorItem(PasswordMemoApplication.instance.getString(R.string.pastel_color_pink), ContextCompat.getColor(PasswordMemoApplication.instance, R.color.pastel_pink)),
+
             ColorItem(PasswordMemoApplication.instance.getString(R.string.safe_color_yellow_red), ContextCompat.getColor(PasswordMemoApplication.instance, R.color.safe_yellow_red)),
+            ColorItem(PasswordMemoApplication.instance.getString(R.string.pastel_color_yellow_red), ContextCompat.getColor(PasswordMemoApplication.instance, R.color.pastel_yellow_red)),
+
             ColorItem(PasswordMemoApplication.instance.getString(R.string.safe_color_yellow), ContextCompat.getColor(PasswordMemoApplication.instance, R.color.safe_yellow)),
+            ColorItem(PasswordMemoApplication.instance.getString(R.string.pastel_color_yellow), ContextCompat.getColor(PasswordMemoApplication.instance, R.color.pastel_yellow)),
+
             ColorItem(PasswordMemoApplication.instance.getString(R.string.safe_color_green), ContextCompat.getColor(PasswordMemoApplication.instance, R.color.safe_green)),
+            ColorItem(PasswordMemoApplication.instance.getString(R.string.pastel_color_green), ContextCompat.getColor(PasswordMemoApplication.instance, R.color.pastel_green)),
+
             ColorItem(PasswordMemoApplication.instance.getString(R.string.safe_color_blue), ContextCompat.getColor(PasswordMemoApplication.instance, R.color.safe_blue)),
-            ColorItem(PasswordMemoApplication.instance.getString(R.string.safe_color_purple), ContextCompat.getColor(PasswordMemoApplication.instance, R.color.safe_purple))
+            ColorItem(PasswordMemoApplication.instance.getString(R.string.pastel_color_blue), ContextCompat.getColor(PasswordMemoApplication.instance, R.color.pastel_blue)),
+
+            ColorItem(PasswordMemoApplication.instance.getString(R.string.safe_color_purple), ContextCompat.getColor(PasswordMemoApplication.instance, R.color.safe_purple)),
+            ColorItem(PasswordMemoApplication.instance.getString(R.string.pastel_color_purple), ContextCompat.getColor(PasswordMemoApplication.instance, R.color.pastel_purple))
         )
     }
 }

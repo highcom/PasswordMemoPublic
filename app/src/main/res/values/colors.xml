@@ -12,6 +12,7 @@
     <color name="deepgreen">#21FFC0</color>
 
     <color name="darkgray">#888888</color>
+    <color name="icon_gray">#c7c7cb</color>
 
     <color name="underlay_red">#FF3C30</color>
     <color name="underlay_gray">#C7C7CB</color>
@@ -30,6 +31,14 @@
     <color name="safe_green">#00b06b</color>
     <color name="safe_blue">#1971ff</color>
     <color name="safe_purple">#990099</color>
+
+    <color name="pastel_creme">#fff8e1</color>
+    <color name="pastel_pink">#ffd1dc</color>
+    <color name="pastel_yellow_red">#ffd180</color>
+    <color name="pastel_yellow">#fff39d</color>
+    <color name="pastel_green">#a5d6a7</color>
+    <color name="pastel_blue">#a7c7e7</color>
+    <color name="pastel_purple">#cdb4db</color>
 
     <!-- テキスト色 -->
     <color name="text_primary">#000000</color>

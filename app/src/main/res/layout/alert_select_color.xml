@@ -2,9 +2,13 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <ListView
-        android:id="@+id/color_list_view"
+    <GridView
+        android:id="@+id/color_grid_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:numColumns="2"
+        android:stretchMode="columnWidth"
+        android:background="@color/icon_gray"
+        android:gravity="center"/>
 
 </FrameLayout>

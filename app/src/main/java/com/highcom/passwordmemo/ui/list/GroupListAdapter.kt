@@ -228,8 +228,8 @@ class GroupListAdapter(
                 holder.binding.folderIcon.setImageDrawable(drawable)
                 // 編集モードではない状態でタップされた場合は選択されたとみなす
                 holder.binding.folderIcon.setOnClickListener { view: View ->
-                    // 安全色を設定
-                    val selectColorUtil = SelectColorUtil(ColorList.safeColors, object : SelectColorUtil.SelectColorListener {
+                    // アイコン色を設定
+                    val selectColorUtil = SelectColorUtil(ColorList.iconColors, object : SelectColorUtil.SelectColorListener {
                         /**
                          * 色選択処理
                          *
@@ -252,7 +252,7 @@ class GroupListAdapter(
                             }
                         }
                     })
-                    selectColorUtil.createSelectColorDialog(view.context)
+                    selectColorUtil.createSelectColorDialog(view.context, SelectColorUtil.NUM_COLUMNS_2)
                 }
                 // グループ名称を選択された場合はイベントを発生
                 holder.binding.groupName.setOnClickListener { view: View ->

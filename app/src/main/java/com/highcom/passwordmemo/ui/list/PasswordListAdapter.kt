@@ -233,8 +233,8 @@ class PasswordListAdapter(
                 holder.binding.roundKeyIcon.setImageDrawable(drawable)
                 // アイテムクリック時ののイベントを追加
                 holder.binding.roundKeyIcon.setOnClickListener { view ->
-                    // 安全色を設定
-                    val selectColorUtil = SelectColorUtil(ColorList.safeColors, object : SelectColorUtil.SelectColorListener {
+                    // アイコン色を設定
+                    val selectColorUtil = SelectColorUtil(ColorList.iconColors, object : SelectColorUtil.SelectColorListener {
                         /**
                          * 色選択処理
                          *
@@ -256,7 +256,7 @@ class PasswordListAdapter(
                             }
                         }
                     })
-                    selectColorUtil.createSelectColorDialog(view.context)
+                    selectColorUtil.createSelectColorDialog(view.context, SelectColorUtil.NUM_COLUMNS_2)
                 }
                 holder.binding.rowLinearLayout.setOnClickListener {
                     holder.binding.passwordEntity?.let { adapterListener.onAdapterClicked(it) }

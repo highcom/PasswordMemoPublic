@@ -457,7 +457,7 @@ class SettingFragment : Fragment(), SelectColorUtil.SelectColorListener,
     private fun colorSelectDialog() {
         // 背景色を設定
         val selectColorUtil = SelectColorUtil(ColorList.backgroundColors, this)
-        selectColorUtil.createSelectColorDialog(requireContext())
+        selectColorUtil.createSelectColorDialog(requireContext(), SelectColorUtil.NUM_COLUMNS_1)
     }
 
     /**

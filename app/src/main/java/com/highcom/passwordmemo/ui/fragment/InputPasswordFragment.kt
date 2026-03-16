@@ -1,7 +1,6 @@
 package com.highcom.passwordmemo.ui.fragment
 
 import android.annotation.SuppressLint
-import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
 import androidx.fragment.app.Fragment
@@ -15,7 +14,6 @@ import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.FrameLayout
 import android.widget.Spinner
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
@@ -35,7 +33,6 @@ import com.highcom.passwordmemo.domain.AdBanner
 import com.highcom.passwordmemo.domain.DarkModeUtil
 import com.highcom.passwordmemo.domain.SelectColorUtil
 import com.highcom.passwordmemo.domain.login.LoginDataManager
-import com.highcom.passwordmemo.ui.list.ColorItem
 import com.highcom.passwordmemo.ui.list.ColorList
 import com.highcom.passwordmemo.ui.viewmodel.BillingViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -148,8 +145,8 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
         binding.inputRoundKeyIcon.setImageDrawable(drawable)
         // アイテムクリック時ののイベントを追加
         binding.inputRoundKeyIcon.setOnClickListener { iconView ->
-            // 安全色を設定
-            val selectColorUtil = SelectColorUtil(ColorList.safeColors, object : SelectColorUtil.SelectColorListener {
+            // アイコン色を設定
+            val selectColorUtil = SelectColorUtil(ColorList.iconColors, object : SelectColorUtil.SelectColorListener {
                 /**
                  * 色選択処理
                  *
@@ -168,7 +165,7 @@ class InputPasswordFragment : Fragment(), GeneratePasswordDialogFragment.Generat
                     passwordEditData.color = color
                 }
             })
-            selectColorUtil.createSelectColorDialog(iconView.context)
+            selectColorUtil.createSelectColorDialog(iconView.context, SelectColorUtil.NUM_COLUMNS_2)
         }
 
         selectGroupNames = ArrayList()
