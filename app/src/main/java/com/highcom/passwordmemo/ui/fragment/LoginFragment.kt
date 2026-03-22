@@ -205,6 +205,11 @@ class LoginFragment : Fragment() {
      * @param isSkipStart スキップして始めたかどうか
      */
     private fun login(isSkipStart: Boolean) {
+        // 現在の画面が LoginFragment であることを確認し、二重遷移を防止する
+        if (findNavController().currentDestination?.id != R.id.loginFragment) {
+            return
+        }
+
         loginViewModel.incorrectPwCount = 0
         loginViewModel.firstPassword = null
         // キーボードは閉じる
