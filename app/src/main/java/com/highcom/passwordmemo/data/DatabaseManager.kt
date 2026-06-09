@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,7 +23,7 @@ import javax.inject.Singleton
  * UI/Repository はこれを注入して DAO を都度取得するか、dbRecreated をトリガーに Flow を切り替える。
  */
 @Singleton
-class DatabaseManager @Inject constructor(private val context: Context) {
+class DatabaseManager @Inject constructor(@ApplicationContext private val context: Context) {
     companion object {
         private const val DB_NAME = "PasswordMemoDB"
         private const val TMP_DB_NAME = "PasswordMemoDB_tmp"
