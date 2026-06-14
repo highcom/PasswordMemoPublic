@@ -4,9 +4,9 @@ import android.content.Context
 import android.util.Log
 import androidx.room.Room
 import com.highcom.passwordmemo.R
-import net.sqlcipher.database.SQLiteDatabase
-import net.sqlcipher.database.SQLiteDatabaseHook
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SQLiteConnection
+import net.zetetic.database.sqlcipher.SQLiteDatabaseHook
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -63,22 +63,19 @@ class DatabaseManager @Inject constructor(@ApplicationContext private val contex
      */
     private fun buildDatabase(): PasswordMemoRoomDatabase {
         // mirror PasswordMemoModule configuration (cipher, migrations, hooks)
-        val passphrase = SQLiteDatabase.getBytes(context.getString(R.string.db_secret_key).toCharArray())
-        val factory = SupportFactory(passphrase, object : SQLiteDatabaseHook {
-            override fun preKey(database: SQLiteDatabase?) {}
-            override fun postKey(database: SQLiteDatabase?) {
-                val cursor = database?.rawQuery("PRAGMA cipher_migrate", null)
-                var migrationOccurred = false
-                if (cursor?.count == 1) {
-                    cursor.moveToFirst()
-                    val selection: String = cursor.getString(0)
-                    migrationOccurred = selection == "0"
-                    Log.d("selection", selection)
+        val passphrase = context.getString(R.string.db_secret_key).toByteArray()
+        val factory = SupportOpenHelperFactory(passphrase, object : SQLiteDatabaseHook {
+            override fun preKey(connection: SQLiteConnection?) {}
+            override fun postKey(connection: SQLiteConnection?) {
+                try {
+                    // net.zetetic.database.sqlcipher.SQLiteConnection does not have executeForString in some versions,
+                    // let's check if we can just execute it.
+                    connection?.executeRaw("PRAGMA cipher_migrate", null, null)
+                } catch (e: Exception) {
+                    Log.e(TAG, "cipher_migrate failed", e)
                 }
-                cursor?.close()
-                Log.d("migrationOccurred:", migrationOccurred.toString())
             }
-        })
+        }, true)
 
         return Room.databaseBuilder(
             context.applicationContext,

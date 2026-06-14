@@ -86,7 +86,7 @@ dependencies {
             because 'previous versions have a bug impacting this application'
         }
     }
-    implementation 'net.zetetic:android-database-sqlcipher:4.5.4'
+    implementation 'net.zetetic:sqlcipher-android:4.6.1@aar'
     implementation 'com.google.firebase:firebase-analytics:22.1.2'
     implementation 'com.google.firebase:firebase-ads:23.6.0'
     implementation 'com.google.firebase:firebase-crashlytics:19.3.0'

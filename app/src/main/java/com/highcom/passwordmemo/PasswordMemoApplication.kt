@@ -16,6 +16,7 @@ class PasswordMemoApplication : Application() {
     }
     override fun onCreate() {
         super.onCreate()
+        System.loadLibrary("sqlcipher")
         ProcessLifecycleOwner.get().lifecycle.addObserver(PasswordMemoLifecycle())
         instance = this
     }
